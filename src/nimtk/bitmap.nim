@@ -5,7 +5,7 @@ import ../nimtk
 import ./image
 
 type
-  Bitmap = ref object of Image
+  Bitmap* = ref object of Image
 
 proc newBitmap*(tk: Tk, file: string, config: openArray[(string, string)] = {:}): Bitmap =
   new result

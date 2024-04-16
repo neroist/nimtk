@@ -1,6 +1,7 @@
 import std/strutils
 
 import ./toplevel
+import ./bitmap
 import ./widget
 import ./root
 import ../nimtk
@@ -8,7 +9,32 @@ import ../nimtk
 type
   Window* = Toplevel or Root
 
-proc wm_aspect*(w: Widget, minNumer, minDenom, maxNumer, maxDenom: int) = w.tk.call("wm aspect", w, $minNumer, $minDenom, $maxNumer, $maxDenom)
+template lucky(op: string) {.dirty.} =
+  let rest = initarr[1].split(op)
+
+  result.height = rest[0].parseInt
+  result.x = rest[1].parseInt
+  result.y = rest[2].parseInt
+
+  when op == "-":
+    result.x = -result.x
+    result.y = -result.y
+
+template unlucky(op, op2: string) {.dirty.} =
+  let
+    piece1 {.gensym.} = initarr[1].split(op)
+    piece2 {.gensym.} = piece1[1].split(op2)
+
+  result.height = piece1[0].parseInt()
+  result.x = piece2[0].parseInt()
+  result.y = piece2[1].parseInt()
+
+  when op == "-":
+    result.x = -result.x
+  else:
+    result.y = -result.y
+
+proc wm_aspect*(w: Widget, minNumer, minDenom, maxNumer, maxDenom: int or string) = w.tk.call("wm aspect", w, $minNumer, $minDenom, $maxNumer, $maxDenom)
 proc wm_aspect*(w: Widget): array[4, int] =
   w.tk.call("wm aspect", w)
 
@@ -54,6 +80,9 @@ proc wm_attributes*(w: Widget, option, val: string) = w.tk.call("wm attributes",
 #     -zoomed 
 
 proc wm_client*(w: Widget, name: string) = w.tk.call("wm client", w, name)
+proc wm_client*(w: Widget): string =
+  w.tk.call("wm client", w)
+  w.tk.result
 proc wm_colormapwindows*(w: Widget, windowList: seq[Widget]) = w.tk.call("wm colormapwindows", w, windowList.join(" "))
 proc wm_colormapwindows*(w: Widget): seq[Widget] =
   w.tk.call("wm colormapwindows", w)
@@ -61,6 +90,9 @@ proc wm_colormapwindows*(w: Widget): seq[Widget] =
   for win in w.tk.result.split(" "):
     result.add w.tk.newWidgetFromPathname(win)
 proc wm_command*(w: Widget, value: string) = w.tk.call("wm command", w, value)
+proc wm_command*(w: Widget): string =
+  w.tk.call("wm command", w)
+  w.tk.result
 proc wm_deiconify*(w: Widget) = w.tk.call("wm deiconify", w)
 proc wm_focusmodel*(w: Widget, focusmodel: FocusModel) = w.tk.call("wm focusmodel", w, focusmodel)
 proc wm_focusmodel*(w: Widget): FocusModel =
@@ -77,31 +109,6 @@ proc wm_geometry*(w: Widget, x, y: int) =
 
   w.tk.call("wm geometry", w, xstr & ystr)
 proc wm_geometry*(w: Widget): tuple[width, height, x, y: int] =
-  template lucky(op: string) {.dirty.} =
-    let rest = initarr[1].split(op)
-
-    result.height = rest[0].parseInt
-    result.x = rest[1].parseInt
-    result.y = rest[2].parseInt
-
-    when op == "-":
-      result.x = -result.x
-      result.y = -result.y
-
-  template unlucky(op, op2: string) {.dirty.} =
-    let
-      piece1 {.gensym.} = initarr[1].split(op)
-      piece2 {.gensym.}= piece1[1].split(op2)
-
-    result.height = piece1[0].parseInt()
-    result.x = piece2[0].parseInt()
-    result.y = piece2[1].parseInt()
-
-    when op == "-":
-      result.x = -result.x
-    else:
-      result.y = -result.y
-
   w.tk.call("wm geometry", w)
   
   let initarr = w.tk.result.split("x")
@@ -118,27 +125,45 @@ proc wm_geometry*(w: Widget): tuple[width, height, x, y: int] =
       unlucky("-", "+")
     else:
       unlucky("+", "-")
+proc wm_grid*(w: Widget, baseWidth, baseHeight, widthInc, heightInc: int) = 
+  w.tk.call("wm grid", w, $baseWidth, $baseHeight, $widthInc, $heightInc)
+proc wm_grid*(w: Widget): array[4, int] = 
+  w.tk.call("wm grid", w)
 
-# proc wm_grid*(w: Widget ?baseWidth baseHeight widthInc heightInc? 
-# proc wm_group*(w: Widget ?pathName? 
-# proc wm_iconbitmap*(w: Widget ?bitmap?
-# # wm_iconbitmap window ?-default? ?image? 
-# proc wm_iconify*(w: Widget 
-# proc wm_iconmask*(w: Widget ?bitmap? 
-# proc wm_iconname*(w: Widget ?newName? 
-# proc wm_iconphoto*(w: Widget ?-default? image1 ?image2 ...? 
-# proc wm_iconposition*(w: Widget ?x y? 
-# proc wm_iconwindow*(w: Widget ?pathName? 
-# proc wm_manage*(w: Widget 
-# proc wm_maxsize*(w: Widget ?width height? 
-# proc wm_minsize*(w: Widget ?width height? 
-# proc wm_overrideredirect*(w: Widget ?boolean? 
-# proc wm_positionfrom*(w: Widget ?who? 
-# proc wm_protocol*(w: Widget ?name? ?command? 
-# proc wm_resizable*(w: Widget ?width height? 
-# proc wm_sizefrom*(w: Widget ?who? 
-# proc wm_stackorder*(w: Widget ?isabove|isbelow window? 
-# proc wm_state*(w: Widget ?newstate? 
-# proc wm_title*(w: Widget ?string? 
-# proc wm_transient*(w: Widget ?container? 
-# proc wm_withdraw*(w: Widget 
+  let res = w.tk.result.split(" ")
+
+  for idx, num in res:
+    result[idx] = num.parseInt()
+proc wm_group*(w: Widget, leader: Widget or string) = w.tk.call("wm group", w, leader)
+proc wm_group*(w: Widget): Widget =
+  w.tk.call("wm group", w)
+
+  if w.tk.result.len == 0: return nil
+  else: return w.tk.newWidgetFromPathname(w.tk.result)
+proc wm_iconbitmap*(w: Widget, bitmap: string, default: bool = false) =
+  if default:
+    w.tk.call("wm iconbitmap", w, "-default", bitmap)
+  else:
+    w.tk.call("wm iconbitmap", w, '$' & $bitmap)
+
+  w.tk.call("wm iconbitmap", w)
+  echo w.tk.result
+# proc wm_iconify*(w: Widget) = discard
+# proc wm_iconmask*(w: Widget ?bitmap?) = discard
+# proc wm_iconname*(w: Widget ?newName?) = discard
+# proc wm_iconphoto*(w: Widget ?-default? image1 ?image2 ...?) = discard
+# proc wm_iconposition*(w: Widget ?x y?) = discard
+# proc wm_iconwindow*(w: Widget ?pathName?) = discard
+# proc wm_manage*(w: Widget) = discard
+# proc wm_maxsize*(w: Widget ?width height?) = discard
+# proc wm_minsize*(w: Widget ?width height?) = discard
+# proc wm_overrideredirect*(w: Widget ?boolean?) = discard
+# proc wm_positionfrom*(w: Widget ?who?) = discard
+# proc wm_protocol*(w: Widget ?name? ?command?) = discard
+# proc wm_resizable*(w: Widget ?width height?) = discard
+# proc wm_sizefrom*(w: Widget ?who?) = discard
+# proc wm_stackorder*(w: Widget ?isabove|isbelow window?) = discard
+# proc wm_state*(w: Widget ?newstate?) = discard
+# proc wm_title*(w: Widget ?string?) = discard
+# proc wm_transient*(w: Widget ?container?) = discard
+# proc wm_withdraw*(w: Widget) = discard
