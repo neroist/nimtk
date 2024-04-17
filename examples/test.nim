@@ -1,9 +1,13 @@
 import std/colors
 
+import ../src/nimtk/widgets
 import ../src/nimtk
 
 let tk = newTk() # create tck & tk interpreter
 let root = tk.getRoot() # get main (root) window
+
+root.title = "test.nim"
+root.resizable = false
 
 # create two buttons
 let frame = root.newFrame()
@@ -11,11 +15,10 @@ let msg = frame.newMessage()
 let button = frame.newButton("this")
 let button2 = frame.newButton("meow")
 
-
 # create image from file
 let bitmap = tk.newBitmap(file="./meow.bitmap")
 
-frame.pack(expand = true, padx = 25, pady = 25)
+frame.pack(padx = 25, pady = 25)
 frame.relief = Solid
 frame.borderwidth = 2
 

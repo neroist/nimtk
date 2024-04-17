@@ -251,7 +251,7 @@ proc eval*(tk: Tk, cmd: string): int {.discardable.} =
     echo "[TK RETURN] ", result
     echo "[TK RESULT] ", tk.interp.getStringResult(), "\n"
 
-  if result != TCL_OK and not nimTkDebug:
+  if result != TCL_OK:
     raise newException(
       TkError,
       "Error when evaluating Tcl!\n" &
@@ -300,36 +300,3 @@ proc newTk*(): Tk =
     )
 
   result.init()
-
-# exports!
-# these should be sorted by section then length
-
-import
-  ./nimtk/bitmap,
-  ./nimtk/button,
-  ./nimtk/frame,
-  ./nimtk/image,
-  ./nimtk/label,
-  ./nimtk/labelframe,
-  ./nimtk/message,
-  ./nimtk/root,
-  ./nimtk/toplevel,
-  ./nimtk/variables,
-  ./nimtk/widget,
-  ./nimtk/wm
-
-export
-  exceptions,
-
-  bitmap,
-  button,
-  frame,
-  image,
-  label,
-  labelframe,
-  message,
-  root,
-  toplevel,
-  variables,
-  widget,
-  wm

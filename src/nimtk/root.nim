@@ -9,3 +9,7 @@ proc getRoot*(tk: Tk): Root =
 
   result.pathname = "."
   result.tk = tk
+
+# !!! better approach?
+# converter rootToTk*(root: Root): Tk =
+#   root.tk
