@@ -9,7 +9,7 @@ type
 proc newMessage*(parent: Widget): Message =
   new result
 
-  result.pathname = pathname(parent.pathname, genName())
+  result.pathname = pathname(parent.pathname, genName("message_"))
   result.tk = parent.tk
 
   discard result.tk.call("message", result.pathname)

@@ -29,7 +29,12 @@ proc genName*(start: string): string =
 template newTkVarImpl(tk: Tk, val1: float or bool or string) {.dirty.} =
   new result
 
-  result.varname = genName()
+  when val1 is float:
+    result.varname = genName("float_")
+  elif val1 is bool:
+    result.varname = genName("bool_")
+  else:
+    result.varname = genName("string_")
   result.tk = tk
 
   discard tk.call("set", result.varname, $val1)

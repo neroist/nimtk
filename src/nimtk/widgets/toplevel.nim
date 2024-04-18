@@ -9,7 +9,7 @@ type
 proc newToplevel*(parent: Widget, class: string = "", container: bool = false, visual: string = "", colormap: string = "new", screen: string = "", use: string = ""): Toplevel =
   new result
 
-  result.pathname = pathname(parent.pathname, genName())
+  result.pathname = pathname(parent.pathname, genName("toplevel_"))
   result.tk = parent.tk
 
   discard result.tk.call(

@@ -11,7 +11,7 @@ type
   Window* = Toplevel or Root
 
 template lucky(op: string) {.dirty.} =
-  let rest {.gensym.} = initarr[1].split(op)
+  let rest = initarr[1].split(op)
 
   result.height = rest[0].parseInt
   result.x = rest[1].parseInt
@@ -23,8 +23,8 @@ template lucky(op: string) {.dirty.} =
 
 template unlucky(op, op2: string) {.dirty.} =
   let
-    piece1 {.gensym.} = initarr[1].split(op)
-    piece2 {.gensym.} = piece1[1].split(op2)
+    piece1 = initarr[1].split(op)
+    piece2 = piece1[1].split(op2)
 
   result.height = piece1[0].parseInt()
   result.x = piece2[0].parseInt()
@@ -252,8 +252,8 @@ proc wm_positionfrom*(w: Window): PositionFrom {.alias: "positionfrom".} =
   w.tk.call("wm positionfrom", w)
   parseEnum[PositionFrom] w.tk.result
 
-template wm_protocol*(w: Window, name: string, clientdata: pointer, command: TkGenericCommand) {.alias: "protocol".} =
-  let cmdname = genName()
+proc wm_protocol*(w: Window, name: string, clientdata: pointer, command: TkGenericCommand) {.alias: "protocol".} =
+  let cmdname = genName("wm_protocol_command_")
   
   w.tk.registerCmd(clientdata, cmdname, command)
 

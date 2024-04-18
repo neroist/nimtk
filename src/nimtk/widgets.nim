@@ -6,6 +6,7 @@ import
   ./widgets/message,
   ./widgets/root,
   ./widgets/toplevel,
+  ./widgets/checkbutton,
   # ./widgets/variables,
   ./widgets/widget
 
@@ -17,5 +18,6 @@ export
   message,
   root,
   toplevel,
+  checkbutton,
   # variables,
   widget

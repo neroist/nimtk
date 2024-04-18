@@ -12,7 +12,7 @@ type
 proc newLabelFrame*(parent: Widget, class: string = "", visual: string = "default", colormap: string = "new"): LabelFrame =
   new result
 
-  result.pathname = pathname(parent.pathname, genName())
+  result.pathname = pathname(parent.pathname, genName("labelframe_"))
   result.tk = parent.tk
 
   discard result.tk.call(

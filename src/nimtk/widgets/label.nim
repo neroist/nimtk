@@ -1,7 +1,7 @@
 import std/strutils
 
-import ./widget
 import ../../nimtk
+import ./widget
 
 type
   Label* = ref object of Widget
@@ -14,7 +14,7 @@ type
 proc newLabel*(parent: Widget, text: string = ""): Label =
   new result
 
-  result.pathname = pathname(parent.pathname, genName())
+  result.pathname = pathname(parent.pathname, genName("label_"))
   result.tk = parent.tk
 
   result.tk.call("label", result.pathname)

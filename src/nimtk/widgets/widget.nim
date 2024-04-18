@@ -39,19 +39,19 @@ type
     clientdata*: pointer
     fun*: TkEventCommand 
 
-  Padding* = (float, float) or
+  Padding* = (float, float)   or
              (string, string) or
-             (string, float) or
-             (float, string) or
-             int or
-             float or
+             (string, float)  or
+             (float, string)  or
+             int              or
+             float            or
              string
 
   EventType* = enum
     Activate
     Destroy
     Map
-    ButtonPress, Button
+    ButtonPress
     Enter
     MapRequest
     ButtonRelease
@@ -67,7 +67,7 @@ type
     Gravity
     Reparent
     Configure
-    KeyPress, Key
+    KeyPress
     ResizeRequest
     ConfigureRequest
     KeyRelease
@@ -91,30 +91,42 @@ type
     window*: Widget
     keycode*: int
     mode*: string # opt
-    overrideRedirect*: bool #?
+    overrideRedirect*: bool
     place*: string # opt
-    # state*: string # float or opt
+    state*: string 
     time*: int # times.Time?
     width*: int
     x*, y*: int
-    # unicodeChar*: Utf16Char # unicode char
+    #? unicodeChar*: Utf16Char # unicode char
     borderWidth*: int
     delta*: int
     sendEvent*: bool
-    bindingPatterns*: int # num of binding patterns
+    bindingPatterns*: int
     keysym*: Keysym
     property*: string
-    root*: Widget # window identifier?
+    root*: Widget
     subwindow*: Widget 
-    #? type
+    #? type*:
     widget*: Widget
     xRoot*, yRoot*: int
 
+  TkCmdType* = TkCommand            or
+               TkSelectionHandleCmd or
+               TkGenericCommand     or
+               TkEventCommand
+
+var
+  cmdData: seq[TkCmdData]
+  selectionHandleCmdData: seq[TkSelectionHandleCmdData]
+  genericCommandData: seq[TkGenericCommandData]
+  eventCommandData: seq[TkEventCommandData]
+
 proc toTclList(padding: int or float or string): string =
   $padding
-
 proc toTclList(padding: tuple): string =
   "{$1 $2}" % [$padding[0], $padding[1]]
+proc toTclList[T](arr: openArray[T]): string =
+  '{' & arr.join(" ") & '}'
 
 proc tkintcmd*(clientData: ClientData, _: ptr Interp, _: cint, _: cstringArray): cint {.cdecl.} =
   var data = cast[TkCmdData](clientData)
@@ -144,11 +156,9 @@ proc tkintgenericcmd*(clientData: ClientData, _: ptr Interp, _: cint, _: cstring
 template dontStress[T](op: T): T =
   var result: T
 
-  try:
-    result = op
-  except ValueError:
-    discard
-
+  try: result = op
+  except ValueError: discard
+  
   result
 
 template newWidgetAttr(interp: ptr Interp, id: int): Widget =
@@ -178,6 +188,8 @@ template newWidgetAttr(interp: ptr Interp, name: string): Widget =
 
   result
 
+{.push warning[HoleEnumConv]: off.}
+
 proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
   let data = cast[TkEventCommandData](clientData)
   let args = argv.cstringArrayToSeq() # all except %K
@@ -202,12 +214,12 @@ proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
   event.mode = args[10]
   event.overrideRedirect = args[11] == "1"
   event.place = args[12]
-  # state
+  event.state =  args[13]
   event.time = args[14].parseInt().dontStress()
   event.width = args[15].parseInt().dontStress()
   event.x = args[16].parseInt().dontStress()
   event.y = args[17].parseInt().dontStress()
-  # unicode char
+  #? unicode char
   event.borderWidth = args[19].parseInt().dontStress()
   event.delta = args[20].parseInt().dontStress()
   event.sendEvent = args[21] == "1"
@@ -225,7 +237,7 @@ proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
   if args[26] != "??":
     event.subwindow = interp.newWidgetAttr(args[26].parseHexInt())
 
-  # type
+  #? type
   if args[28] != "??":
     event.widget = interp.newWidgetAttr(args[28])
 
@@ -237,38 +249,43 @@ proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
 
   return TCL_OK
 
-template registerCmd*(tk: Tk, w: Widget, clientdata1: pointer, name: string, cmd: TkCommand) =
-  let data = new TkCmdData
+{.pop.}
+
+template registerCmdImpl(datatype, dataseq, intcmd: typed) {.dirty.} =
+  let data = new datatype
   data.clientdata = clientdata1
-  data.widget = w
+
+  # dirty
+  when cmd is TkCommand:
+    data.widget = w
+
   data.fun = cmd
 
-  tk.createCommand(name, cast[pointer](data), tkintcmd)
+  dataseq.add data
 
-template registerCmd*(tk: Tk, clientdata1: pointer, name: string, cmd: TkSelectionHandleCmd) =
-  let data = new TkSelectionHandleCmdData
-  data.clientdata = clientdata1
-  data.fun = cmd
+  tk.createCommand(name, cast[pointer](dataseq[^1]), intcmd)
 
-  tk.createCommand(name, cast[pointer](data), tkintselhandlecmd)
+proc registerCmd*(tk: Tk, w: Widget, clientdata1: pointer, name: string, cmd: TkCmdType) =
+  when cmd is TkCommand:
+    registerCmdImpl(TkCmdData, cmdData, tkintcmd)
+  elif cmd is TkSelectionHandleCmd:
+    registerCmdImpl(TkSelectionHandleCmdData, selectionHandleCmdData, tkintselhandlecmd)
+  elif cmd is TkGenericCommand:
+    registerCmdImpl(TkGenericCommandData, genericCommandData, tkintgenericcmd)
+  else:
+    registerCmdImpl(TkEventCommandData, eventCommandData, tkinteventcmd)
 
-template registerCmd*(tk: Tk, clientdata1: pointer, name: string, cmd: TkGenericCommand) =
-  let data = new TkGenericCommandData
-  data.clientdata = clientdata1
-  data.fun = cmd
-
-  tk.createCommand(name, cast[pointer](data), tkintgenericcmd)
-
-template registerCmd*(tk: Tk, clientdata1: pointer, name: string, cmd: TkEventCommand) =
-  let data = new TkEventCommandData
-  data.clientdata = clientdata1
-  data.fun = cmd
-
-  tk.createCommand(name, cast[pointer](data), tkinteventcmd)
+proc registerCmd*(tk: Tk, clientdata1: pointer, name: string, cmd: TkCmdType) =
+  registerCmd(tk, nil, clientdata1, name, cmd)
 
 proc `$`*(w: Widget): string = 
   if w != nil: w.pathname
   else: ""
+
+proc `==`*(w1, w2: Widget): bool =
+  if w1 == nil and w2 == nil: return true
+  elif w1 == nil xor w2 == nil: return false
+  else: w1.pathname == w2.pathname
 
 proc newWidgetFromPathname*(tk: Tk, pathname: string): Widget =
   new result
@@ -276,18 +293,7 @@ proc newWidgetFromPathname*(tk: Tk, pathname: string): Widget =
   result.tk = tk
   result.pathname = pathname
 
-proc newWidgetFromId*(tk: Tk, id: int): Widget =
-  if id < 1:
-    return nil
-
-  new result
-
-  tk.call("winfo pathname", id)
-
-  result.tk = tk
-  result.pathname = tk.result
-
-proc pathName*(names: varargs[string]): string {.inline.} =
+proc pathName*(names: varargs[string]): string =
   result = names.join(".")
 
   if names[0] == ".":
@@ -730,7 +736,7 @@ template getFileImpl(cmd: string): string {.dirty.} =
     {
       "confirmoverwrite": $confirmoverwrite,
       "defaultextension": $defaultextension,
-      "filetypes": '{' & filetypesList.join(" ") & '}',
+      "filetypes": filetypesList.toTclList(),
       "initialdir": repr initialdir,
       "initialfile": repr initialfile,
       "multiple": $multiple,
@@ -871,8 +877,8 @@ proc send*(w: Widget, async: bool, cmd: string, args: varargs[string]) =
 
 # --- bind
 
-template `bind`*(w: Widget, sequence: string, clientdata: pointer = nil, command: TkEventCommand) =
-  let name = genName("event_command__")
+proc `bind`*(w: Widget, sequence: string, clientdata: pointer = nil, command: TkEventCommand) =
+  let name = genName("event_command_" & sequence & "_")
 
   w.tk.registerCmd(nil, name, command)
 
@@ -882,7 +888,40 @@ template `bind`*(w: Widget, sequence: string, clientdata: pointer = nil, command
     sequence,
     "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
   )
-   
+
+proc `bind`*(tk: Tk, className: string, sequence: string, clientdata: pointer = nil, command: TkEventCommand) =
+  let name = genName("event_command_" & className & "_")
+
+  tk.registerCmd(nil, name, command)
+
+  tk.call(
+    "bind",
+    className,
+    sequence,
+    "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
+  )
+
+proc bindAll*(tk: Tk, sequence: string, clientdata: pointer = nil, command: TkEventCommand) =
+  let name = genName("event_command_ALL_")
+
+  tk.registerCmd(nil, name, command)
+
+  tk.call(
+    "bind",
+    "all",
+    sequence,
+    "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
+  )
+
+# --- bindtags
+
+proc bindtags*(w: Widget, tagList: varargs[string, `$`]) = 
+  w.tk.call("bindtags", w, tagList.toTclList())
+
+proc bindtags*(w: Widget): seq[string] =
+  w.tk.call("bindtags", w)
+  w.tk.result.split(" ")
+
 # --- clipboard
 
 proc clipboardAdd*(w: Widget, data: string; format = "STRING", `type`: string = "STRING") =
@@ -910,11 +949,11 @@ proc selectionGet*(w: Widget, selection = "PRIMARY", `type`: string = "UTF8_STRI
   w.tk.call("selection get", {"displayof": $w, "selection": selection, "type": `type`}.toArgs)
   w.tk.result
 
-template selectionHandle*(w: Widget, selection = "PRIMARY", `type`: string = "UTF8_STRING", format: string = "STRING", clientdata: pointer = nil, command: TkSelectionHandleCmd) =
+proc selectionHandle*(w: Widget, selection = "PRIMARY", `type`: string = "UTF8_STRING", format: string = "STRING", clientdata: pointer = nil, command: TkSelectionHandleCmd) =
   var cmdname: string
 
-  when command != nil:
-    cmdname = genName()
+  if command != nil:
+    cmdname = genName("selection_handle_command_")
     w.tk.registerCmd(nil, cmdname, command)
   else:
     cmdname = repr ""
@@ -929,11 +968,11 @@ proc selectionOwn*(w: Widget, selection: string = "PRIMARY"): Widget =
 
   return w.tk.newWidgetFromPathname(w.tk.result)
 
-template selectionOwn*(w: Widget, selection: string = "PRIMARY", clientdata: pointer = nil, command: TkGenericCommand) =
+proc selectionOwn*(w: Widget, selection: string = "PRIMARY", clientdata: pointer = nil, command: TkGenericCommand) =
   var cmdname: string
 
-  when command != nil:
-    cmdname = genName()
+  if command != nil:
+    cmdname = genName("selection_own_command_")
     w.tk.registerCmd(nil, cmdname, command)
   else:
     cmdname = ""

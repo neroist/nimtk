@@ -9,7 +9,7 @@ type
 proc newFrame*(parent: Widget, class: string = "", container: bool = false, visual: string = "default", colormap: string = "new"): Frame =
   new result
 
-  result.pathname = pathname(parent.pathname, genName())
+  result.pathname = pathname(parent.pathname, genName("frame_"))
   result.tk = parent.tk
 
   discard result.tk.call(

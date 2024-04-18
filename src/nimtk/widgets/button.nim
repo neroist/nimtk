@@ -15,7 +15,7 @@ type
 proc newButton*(parent: Widget, text: string = "", configuration: openArray[(string, string)] = {:}): Button =
   new result
 
-  result.pathname = pathname(parent.pathname, genName())
+  result.pathname = pathname(parent.pathname, genName("button_"))
   result.tk = parent.tk
 
   result.tk.call("button", result.pathname)
@@ -26,13 +26,13 @@ proc newButton*(parent: Widget, text: string = "", configuration: openArray[(str
 proc invoke*(b: Button) = b.tk.call($b, "invoke")
 proc flash*(b: Button) = b.tk.call($b, "flash")
 
-template setCommand*(b: Button, clientData: pointer, command: TkCommand) =
-  let name = genName()
+proc setCommand*(b: Button, clientData: pointer, command: TkCommand) =
+  let name = genName("button_command_")
   
   b.tk.registerCmd(b, clientdata, name, command)
 
   b.configure({"command": name})
-template `command=`*(b: Button, command: TkCommand) = b.setCommand(nil, command)
+proc `command=`*(b: Button, command: TkCommand) = b.setCommand(nil, command)
 proc `default=`*(b: Button, default: ButtonState) = b.configure({"default": $default})
 proc `height=`*(b: Button, height: string or float or int) = b.configure({"height": $height})
 proc `overrelief=`*(b: Button, overrelief: WidgetRelief) = b.configure({"overrelief": $overrelief})

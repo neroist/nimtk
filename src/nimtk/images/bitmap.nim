@@ -10,7 +10,7 @@ type
 proc newBitmap*(tk: Tk, file: string, config: openArray[(string, string)] = {:}): Bitmap =
   new result
 
-  result.name = genName()
+  result.name = genName("bitmap_")
   result.tk = tk
 
   tk.call("image create bitmap", result.name)
@@ -21,7 +21,7 @@ proc newBitmap*(tk: Tk, file: string, config: openArray[(string, string)] = {:})
 proc newBitmap*(tk: Tk, data: string, config: openArray[(string, string)] = {:}): Bitmap =
   new result
 
-  result.name = genName()
+  result.name = genName("bitmap_")
   result.tk = tk
 
   tk.call("image create bitmap", result.name)
