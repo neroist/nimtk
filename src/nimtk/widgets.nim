@@ -1,20 +1,17 @@
 import
-  ./bitmap,
-  ./button,
-  ./frame,
-  ./image,
-  ./label,
-  ./labelframe,
-  ./message,
-  ./root,
-  ./toplevel,
-  ./variables,
-  ./widget,
-  ./wm
+  ./widgets/bitmap,
+  ./widgets/button,
+  ./widgets/frame,
+  ./widgets/image,
+  ./widgets/label,
+  ./widgets/labelframe,
+  ./widgets/message,
+  ./widgets/root,
+  ./widgets/toplevel,
+  ./widgets/variables,
+  ./widgets/widget
 
 export
-  exceptions,
-
   bitmap,
   button,
   frame,
@@ -25,5 +22,4 @@ export
   root,
   toplevel,
   variables,
-  widget,
-  wm
+  widget

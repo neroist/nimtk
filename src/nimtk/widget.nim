@@ -1,5 +1,6 @@
 import std/strutils
 import std/tables
+
 import std/colors
 
 import nimtcl
@@ -16,7 +17,7 @@ type
   
   TkCommand* = proc (clientdata: pointer, widget: Widget)
   TkSelectionOwnCmd* = proc (clientdata: pointer, offset, maxChars: int)
-  TkSelectionHandle* = proc (clientdata: pointer)
+  TkGenericCommand* = proc (clientdata: pointer)
 
   TkCmdData* = ref object
     clientdata*: pointer
@@ -27,9 +28,9 @@ type
     clientdata*: pointer
     fun*: TkSelectionOwnCmd
 
-  TkSelectionHandleData* = ref object
+  TkGenericCommandData* = ref object
     clientdata*: pointer
-    fun*: TkSelectionHandle
+    fun*: TkGenericCommand
 
 proc tkintcmd*(clientData: ClientData, _: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
   var data = cast[TkCmdData](clientData)
@@ -43,28 +44,40 @@ proc tkintselowncmd*(clientData: ClientData, interp: ptr Interp, argc: cint, arg
   let data = cast[TkSelectionOwnCmdData](clientData)
   let args = argv.cstringArrayToSeq()
 
-  data.fun(data.clientdata, args[0].parseInt(), args[1].parseInt())
+  if data.fun != nil:
+    data.fun(data.clientdata, args[0].parseInt(), args[1].parseInt())
 
   return TCL_OK
 
-proc tkintselhandle*(clientData: ClientData, interp: ptr Interp, argc: cint, argv: cstringArray): cint {.cdecl.} =
-  let data = cast[TkSelectionHandleData](clientData)
+proc tkintgenericcmd*(clientData: ClientData, interp: ptr Interp, argc: cint, argv: cstringArray): cint {.cdecl.} =
+  let data = cast[TkGenericCommandData](clientData)
 
-  data.fun(data.clientdata)
+  if data.fun != nil:
+    data.fun(data.clientdata)
 
   return TCL_OK
 
 template registerCmd*(tk: Tk, w: Widget, clientdata1: pointer, name: string, cmd: TkCommand) =
-  let data {.gensym.} = new TkCmdData
+  let data = new TkCmdData
   data.clientdata = clientdata1
   data.widget = w
   data.fun = cmd
 
-  discard tk.interp.createCommand(
-    cstring name,
-    tkintcmd,
-    clientdata = cast[pointer](data)
-  )
+  tk.createCommand(name, cast[pointer](data), tkintcmd)
+
+template registerCmd*(tk: Tk, w: Widget, clientdata1: pointer, name: string, cmd: TkSelectionOwnCmd) =
+  let data = new TkSelectionOwnCmdData
+  data.clientdata = clientdata1
+  data.fun = cmd
+
+  tk.createCommand(name, cast[pointer](data), tkintselowncmd)
+
+template registerCmd*(tk: Tk, w: Widget, clientdata1: pointer, name: string, cmd: TkGenericCommand) =
+  let data = new TkGenericCommandData
+  data.clientdata = clientdata1
+  data.fun = cmd
+
+  tk.createCommand(name, cast[pointer](data), tkintgenericcmd)
 
 proc `$`*(w: Widget): string = 
   if w != nil: w.pathname

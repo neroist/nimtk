@@ -212,7 +212,7 @@ type
     Solid = "solid"
     Groove = "groove"
 
-  WindowType* = enum
+  WindowType* {.pure.} = enum
     Desktop = "desktop"
     Dock = "dock"
     Toolbar = "toolbar"
@@ -228,9 +228,20 @@ type
     Dnd = "dnd"
     Normal = "normal"
 
-  FocusModel* = enum
+  FocusModel* {.pure.} = enum
     Active = "active"
     Passive = "passive"
+
+  PositionFrom* {.pure.} = enum # TODO change name
+    User = "user"
+    Program = "program"
+
+  WindowState* {.pure.} = enum
+    Normal = "normal"
+    Iconic = "iconic"
+    Withdrawn = "withdrawn"
+    Icon = "icon"
+    Zoomed = "zoomed"
 
   Tk* = ref object
     interp*: ptr Interp
@@ -267,6 +278,13 @@ proc result*(tk: Tk): string =
 
 proc mainloop*(tk: Tk) =
   tkMainloop()
+
+proc createCommand*(tk: Tk, name: string, clientdata: pointer, fun: CmdProc) =
+  discard tk.interp.createCommand(
+    name,
+    fun,
+    clientdata
+  )
 
 proc init*(tk: Tk) =
   let tclInit = tk.interp.init()

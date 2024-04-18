@@ -1,6 +1,7 @@
 import std/colors
 
 import ../src/nimtk/widgets
+import ../src/nimtk/wm
 import ../src/nimtk
 
 let tk = newTk() # create tck & tk interpreter

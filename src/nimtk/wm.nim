@@ -1,41 +1,17 @@
 import std/strutils
 import std/macros
 
-import ./toplevel
-import ./widget
-import ./root
+import std/colors
+
+import ./private/alias
+import ./widgets
 import ../nimtk
 
 type
   Window* = Toplevel or Root
 
-  WindowState* = enum
-    Normal = "normal"
-    Iconic = "iconic"
-    Withdrawn = "withdrawn"
-    Icon = "icon"
-
-macro alias(name: string, fun: untyped) =
-  result = newStmtList()
-
-  result.add fun
-
-  result.add newTree(
-    nnkProcDef,      # we are defining a proc
-
-    nnkPostfix.newTree(ident"*", ident(name.strVal)),  # proc name
-    newEmptyNode(),  # term rewriting macros stuff
-    fun[2],       # generic params
-    fun[3],       # formal params
-    fun[4],       # pragmas
-    newEmptyNode(),  # reserved slot for future use by nim compiler
-    fun[^1]       # MEAT
-  )
-
-# TODO multiple alias?
-
 template lucky(op: string) {.dirty.} =
-  let rest = initarr[1].split(op)
+  let rest {.gensym.} = initarr[1].split(op)
 
   result.height = rest[0].parseInt
   result.x = rest[1].parseInt
@@ -80,38 +56,54 @@ proc wm_attributes*(w: Widget, option: string): string {.alias: "attributes".} =
   w.tk.result
 proc wm_attributes*(w: Widget, option, val: string) {.alias: "[]=".} = w.tk.call("wm attributes", w, '-' & option, val)
 proc wm_attributes*(w: Widget, dict: openArray[(string, string)]) {.alias: "attributes".} = w.tk.call("wm attributes", w, dict.toArgs())
-# proc wm_attributes window ?option value option value...?
 
-#     -alpha 
-#     -fullscreen 
-#     -topmost 
+#! these
 
-#     -disabled 
-#     -toolwindow 
-#     -transparentcolor 
+# -- getters
 
-#     -modified 
-#     -notify 
-#     -titlepath 
-#     -transparent 
+proc alpha*(w: Widget): float = parseFloat w.wm_attributes("alpha")
+proc fullscreen*(w: Widget): bool = parseBool w.wm_attributes("fullscreen")
+proc topmost*(w: Widget): bool = parseBool w.wm_attributes("topmost")
 
-#     -type
-#         desktop 
-#         dock 
-#         toolbar 
-#         menu 
-#         utility 
-#         splash 
-#         dialog 
-#         dropdown_menu 
-#         popup_menu 
-#         tooltip 
-#         notification 
-#         combo 
-#         dnd 
-#         normal 
+when defined(windows):
+  proc disabled*(w: Widget): bool = parseBool w.wm_attributes("disabled")
+  proc toolwindow*(w: Widget): bool = parseBool w.wm_attributes("toolwindow")
+  proc transparentcolor*(w: Widget): Color = parseColor w.wm_attributes("transparentcolor")
 
-#     -zoomed 
+elif defined(macos):
+  proc modified*(w: Widget): bool = parseBool w.wm_attributes("modified")
+  proc notify*(w: Widget): string = w.wm_attributes("notify")
+  proc titlepath*(w: Widget): string = w.wm_attributes("titlepath")
+  proc transparent*(w: Widget): bool = parseBool w.wm_attributes("transparent")
+
+else:
+  proc type*(w: Widget): WindowType = parseEnum[WindowType] w.wm_attributes("type")
+
+proc zoomed*(w: Widget): bool = parseBool w.wm_attributes("zoomed")
+
+# -- setters
+
+proc `alpha=`*(w: Widget, alpha: float) = w.wm_attributes("alpha", $alpha)
+proc `fullscreen=`*(w: Widget, fullscreen: bool) = w.wm_attributes("fullscreen", $fullscreen)
+proc `topmost=`*(w: Widget, topmost: bool) = w.wm_attributes("topmost", $topmost)
+
+when defined(macos):
+  proc `disabled=`*(w: Widget, disabled: bool) = w.wm_attributes("disabled", $disabled)
+  proc `toolwindow=`*(w: Widget, toolwindow: bool) = w.wm_attributes("toolwindow", $toolwindow)
+  proc `transparentcolor=`*(w: Widget, transparentcolor: Color) = w.wm_attributes("transparentcolor", $transparentcolor)
+
+elif defined(macos):
+  proc `modified=`*(w: Widget, modified: bool) = w.wm_attributes("modified", $modified)
+  proc `notify=`*(w: Widget, notify: string) = w.wm_attributes("notify", $notify)
+  proc `titlepath=`*(w: Widget, titlepath: string) = w.wm_attributes("titlepath", $titlepath)
+  proc `transparent=`*(w: Widget, transparent: bool) = w.wm_attributes("transparent", $transparent)
+
+else:
+  proc `type=`*(w: Widget, `type`: WindowType) = w.wm_attributes("type", $`type`)
+
+proc `zoomed=`*(w: Widget, zoomed: bool) = w.wm_attributes("zoomed", $zoomed)
+
+# -- others...
 
 proc wm_client*(w: Widget, name: string) {.alias: "client=".} = w.tk.call("wm client", w, name)
 proc wm_client*(w: Widget): string {.alias: "client".} =
@@ -191,22 +183,81 @@ proc wm_iconbitmap*(w: Widget, bitmap: string, default: bool = false) {.alias: "
   if default:
     w.tk.call("wm iconbitmap", w, "-default", bitmap)
   else:
-    w.tk.call("wm iconbitmap", w, '$' & $bitmap)
+    w.tk.call("wm iconbitmap", w, bitmap)
 
-  w.tk.call("wm iconbitmap", w)
-  echo w.tk.result
-# proc wm_iconify*(w: Widget) = discard
-# proc wm_iconmask*(w: Widget ?bitmap?) = discard
-# proc wm_iconname*(w: Widget ?newName?) = discard
-# proc wm_iconphoto*(w: Widget ?-default? image1 ?image2 ...?) = discard
-# proc wm_iconposition*(w: Widget ?x y?) = discard
-# proc wm_iconwindow*(w: Widget ?pathName?) = discard
-# proc wm_manage*(w: Widget) = discard
-# proc wm_maxsize*(w: Widget ?width height?) = discard
-# proc wm_minsize*(w: Widget ?width height?) = discard
-# proc wm_overrideredirect*(w: Widget ?boolean?) = discard
-# proc wm_positionfrom*(w: Widget ?who?) = discard
-# proc wm_protocol*(w: Widget ?name? ?command?) = discard
+proc wm_iconify*(w: Widget) {.alias: "iconify".} = w.tk.call("wm iconify", w)
+
+proc wm_iconmask*(w: Widget, bitmap: string) {.alias: "iconmask=".} = w.tk.call("wm iconmask", w, bitmap)
+proc wm_iconmask*(w: Widget): string {.alias: "iconmask".} =
+  w.tk.call("wm iconmask", w)
+  w.tk.result
+
+proc wm_iconname*(w: Widget, newName: string) {.alias: "iconname=".} = w.tk.call("wm iconname", w, newName)
+proc wm_iconname*(w: Widget): string {.alias: "iconname".} =
+  w.tk.call("wm iconname", w)
+  w.tk.result
+
+proc wm_iconphoto*(w: Widget, images: string) {.alias: "iconphoto=".} = w.tk.call("wm iconphoto", w, images)
+proc wm_iconphoto*(w: Widget, images: varargs[string]) {.alias: "iconphoto".} = w.tk.call("wm iconphoto", w, images.join(" "))
+proc wm_iconphoto*(w: Widget, default: bool, images: varargs[string]) {.alias: "iconphoto".} = w.tk.call("wm iconphoto", w, "-default", images.join(" "))
+
+proc wm_iconposition*(w: Widget, x, y: int or string) {.alias: "iconposition".} = w.tk.call("wm iconposition", $x, $y)
+proc wm_iconposition*(w: Widget): tuple[x, y: int, nohints: bool] {.alias: "iconposition".} =
+  w.tk.call("wm iconposition")
+
+  if w.tk.result.len == 0:
+    result.nohints = true
+  else:
+    let xy = w.tk.result.split(" ")
+
+    result.x = xy[0].parseInt()
+    result.y = xy[1].parseInt()
+
+proc wm_iconwindow*(w: Widget, window: Widget) {.alias: "iconwindow=".} = w.tk.call("wm iconwindow", window)
+proc wm_iconwindow*(w: Widget): Widget {.alias: "iconwindow".} =
+  w.tk.call("wm iconwindow")
+
+  if w.tk.result.len == 0: return nil
+  else: return w.tk.newWidgetFromPathname(w.tk.result)
+
+proc wm_manage*(w: Frame or LabelFrame or Toplevel) {.alias: "manage".} = w.tk.call("wm manage", w)
+
+proc wm_maxsize*(w: Widget, size: tuple[width, height: int]) {.alias: "maxsize=".} = w.tk.call("wm maxsize", w, $size.width, $size.height)
+proc wm_maxsize*(w: Widget, width, height: int) {.alias: "maxsize".} = w.tk.call("wm maxsize", w, $width, $height)
+proc wm_maxsize*(w: Widget): tuple[width, height: int] {.alias: "maxsize".} =
+  w.tk.call("wm maxsize")
+
+  let wh = w.tk.result.split(" ")
+
+  result.width = wh[0].parseInt()
+  result.height = wh[1].parseInt()
+
+proc wm_minsize*(w: Widget, size: tuple[width, height: int]) {.alias: "minsize=".} = w.tk.call("wm minsize", w, $size.width, $size.height)
+proc wm_minsize*(w: Widget, width, height: int) {.alias: "minsize=".} = w.tk.call("wm minsize", w, $width, $height)
+proc wm_minsize*(w: Widget): tuple[width, height: int] {.alias: "minsize=".} =
+  w.tk.call("wm minsize")
+
+  let wh = w.tk.result.split(" ")
+
+  result.width = wh[0].parseInt()
+  result.height = wh[1].parseInt()
+
+proc wm_overrideredirect*(w: Widget, overrideredirect: bool) {.alias: "overrideredirect=".} = w.tk.call("wm overridedirect", w, overrideredirect)
+proc wm_overrideredirect*(w: Widget): bool {.alias: "overrideredirect".} =
+  w.tk.call("wm overridedirect", w)
+  w.tk.result == "1"
+
+proc wm_positionfrom*(w: Widget, who: PositionFrom) {.alias: "positionfrom=".} = w.tk.call("wm positionfrom", w, who)
+proc wm_positionfrom*(w: Widget): PositionFrom {.alias: "positionfrom".} =
+  w.tk.call("wm positionfrom", w)
+  parseEnum[PositionFrom] w.tk.result
+
+template wm_protocol*(w: Widget, name: string, clientdata: pointer, command: TkGenericCommand) {.alias: "protocol".} =
+  let cmdname = genName()
+  
+  w.tk.registerCmd(nil, clientdata, cmdname, command)
+
+  w.tk.call("wm protocol", w, repr name, cmdname)
 
 proc wm_resizable*(w: Widget, width, height: bool) {.alias: "resizable".} = w.tk.call("wm resizable", w, width, height)
 proc wm_resizable*(w: Widget, both: bool) {.alias: "resizable=".} = w.tk.call("wm resizable", w, both, both)
@@ -218,10 +269,10 @@ proc wm_resizable*(w: Widget): tuple[width, height: bool] {.alias: "resizable".}
   result.width = res[0] == "1"
   result.height = res[1] == "1"
 
-proc wm_sizefrom*(w: Widget, who: string) {.alias: "sizefrom".} = w.tk.call("wm sizefrom", w, who)
-proc wm_sizefrom*(w: Widget): string {.alias: "sizefrom".} =
-  w.tk.call("wm sizefrom", w)
-  w.tk.result
+proc wm_sizefrom*(w: Widget, who: PositionFrom) {.alias: "sizefrom".} = w.tk.call("wm sizefrom", w, $who)
+proc wm_sizefrom*(w: Widget): PositionFrom {.alias: "sizefrom".} =
+  w.tk.call("wm sizefrom", $w)
+  parseEnum[PositionFrom] w.tk.result
 
 proc wm_stackorder*(w: Widget, isbelow: Window): seq[Widget] {.alias: "stackorder".} =
   w.tk.call("wm stackorder", w, "isbelow", isbelow)

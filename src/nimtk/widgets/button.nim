@@ -27,7 +27,8 @@ proc invoke*(b: Button) = b.tk.call($b, "invoke")
 proc flash*(b: Button) = b.tk.call($b, "flash")
 
 template setCommand*(b: Button, clientData: pointer, command: TkCommand) =
-  let name = genName()
+  let nanme = genName()
+  
   b.tk.registerCmd(b, clientdata, name, command)
 
   b.configure({"command": name})
