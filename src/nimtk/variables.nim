@@ -18,10 +18,13 @@ type
   
   TkVar* = TkString or TkFloat or TkBool
 
-proc `$`*(`var`: TkVar): string {.inline.}
+proc `$`*(`var`: TkVar): string
 
 proc genName*(): string =
   $genOid()
+
+proc genName*(start: string): string =
+  start & $genOid()
 
 template newTkVarImpl(tk: Tk, val1: float or bool or string) {.dirty.} =
   new result
@@ -58,7 +61,7 @@ proc set*(`var`: TkVar, val: string | float | bool) =
 
   `var`.tk.call("set", `var`.varname, $val)
 
-proc `$`*(`var`: TkVar): string {.inline.} =
+proc `$`*(`var`: TkVar): string =
   if `var` == nil or `var`.tk == nil: ""
   else: $`var`.get()
 

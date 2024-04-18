@@ -1,7 +1,7 @@
 import std/colors
 
 import ./widget
-import ../nimtk
+import ../../nimtk
 
 type
   Frame* = ref object of Widget

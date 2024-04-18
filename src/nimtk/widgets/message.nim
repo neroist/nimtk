@@ -1,7 +1,7 @@
 import std/strutils
 
 import ./widget
-import ../nimtk
+import ../../nimtk
 
 type
   Message* = ref object of Widget

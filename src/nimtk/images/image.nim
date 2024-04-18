@@ -1,6 +1,6 @@
 import std/strutils
 
-import ../nimtk
+import ../../nimtk
 
 type
   Image* = ref object of RootObj

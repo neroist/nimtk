@@ -1,4 +1,4 @@
-import ../nimtk
+import ../../nimtk
 import ./widget
 
 type

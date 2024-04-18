@@ -1,25 +1,21 @@
 import
-  ./widgets/bitmap,
   ./widgets/button,
   ./widgets/frame,
-  ./widgets/image,
   ./widgets/label,
   ./widgets/labelframe,
   ./widgets/message,
   ./widgets/root,
   ./widgets/toplevel,
-  ./widgets/variables,
+  # ./widgets/variables,
   ./widgets/widget
 
 export
-  bitmap,
   button,
   frame,
-  image,
   label,
   labelframe,
   message,
   root,
   toplevel,
-  variables,
+  # variables,
   widget

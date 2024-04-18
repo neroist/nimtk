@@ -4,7 +4,7 @@ import std/colors
 
 import ./label
 import ./widget
-import ../nimtk
+import ../../nimtk
 
 type
   LabelFrame* = ref object of Widget

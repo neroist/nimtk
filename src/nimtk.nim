@@ -246,7 +246,9 @@ type
   Tk* = ref object
     interp*: ptr Interp
 
-const nimTkDebug* {.booldefine.} = false
+const
+  nimtkDebug* {.booldefine.} = false
+  nimtkIgnoreErrors* {.booldefine.} = false
 
 proc toArgs*(map: openArray[tuple[name, val: string]]): string =
   for tup in map:
@@ -262,10 +264,10 @@ proc eval*(tk: Tk, cmd: string): int {.discardable.} =
     echo "[TK RETURN] ", result
     echo "[TK RESULT] ", tk.interp.getStringResult(), "\n"
 
-  if result != TCL_OK:
+  if result != TCL_OK and not nimtkIgnoreErrors:
     raise newException(
       TkError,
-      "Error when evaluating Tcl!\n" &
+      "Error when evaluating Tcl!\n\n" &
       "Command: " & cmd & "\n" &
       "Result: " & $tk.interp.getStringResult()
     )
