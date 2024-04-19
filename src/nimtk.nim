@@ -243,6 +243,12 @@ type
     Icon = "icon"
     Zoomed = "zoomed"
 
+  WidgetState* = enum
+    Normal = "normal"
+    Active = "active"
+    Disabled = "disabled"
+
+
   Tk* = ref object
     interp*: ptr Interp
 
