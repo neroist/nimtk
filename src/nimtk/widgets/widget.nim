@@ -345,8 +345,8 @@ proc pack*[PX, PY: Padding](
   expand: bool = false,
   fill: FillStyle = FillStyle.None,
   `in`: Widget = nil,
-  ipadx: float or string = 0,
-  ipady: float or string = 0,
+  ipadx: int or float or string = 0,
+  ipady: int or float or string = 0,
   padx: PX = 0,
   pady: PY = 0,
   side: Side = Side.Top
@@ -462,15 +462,15 @@ proc grid*[PX, PY: Padding](
     "grid configure",
     w,
     {
-      "column": column,
-      "columnspan": columnspan,
+      "column": $column,
+      "columnspan": $columnspan,
       "in": $`in`,
       "ipadx": $ipadx,
       "ipady": $ipady,
       "padx": padx.toTclList(),
       "pady": pady.toTclList(),
-      "row": row,
-      "rowspan": rowspan,
+      "row": $row,
+      "rowspan": $rowspan,
       "sticky": $sticky
     }.toArgs
   )
@@ -996,14 +996,14 @@ proc `activebackground=`*(w: Widget, activebackground: Color) = w.configure({"ac
 proc `activeborderwidth=`*(w: Widget, activeborderwidth: string or float or int) = w.configure({"activeborderwidth": $activeborderwidth})
 proc `activeforeground=`*(w: Widget, activeforeground: Color) = w.configure({"activeforeground": $activeforeground})
 proc `anchor=`*(w: Widget, anchor: AnchorPosition) = w.configure({"anchor": $anchor})
-proc `background=`*(w: Widget, background: Color) = w.configure({"background": $background})
-proc `borderwidth=`*(w: Widget, borderwidth: string or float or int) = w.configure({"borderwidth": $borderwidth})
+proc `background=`*(w: Widget, background: Color) {.alias: "bg=".} = w.configure({"background": $background})
+proc `borderwidth=`*(w: Widget, borderwidth: string or float or int) {.alias: "bd=".} = w.configure({"borderwidth": $borderwidth})
 proc `cursor=`*(w: Widget, cursor: Cursor) = w.configure({"cursor": $cursor})
 proc `compound=`*(w: Widget, compound: WidgetCompound) = w.configure({"compound": $compound})
 proc `disabledforeground=`*(w: Widget, disabledforeground: Color) = w.configure({"disabledforeground": $disabledforeground})
 proc `exportselection=`*(w: Widget, exportselection: bool) = w.configure({"exportselection": $exportselection})
 # proc `font=`*(w: Widget, font) = w.configure({"font": $font})
-proc `foreground=`*(w: Widget, foreground: Color) = w.configure({"foreground": $foreground})
+proc `foreground=`*(w: Widget, foreground: Color) {.alias: "fg=".} = w.configure({"foreground": $foreground})
 proc `highlightbackground=`*(w: Widget, highlightbackground: Color) = w.configure({"highlightbackground": $highlightbackground})
 proc `highlightcolor=`*(w: Widget, highlightcolor: Color) = w.configure({"highlightcolor": $highlightcolor})
 proc `highlightthickness=`*(w: Widget, highlightthickness: string or float or int) = w.configure({"highlightthickness": $highlightthickness})
@@ -1036,14 +1036,14 @@ proc activebackground*(w: Widget): Color = parseColor w.cget("activebackground")
 proc activeborderwidth*(w: Widget): string = w.cget("activeborderwidth")
 proc activeforeground*(w: Widget): Color = parseColor w.cget("activeforeground")
 proc anchor*(w: Widget): AnchorPosition = parseEnum[AnchorPosition] w.cget("anchor")
-proc background*(w: Widget): Color = parseColor w.cget("background")
-proc borderwidth*(w: Widget): string = w.cget("borderwidth")
+proc background*(w: Widget): Color {.alias: "bg".} = parseColor w.cget("background")
+proc borderwidth*(w: Widget): string {.alias: "bd".} = w.cget("borderwidth")
 proc cursor*(w: Widget): Cursor = parseEnum[Cursor] w.cget("cursor")
 proc compound*(w: Widget): WidgetCompound = parseEnum[WidgetCompound] w.cget("compound")
 proc disabledforeground*(w: Widget): Color = parseColor w.cget("disabledforeground")
 proc exportselection*(w: Widget): bool = w.cget("exportselection") == "1"
 # proc font*(w: Widget) = w.cget("font")
-proc foreground*(w: Widget): Color = parseColor w.cget("foreground")
+proc foreground*(w: Widget): Color {.alias: "fg".} = parseColor w.cget("foreground")
 proc highlightbackground*(w: Widget): Color = parseColor w.cget("highlightbackground")
 proc highlightcolor*(w: Widget): Color = parseColor w.cget("highlightcolor")
 proc highlightthickness*(w: Widget): string = w.cget("highlightthickness")
