@@ -965,8 +965,8 @@ type
     ksHangul_J_YeorinHieuh              = 3834
     ksKorean_Won                        = 3839
     ksOE                                = 5052
-    ksOe2                                = 5053
-    ksYdiaeresis2                        = 5054
+    ksOe2                               = 5053
+    ksYdiaeresis2                       = 5054
     ksISO_Lock                         = 65025
     ksISO_Level2_Latch                 = 65026
     ksISO_Level3_Shift                 = 65027
@@ -1067,7 +1067,7 @@ type
     ksDead_belowverticalline           = 65170
     ksDead_longsolidusoverlay          = 65171
     ksCh                               = 65184
-    ksCh2                               = 65185
+    ksCh2                              = 65185
     ksCH3                              = 65186
     ksC_h4                             = 65187
     ksC_h5                             = 65188
@@ -1484,7 +1484,7 @@ type
     ksXF86PowerOff                 = 269025066
     ksXF86WakeUp                   = 269025067
     ksXF86Eject                    = 269025068
-    ksXF86ScreenSaver2              = 269025069
+    ksXF86ScreenSaver2             = 269025069
     ksXF86WWW                      = 269025070
     ksXF86Sleep                    = 269025071
     ksXF86Favorites                = 269025072
