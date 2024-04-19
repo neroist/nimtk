@@ -7,6 +7,7 @@ import
   ./widgets/root,
   ./widgets/toplevel,
   ./widgets/checkbutton,
+  ./widgets/radiobutton,
   ./widgets/scale,
   # ./widgets/variables,
   ./widgets/widget
@@ -20,6 +21,7 @@ export
   root,
   toplevel,
   checkbutton,
+  radiobutton,
   scale,
   # variables,
   widget

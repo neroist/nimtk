@@ -32,7 +32,6 @@ proc setCommand*(c: CheckButton, clientData: pointer, command: TkWidgetCommand) 
 
   c.configure({"command": name})
 proc `command=`*(c: CheckButton, command: TkWidgetCommand) = c.setCommand(nil, command)
-proc `default=`*(c: CheckButton, default: WidgetState) = c.configure({"default": $default})
 proc `indicatoron=`*(c: CheckButton, indicatoron: bool) = c.configure({"indicatoron": $indicatoron})
 proc `height=`*(c: CheckButton, height: string or float or int) = c.configure({"height": $height})
 proc `offrelief=`*(c: CheckButton, offrelief: WidgetRelief) = c.configure({"offrelief": $offrelief})
@@ -44,7 +43,6 @@ proc `variable=`*(c: CheckButton, variable: TkBool) = c.configure({"variable": $
 proc `state=`*(c: CheckButton, state: WidgetState) = c.configure({"state": $state})
 proc `width=`*(c: CheckButton, width: string or float or int) = c.configure({"width": $width})
 
-proc default*(c: CheckButton): WidgetState = parseEnum[WidgetState] c.cget("default")
 proc indicatoron*(c: CheckButton): bool = c.cget("indicatoron") == "1"
 proc height*(c: CheckButton): string = c.cget("height")
 proc offrelief*(c: CheckButton): WidgetRelief = parseEnum[WidgetRelief] c.cget("offrelief")
