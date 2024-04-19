@@ -21,7 +21,9 @@ proc newButton*(parent: Widget, text: string = "", configuration: openArray[(str
   result.tk.call("button", result.pathname)
 
   result.configure({"text": text})
-  result.configure(configuration)
+  
+  if configuration.len > 0:
+    result.configure(configuration)
 
 proc invoke*(b: Button) = b.tk.call($b, "invoke")
 proc flash*(b: Button) = b.tk.call($b, "flash")
