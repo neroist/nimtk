@@ -9,7 +9,7 @@ import ../../nimtk
 type
   LabelFrame* = ref object of Widget
 
-proc newLabelFrame*(parent: Widget, class: string = "", visual: string = "default", colormap: string = "new"): LabelFrame =
+proc newLabelFrame*(parent: Widget, text: string, class: string = "", visual: string = "default", colormap: string = "new"): LabelFrame =
   new result
 
   result.pathname = pathname(parent.pathname, genName("labelframe_"))
@@ -18,6 +18,7 @@ proc newLabelFrame*(parent: Widget, class: string = "", visual: string = "defaul
   discard result.tk.call(
     "labelframe",
     result.pathname,
+    {"text": repr text}.toArgs(),
     {"class": class, "visual": visual, "colormap": colormap}.toArgs()
   )
 

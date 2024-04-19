@@ -71,7 +71,7 @@ proc `sliderrelief=`*(s: Scale, sliderrelief: WidgetRelief)           = s.config
 proc `state=`*(s: Scale, state: WidgetState)                          = s.configure({"state": $state})
 proc `tickinterval=`*(s: Scale, tickinterval: int or float)           = s.configure({"tickinterval": $tickinterval})
 proc `to=`*(s: Scale, to: int or float)                               = s.configure({"to": $to})
-proc `variable=`*(s: Scale, variable: TkFloat)                        = s.configure({"variable": $variable})
+proc `variable=`*(s: Scale, variable: TkVar)                        = s.configure({"variable": $variable})
 proc `width=`*(s: Scale, width: string or float or int)               = s.configure({"width": $width})
 
 proc bigincrement*(s: Scale): float        = parseFloat s.cget("bigincrement")
@@ -86,5 +86,5 @@ proc sliderrelief*(s: Scale): WidgetRelief = parseEnum[WidgetRelief] s.cget("sli
 proc state*(s: Scale): WidgetState         = parseEnum[WidgetState] s.cget("state")
 proc tickinterval*(s: Scale): float        = parseFloat s.cget("tickinterval")
 proc to*(s: Scale): float                  = parseFloat s.cget("to")
-proc variable*(s: Scale): TkFloat          = createTkVar s.tk, s.cget("variable")
+proc variable*(s: Scale): Tkvar            = createTkVar s.tk, s.cget("variable")
 proc width*(s: Scale): string              = s.cget("width")

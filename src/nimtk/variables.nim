@@ -55,7 +55,7 @@ proc newTkString*(tk: Tk, val: string = ""): TkString = newTkVarImpl(tk, (repr v
 proc newTkFloat*(tk: Tk, val: float = 0): TkFloat = newTkVarImpl(tk, val)
 proc newTkBool*(tk: Tk, val: bool = false): TkBool = newTkVarImpl(tk, val)
 
-proc get*(`var`: TkString): string = getImpl(`var`, `$`)
+proc get*(`var`: TkString or TkVar): string = getImpl(`var`, `$`)
 proc get*(`var`: TkFloat): float = getImpl(`var`, parseFloat)
 proc get*(`var`: TkBool): bool = getImpl(`var`, parseBool)
 

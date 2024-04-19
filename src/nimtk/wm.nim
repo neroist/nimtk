@@ -252,10 +252,10 @@ proc wm_positionfrom*(w: Window): PositionFrom {.alias: "positionfrom".} =
   w.tk.call("wm positionfrom", w)
   parseEnum[PositionFrom] w.tk.result
 
-proc wm_protocol*(w: Window, name: string, clientdata: pointer, command: TkGenericCommand) {.alias: "protocol".} =
+proc wm_protocol*(w: Window, name: string, clientdata: pointer, command: TkWidgetCommand) {.alias: "protocol".} =
   let cmdname = genName("wm_protocol_command_")
   
-  w.tk.registerCmd(clientdata, cmdname, command)
+  w.tk.registerCmd(w, clientdata, cmdname, command)
 
   w.tk.call("wm protocol", w, repr name, cmdname)
 
