@@ -5,8 +5,9 @@ import ./widget
 
 type
   Entry* = ref object of Widget
+  Index = string or int
 
-proc newButton*(parent: Widget, text: string = "", configuration: openArray[(string, string)] = {:}): Entry =
+proc newEntry*(parent: Widget, text: string = "", configuration: openArray[(string, string)] = {:}): Entry =
   new result
 
   result.pathname = pathname(parent.pathname, genName("entry_"))
@@ -20,8 +21,21 @@ proc newButton*(parent: Widget, text: string = "", configuration: openArray[(str
   if configuration.len > 0:
     result.configure(configuration)
 
-proc invoke*(e: Entry) = e.tk.call($e, "invoke")
-proc flash*(e: Entry) = e.tk.call($e, "flash")
+#! bbox
+
+proc delete*(e: Entry, first: Index; last: Index = "") = e.tk.call($e, "delete", first, last)
+proc get*(e: Entry): string = e.tk.call($e, "get")
+proc icursor*(e: Entry, index: Index) = e.tk.call($e, "icursor", index)
+proc index*(e: Entry, index: string): int = parseInt e.tk.call($e, "index", index)
+proc scanMark*(e: Entry, x: int) = e.tk.call($e, "scan mark", x)
+proc scanDragTo*(e: Entry, x: int) = e.tk.call($e, "scan dragto", x)
+proc selectionAdjust*(e: Entry, index: Index) = e.tk.call($e, "selection adjust", index)
+proc selectionClear*(e: Entry) = e.tk.call($e, "selection clear")
+proc selectionFrom*(e: Entry, index: Index) = e.tk.call($e, "selection from", index)
+proc selectionPresent*(e: Entry): bool = e.tk.call($e, "selection present") == "1"
+proc selectionRange*(e: Entry, start, `end`: Index) = e.tk.call($e, "selection range", start, `end`)
+proc selectionTo*(e: Entry, index: Index) = e.tk.call($e, "selection to", index)
+proc validate*(e: Entry) = e.tk.call($e, "validate")
 
 proc setCommand*(e: Entry, clientData: pointer, command: TkWidgetCommand) =
   let name = genName("button_command_")

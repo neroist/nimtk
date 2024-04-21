@@ -261,6 +261,14 @@ type
     Staticgray
     Truecolor
 
+  ValidationMode* {.pure.} = enum 
+    None = "none"
+    Focus = "focus"
+    Focusin = "focusin"
+    Focusout = "focusout"
+    Key = "key"
+    All = "all"
+  
   Tk* = ref object
     interp*: ptr Interp
 
