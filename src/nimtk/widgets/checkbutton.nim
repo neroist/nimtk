@@ -16,8 +16,11 @@ proc newCheckButton*(parent: Widget, text: string = "", configuration: openArray
 
   result.tk.call("checkbutton", result.pathname)
 
-  result.configure({"text": text})
-  result.configure(configuration)
+  if text.len > 0:
+    result.configure({"text": repr text})
+
+  if configuration.len > 0:
+    result.configure(configuration)
 
 proc invoke*(c: CheckButton) = c.tk.call($c, "invoke")
 proc flash*(c: CheckButton) = c.tk.call($c, "flash")
@@ -41,6 +44,7 @@ proc `variable=`*(c: CheckButton, variable: TkVar) = c.configure({"variable": va
 # proc `selectimage=`*(c: CheckButton, selectimage: Image) = c.configure({"selectimage": $selectimage})
 # proc `tristateimage=`*(c: CheckButton, tristateimage: Image) = c.configure({"tristateimage": $tristateimage})
 proc `state=`*(c: CheckButton, state: WidgetState) = c.configure({"state": $state})
+proc `tristatevalue=`*(c: CheckButton, tristatevalue: string) = c.configure({"tristatevalue": $tristatevalue})
 proc `width=`*(c: CheckButton, width: string or float or int) = c.configure({"width": $width})
 
 proc indicatoron*(c: CheckButton): bool = c.cget("indicatoron") == "1"
@@ -50,4 +54,5 @@ proc overrelief*(c: CheckButton): WidgetRelief = parseEnum[WidgetRelief] c.cget(
 proc selectcolor*(c: CheckButton): Color = parseColor c.cget("selectcolor")
 proc variable*(c: CheckButton): TkVar = createTkVar c.tk, c.cget("variable")
 proc state*(c: CheckButton): WidgetState = parseEnum[WidgetState] c.cget("state")
+proc tristatevalue*(c: CheckButton): string = c.cget("tristatevalue")
 proc width*(c: CheckButton): string = c.cget("width")

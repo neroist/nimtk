@@ -16,7 +16,9 @@ proc newScale*(parent: Widget, fromto: Slice[int or float], configuration: openA
   result.tk.call("scale", result.pathname)
 
   result.configure({"from": $fromto.a, "to": $fromto.b})
-  result.configure(configuration)
+
+  if configuration.len > 0:
+    result.configure(configuration)
 
 proc coords*(s: Scale, value: int or float): tuple[x, y: int] = 
   s.tk.call($s, "coords", value)
@@ -35,21 +37,16 @@ proc coords*(s: Scale): tuple[x, y: int] =
   result.y = res[1].parseInt()
 
 proc get*(s: Scale, x, y: int): float =
-  s.tk.call($s, "get", x, y)
-  s.tk.result.parseFloat()
+  s.tk.call($s, "get", x, y).parseFloat()
 
 proc get*(s: Scale): float =
-  s.tk.call($s, "get")
-  s.tk.result.parseFloat()
+  s.tk.call($s, "get").parseFloat()
 
 proc identify*(s: Scale, x, y: int): string =
   s.tk.call($s, "idenify", x, y)
-  s.tk.result
 
 proc set*(s: Scale, value: int or float) {.alias: "value=".} =
   s.tk.call($s, "set", value)
-
-
 
 proc setCommand*(s: Scale, clientData: pointer, command: TkScaleCommand) =
   let name = genName("scale_command_")
@@ -71,7 +68,7 @@ proc `sliderrelief=`*(s: Scale, sliderrelief: WidgetRelief)           = s.config
 proc `state=`*(s: Scale, state: WidgetState)                          = s.configure({"state": $state})
 proc `tickinterval=`*(s: Scale, tickinterval: int or float)           = s.configure({"tickinterval": $tickinterval})
 proc `to=`*(s: Scale, to: int or float)                               = s.configure({"to": $to})
-proc `variable=`*(s: Scale, variable: TkVar)                        = s.configure({"variable": $variable})
+proc `variable=`*(s: Scale, variable: TkVar)                          = s.configure({"variable": variable.varname})
 proc `width=`*(s: Scale, width: string or float or int)               = s.configure({"width": $width})
 
 proc bigincrement*(s: Scale): float        = parseFloat s.cget("bigincrement")

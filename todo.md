@@ -1,0 +1,37 @@
+These should be sorted by urgency/importance
+
+---
+
+- [ ] Support not deciding for the dev, for `toArgs`, options with no value (`value.len == 0`), the option is ignored. this may be used to wrap functions such as `rowconfigure` and `columnconfigure` or other functions which are wraped via default values
+    
+    In summary, dont use default values and instead use `""`
+
+- [ ] For all strings passed to Tcl, use `repr`, or some kind of escaping function
+
+- [ ] Reduce code duplication and use templates & macros when needed
+
+- [x] `configure` macro that transforms code like this
+
+```nim
+button.configure(
+    text = "hi!",
+    foreground = colAliceBlue,
+    relief = WidgetRelief.Groove
+)
+```
+
+into this
+
+```nim
+button.text = "hi!",
+button.foreground = colAliceBlue,
+button.relief = WidgetRelief.Groove
+```
+
+- [ ] All widget creation procs should accept a `configuration` argument which is of type `openArray[(string, string)]` and is passed to `result.configure`
+
+- [ ] Try to merge `Root` and `Tk`
+
+- [ ] Add documenation (<https://www.tcl.tk/man/tcl8.6/>)
+
+- [ ] Learn from `tkinter` and other tk wrappers

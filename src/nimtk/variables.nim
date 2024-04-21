@@ -46,10 +46,14 @@ template newTkVarImpl(tk: Tk, val1: float or bool or string) {.dirty.} =
   discard tk.call("set", result.varname, $val1)
 
 template getImpl(v: TkVar, endproc: proc) =
-  if v.tk == nil: return
+  if v.tk.isNil(): return
 
   v.tk.call("set", v.varname)
   return v.tk.result.endproc
+
+template tkString*(v: TkVar): TkString = cast[TkString](v)
+template tkFloat*(v: TkVar): TkFloat = cast[TkFloat](v)
+template tkBool*(v: TkVar): TkBool = cast[TkBool](v)
 
 proc newTkString*(tk: Tk, val: string = ""): TkString = newTkVarImpl(tk, (repr val))
 proc newTkFloat*(tk: Tk, val: float = 0): TkFloat = newTkVarImpl(tk, val)
@@ -62,7 +66,13 @@ proc get*(`var`: TkBool): bool = getImpl(`var`, parseBool)
 proc set*(`var`: TkVar, val: string | float | bool) =
   if `var`.tk == nil: return
 
-  `var`.tk.call("set", `var`.varname, $val)
+  when val is string:
+    `var`.tk.call("set", `var`.varname, repr val)
+  else:
+    `var`.tk.call("set", `var`.varname, $val)
+
+proc add*(`var`: TkString, val: string) =
+  `var`.set(`var`.get() & val)
 
 proc `$`*(`var`: TkVarType): string =
   if `var` == nil or `var`.tk == nil: ""

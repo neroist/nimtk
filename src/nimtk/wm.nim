@@ -10,8 +10,9 @@ import ../nimtk
 type
   Window* = Toplevel or Root
 
-template lucky(op: string) {.dirty.} =
-  let rest = initarr[1].split(op)
+# used in winfo
+template lucky*(op: string) {.dirty.} =
+  let rest = res[1].split(op)
 
   result.height = rest[0].parseInt
   result.x = rest[1].parseInt
@@ -23,7 +24,7 @@ template lucky(op: string) {.dirty.} =
 
 template unlucky(op, op2: string) {.dirty.} =
   let
-    piece1 = initarr[1].split(op)
+    piece1 = res[1].split(op)
     piece2 = piece1[1].split(op2)
 
   result.height = piece1[0].parseInt()
@@ -51,9 +52,7 @@ proc wm_aspect*(w: Window): array[4, int] {.alias: "aspect".} =
   for idx, num in res:
     result[idx] = num.parseInt()
 
-proc wm_attributes*(w: Window, option: string): string {.alias: "attributes".} =
-  w.tk.call("wm attributes", w, '-' & option)
-  w.tk.result
+proc wm_attributes*(w: Window, option: string): string {.alias: "attributes".} = w.tk.call("wm attributes", w, '-' & option)
 proc wm_attributes*(w: Window, option, val: string) {.alias: "[]=".} = w.tk.call("wm attributes", w, '-' & option, val)
 proc wm_attributes*(w: Window, dict: openArray[(string, string)]) {.alias: "attributes".} = w.tk.call("wm attributes", w, dict.toArgs())
 
@@ -108,7 +107,6 @@ proc `zoomed=`*(w: Window, zoomed: bool) = w.wm_attributes("zoomed", $zoomed)
 proc wm_client*(w: Window, name: string) {.alias: "client=".} = w.tk.call("wm client", w, name)
 proc wm_client*(w: Window): string {.alias: "client".} =
   w.tk.call("wm client", w)
-  w.tk.result
 
 proc wm_colormapwindows*(w: Window, windowList: seq[Widget]) {.alias: "colormapwindows=".} = w.tk.call("wm colormapwindows", w, windowList.join(" "))
 proc wm_colormapwindows*(w: Window): seq[Widget] {.alias: "colormapwindows".} =
@@ -123,14 +121,12 @@ proc wm_colormapwindows*(w: Window): seq[Widget] {.alias: "colormapwindows".} =
 proc wm_command*(w: Window, value: string) {.alias: "command=".} = w.tk.call("wm command", w, value)
 proc wm_command*(w: Window): string {.alias: "command".} =
   w.tk.call("wm command", w)
-  w.tk.result
 
 proc wm_deiconify*(w: Window) {.alias: "deiconify".} = w.tk.call("wm deiconify", w)
 
 proc wm_focusmodel*(w: Window, focusmodel: FocusModel) {.alias: "focusmodel=".} = w.tk.call("wm focusmodel", w, focusmodel)
 proc wm_focusmodel*(w: Window): FocusModel {.alias: "focusmodel".} =
-  w.tk.call("wm focusmodel", w)
-  parseEnum[FocusModel] w.tk.result
+  parseEnum[FocusModel] w.tk.call("wm focusmodel", w)
 
 proc wm_forget*(w: Window) {.alias: "forget".} = w.tk.call("wm forget", w)
 
@@ -144,20 +140,20 @@ proc wm_geometry*(w: Window, x, y: int) {.alias: "geometry".} =
     ystr = if y >= 0: '+' & $y else: $y
 
   w.tk.call("wm geometry", w, xstr & ystr)
-proc wm_geometry*(w: Window): tuple[width, height, x, y: int] {.alias: "geometry".} =
+proc wm_geometry*(w: Window): tuple[width, height, x, y: int] = # {.alias: "geometry".}
   w.tk.call("wm geometry", w)
   
-  let initarr = w.tk.result.split("x")
+  let res = w.tk.result.split("x")
 
-  result.width = initarr[0].parseInt()
+  result.width = res[0].parseInt()
 
-  if '+' in initarr[1] and '-' notin initarr[1]:
+  if '+' in res[1] and '-' notin res[1]:
     lucky("+")
-  elif '-' in initarr[1] and '+' notin initarr[1]:
+  elif '-' in res[1] and '+' notin res[1]:
     lucky("-")
   else:
     # ???-???+???
-    if initarr[1].find('+') > initarr[1].find('-'):
+    if res[1].find('+') > res[1].find('-'):
       unlucky("-", "+")
     else:
       unlucky("+", "-")
@@ -190,12 +186,10 @@ proc wm_iconify*(w: Window) {.alias: "iconify".} = w.tk.call("wm iconify", w)
 proc wm_iconmask*(w: Window, bitmap: string) {.alias: "iconmask=".} = w.tk.call("wm iconmask", w, bitmap)
 proc wm_iconmask*(w: Window): string {.alias: "iconmask".} =
   w.tk.call("wm iconmask", w)
-  w.tk.result
 
 proc wm_iconname*(w: Window, newName: string) {.alias: "iconname=".} = w.tk.call("wm iconname", w, newName)
 proc wm_iconname*(w: Window): string {.alias: "iconname".} =
   w.tk.call("wm iconname", w)
-  w.tk.result
 
 proc wm_iconphoto*(w: Window, images: string) {.alias: "iconphoto=".} = w.tk.call("wm iconphoto", w, images)
 proc wm_iconphoto*(w: Window, images: varargs[string]) {.alias: "iconphoto".} = w.tk.call("wm iconphoto", w, images.join(" "))
@@ -244,13 +238,11 @@ proc wm_minsize*(w: Window): tuple[width, height: int] {.alias: "minsize=".} =
 
 proc wm_overrideredirect*(w: Window, overrideredirect: bool) {.alias: "overrideredirect=".} = w.tk.call("wm overridedirect", w, overrideredirect)
 proc wm_overrideredirect*(w: Window): bool {.alias: "overrideredirect".} =
-  w.tk.call("wm overridedirect", w)
-  w.tk.result == "1"
+  w.tk.call("wm overridedirect", w) == "1"
 
 proc wm_positionfrom*(w: Window, who: PositionFrom) {.alias: "positionfrom=".} = w.tk.call("wm positionfrom", w, who)
 proc wm_positionfrom*(w: Window): PositionFrom {.alias: "positionfrom".} =
-  w.tk.call("wm positionfrom", w)
-  parseEnum[PositionFrom] w.tk.result
+  parseEnum[PositionFrom] w.tk.call("wm positionfrom", w)
 
 proc wm_protocol*(w: Window, name: string, clientdata: pointer, command: TkWidgetCommand) {.alias: "protocol".} =
   let cmdname = genName("wm_protocol_command_")
@@ -271,8 +263,7 @@ proc wm_resizable*(w: Window): tuple[width, height: bool] {.alias: "resizable".}
 
 proc wm_sizefrom*(w: Window, who: PositionFrom) {.alias: "sizefrom".} = w.tk.call("wm sizefrom", w, $who)
 proc wm_sizefrom*(w: Window): PositionFrom {.alias: "sizefrom".} =
-  w.tk.call("wm sizefrom", $w)
-  parseEnum[PositionFrom] w.tk.result
+  parseEnum[PositionFrom] w.tk.call("wm sizefrom", $w)
 
 proc wm_stackorder*(w: Window, isbelow: Window): seq[Widget] {.alias: "stackorder".} =
   w.tk.call("wm stackorder", w, "isbelow", isbelow)
@@ -283,13 +274,11 @@ proc wm_stackorder*(w: Window, isabove: Window): seq[Widget] {.alias: "stackorde
 
 proc wm_state*(w: Window, newstate: WindowState) {.alias: "state=".} = w.tk.call("wm state", w, newstate)
 proc wm_state*(w: Window): WindowState {.alias: "state".} =
-  w.tk.call("wm state", w)
-  parseEnum[WindowState] w.tk.result
+  parseEnum[WindowState] w.tk.call("wm state", w)
 
 proc wm_title*(w: Window, title: string) {.alias: "title=".} = w.tk.call("wm title", w, title)
 proc wm_title*(w: Window): string {.alias: "title".} =
   w.tk.call("wm title", w)
-  w.tk.result
 
 proc wm_transient*(w: Window, container: Widget) {.alias: "transient=".} = w.tk.call("wm transient", w, container)
 proc wm_transient*(w: Window): Widget {.alias: "transient".} =

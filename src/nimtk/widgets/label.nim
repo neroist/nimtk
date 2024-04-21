@@ -19,7 +19,8 @@ proc newLabel*(parent: Widget, text: string = ""): Label =
 
   result.tk.call("label", result.pathname)
 
-  result.configure({"text": text})
+  if text.len > 0:
+    result.configure({"text": repr text})
 
 proc `height=`*(l: Label, height: string or float or int) = l.configure({"height": $height})
 proc `state=`*(l: Label, state: LabelState) = l.configure({"state": $state})

@@ -63,14 +63,12 @@ checkbutton.cursor = Gobbler # set button2 cursor
 checkbutton.padx = "3c" # set button2 horizontal padding
 checkbutton.setCommand(nil) do (w: Widget, _: pointer):
   echo checkvar.get, '\n'
-  checkvar.set(not checkvar)
 
 msg.grid(padx = 25, pady = 25)
 msg.text = "This is a message! o sitelen a!"
 msg.cursor = Gumby
 
 scale.grid(padx = 25, pady = 25)
-scale.showvalue = true
 scale.label = "nanpa!"
 scale.resolution = 0.01
 scale.orient = Horizontal

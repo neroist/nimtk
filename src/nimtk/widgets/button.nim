@@ -14,7 +14,8 @@ proc newButton*(parent: Widget, text: string = "", configuration: openArray[(str
 
   result.tk.call("button", result.pathname)
 
-  result.configure({"text": text})
+  if text.len > 0:
+    result.configure({"text": repr text})
   
   if configuration.len > 0:
     result.configure(configuration)

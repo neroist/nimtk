@@ -12,12 +12,10 @@ proc `$`*(i: Image): string = i.name
 proc delete*(i: Image) = i.tk.call("image delete", i)
 
 proc height*(i: Image): float =
-  i.tk.call("image height", i)
-  i.tk.result.parseFloat()
+  i.tk.call("image height", i).parseFloat()
 
 proc inuse*(i: Image): bool =
-  i.tk.call("image inuse", i)
-  i.tk.result == "1"
+  i.tk.call("image inuse", i) == "1"
 
 proc names*(tk: Tk): seq[Image] =
   tk.call("image names")
@@ -30,12 +28,9 @@ proc names*(tk: Tk): seq[Image] =
 
 proc type*(i: Image): string =
   i.tk.call("image type", i)
-  i.tk.result
 
 proc types*(tk: Tk): seq[string] =
-  tk.call("image types")
-  tk.result.split()
+  tk.call("image types").split()
 
 proc width*(i: Image): float =
-  i.tk.call("image width", i)
-  i.tk.result.parseFloat()
+  i.tk.call("image width", i).parseFloat()

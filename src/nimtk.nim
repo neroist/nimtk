@@ -1,9 +1,10 @@
 import std/strutils
-
-import nimtcl/tk as _ # avoid name conflicts
-import nimtcl
+import std/macros
+import std/with
 
 import nimtk/exceptions
+import nimtcl/tk
+import nimtcl
 
 type
   AnchorPosition* {.pure.} = enum
@@ -243,11 +244,22 @@ type
     Icon = "icon"
     Zoomed = "zoomed"
 
-  WidgetState* = enum
+  WidgetState* {.pure.} = enum
     Normal = "normal"
     Active = "active"
     Disabled = "disabled"
 
+  AfterEventHandler* {.pure.} = enum
+    Idle
+    Timer
+
+  VisualClass* {.pure.} = enum
+    Directcolor
+    Grayscale
+    Pseudocolor
+    Staticcolor
+    Staticgray
+    Truecolor
 
   Tk* = ref object
     interp*: ptr Interp
@@ -274,15 +286,16 @@ proc eval*(tk: Tk, cmd: string): int {.discardable.} =
     raise newException(
       TkError,
       "Error when evaluating Tcl!\n\n" &
-      "Command: " & cmd & "\n" &
-      "Result: " & $tk.interp.getStringResult()
+      "Command: $1\n" % cmd & 
+      "Result: $1" % $tk.interp.getStringResult()
     )
-
-proc call*(tk: Tk, cmd: string, args: varargs[string, `$`]): int {.discardable.} =
-  tk.eval(cmd & " " & args.join(" ").strip())
 
 proc result*(tk: Tk): string =
   $tk.interp.getStringResult()
+
+proc call*(tk: Tk, cmd: string, args: varargs[string, `$`]): string {.discardable.} =
+  tk.eval(cmd & " " & args.join(" ").strip())
+  tk.result
 
 proc mainloop*(tk: Tk) =
   tkMainloop()
@@ -326,3 +339,7 @@ proc newTk*(): Tk =
     )
 
   result.init()
+
+export with
+macro config*(arg: typed; calls: varargs[untyped]) = quote do: with(`arg`, `calls`)
+  

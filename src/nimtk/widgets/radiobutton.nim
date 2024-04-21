@@ -17,7 +17,9 @@ proc newRadioButton*(parent: Widget, text: string = "", configuration: openArray
   result.tk.call("radiobutton", result.pathname)
 
   result.configure({"text": repr text, "value": "1"})
-  result.configure(configuration)
+
+  if configuration.len > 0:
+    result.configure(configuration)
 
 
 proc invoke*(r: RadioButton) = r.tk.call($r, "invoke")
@@ -41,6 +43,7 @@ proc `overrelief=`*(r: RadioButton, overrelief: WidgetRelief) = r.configure({"ov
 proc `selectcolor=`*(r: RadioButton, selectcolor: Color) = r.configure({"selectcolor": $selectcolor})
 proc `variable=`*(r: RadioButton, variable: TkVar) = r.configure({"variable": variable.varname})
 proc `value=`*(r: RadioButton, value: int or string) = r.configure({"value": $value})
+proc `tristatevalue=`*(r: RadioButton, tristatevalue: string) = r.configure({"tristatevalue": $tristatevalue})
 # proc `selectimage=`*(r: RadioButton, selectimage: Image) = r.configure({"selectimage": $selectimage})
 # proc `tristateimage=`*(r: RadioButton, tristateimage: Image) = r.configure({"tristateimage": $tristateimage})
 proc `state=`*(r: RadioButton, state: WidgetState) = r.configure({"state": $state})
@@ -53,5 +56,6 @@ proc overrelief*(r: RadioButton): WidgetRelief = parseEnum[WidgetRelief] r.cget(
 proc selectcolor*(r: RadioButton): Color = parseColor r.cget("selectcolor")
 proc variable*(r: RadioButton): TkVar = createTkVar r.tk, r.cget("variable")
 proc value*(r: RadioButton): string = r.cget("value")
+proc tristatevalue*(r: RadioButton): string = r.cget("tristatevalue")
 proc state*(r: RadioButton): WidgetState = parseEnum[WidgetState] r.cget("state")
 proc width*(r: RadioButton): string = r.cget("width")

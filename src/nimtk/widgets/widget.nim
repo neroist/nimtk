@@ -68,7 +68,7 @@ type
     Deactivate
 
   Event* = object
-    eventType*: EventType
+    # eventType*: EventType
 
     # event data
     lastRequest*: int
@@ -308,7 +308,6 @@ template configure*(w: Widget or typed, args: openArray[(string, string)]) =
 
 template cget*(w: Widget or typed, option: string): string =
   w.tk.call($w, "cget", {option: " "}.toArgs())
-  w.tk.result
 
 proc destroy*(w: Widget) =
   ## Destroys a widget and its children
@@ -399,13 +398,13 @@ proc place*(
   w: Widget,
   anchor: AnchorPosition = Northwest,
   bordermode: BorderMode = Inside,
-  height: string,
+  height: int or float or string,
   `in`: Widget = nil,
   relheight: float = 1,
   relwidth: float = 1,
   relx: float = 0,
   rely: float = 0,
-  width: string,
+  width: int or float or string,
   x: string or float,
   y: string or float
 ) =
@@ -538,9 +537,7 @@ proc gridPropagate*(w: Widget, propagate: bool) =
   w.tk.call("grid propagate", w, propagate)
 
 proc gridPropagate*(w: Widget): bool =
-  w.tk.call("grid propagate", w)
-
-  w.tk.result == "1"
+  w.tk.call("grid propagate", w) == "1"
 
 proc gridRemove*(w: Widget) =
   w.tk.call("grid remove", w)
@@ -569,12 +566,11 @@ proc busyCget*(w: Widget): string =
   w.tk.call("tk busy cget", w, "-cursor")
   w.tk.result
 
-proc busyConfigure*(w: Widget, cursorName: string) =
-  w.tk.call("tk busy configure", w, {"cursor": cursorName}.toArgs())
+proc busyConfigure*(w: Widget, cursorName: string or Cursor) =
+  w.tk.call("tk busy configure", w, {"cursor": repr $cursorName}.toArgs())
 
 proc busyConfigure*(w: Widget): seq[string] =
-  w.tk.call("tk busy configure", w)
-  w.tk.result[1..^2].split()[3..^1]
+  w.tk.call("tk busy configure", w)[1..^2].split()[3..^1]
 
 proc busyForget*(w: Widget) =
   w.tk.call("tk busy forget", w)
@@ -585,24 +581,29 @@ proc busyCurrent*(w: Widget, pattern: string = ""): seq[Widget] =
   w.slavesImpl()
 
 proc busyStatus*(w: Widget): bool =
-  w.tk.call("tk busy status", w)
-  
-  w.tk.result == "1"
+  w.tk.call("tk busy status", w) == "1"
 
 # --- appname
 
 proc appname*(tk: Tk, appname: string) {.alias: "appname=".} =
-  tk.call("tk appname", appname)
+  tk.call("tk appname", repr appname)
 
 proc appname*(tk: Tk): string =
   tk.call("tk appname")
   tk.result
 
+# --- tk_version & tk_patchLevel
+
+proc version*(tk: Tk): string =
+  tk.call("set tk_version")
+
+proc patchLevel*(tk: Tk): string =
+  tk.call("set tk_patchLevel")
+
 # --- inactive
 
 proc inactive*(w: Widget): int =
-  w.tk.call("tk inactive", {"displayof": $w}.toArgs)
-  parseInt w.tk.result
+  parseInt w.tk.call("tk inactive", {"displayof": $w}.toArgs)
 
 proc inactiveReset*(w: Widget) =
   w.tk.call("tk inactive", {"displayof": $w}.toArgs, "reset")
@@ -613,8 +614,7 @@ proc scaling*(w: Widget, number: float) {.alias: "scaling=".} =
   w.tk.call("tk scaling", {"displayof": $w}.toArgs, number)
 
 proc scaling*(w: Widget): float =
-  w.tk.call("tk scaling", {"displayof": $w}.toArgs)
-  parseFloat w.tk.result
+  parseFloat w.tk.call("tk scaling", {"displayof": $w}.toArgs)
 
 # --- fontchooser 
 
@@ -626,8 +626,7 @@ proc useinputmethods*(w: Widget, useinputmethods: bool) {.alias: "useinputmethod
   w.tk.call("tk useinputmethods", {"displayof": $w}.toArgs, useinputmethods)
 
 proc useinputmethods*(w: Widget): bool =
-  w.tk.call("tk useinputmethods", {"displayof": $w}.toArgs)
-  w.tk.result == "1"
+  w.tk.call("tk useinputmethods", {"displayof": $w}.toArgs) == "1"
 
 # --- windowingsystem
 
@@ -660,8 +659,6 @@ proc chooseDirectory*(
     }.toArgs()
   )
 
-  w.tk.result
-
 # --- tk_chooseColor
 
 proc chooseColor*(
@@ -677,9 +674,7 @@ proc chooseColor*(
       "initialcolor": $initialColor,
       "title": repr title,
     }.toArgs()
-  )
-
-  w.tk.result.parseColor()
+  ).parseColor()
 
 # --- tk_focus*
 
@@ -749,8 +744,6 @@ template getFileImpl(cmd: string): string {.dirty.} =
       "typevariable": $typevariable
     }.toArgs()
   )
-
-  w.tk.result
 
 proc getOpenFile*(
   w: Widget,
@@ -843,8 +836,6 @@ proc grabRelease*(w: Widget) =
 
 proc grabStatus*(w: Widget): string =
   w.tk.call("grab status", w)
-  
-  w.tk.result
 
 proc grabCurrent*(w: Widget): Widget =
   w.tk.call("grab current", w)
@@ -923,8 +914,87 @@ proc bindtags*(w: Widget, tagList: varargs[string, `$`]) =
   w.tk.call("bindtags", w, tagList.toTclList())
 
 proc bindtags*(w: Widget): seq[string] =
-  w.tk.call("bindtags", w)
-  w.tk.result.split(" ")
+  w.tk.call("bindtags", w).split(" ")
+
+# --- event
+
+proc eventAdd*(tk: Tk, virtual: string, sequence: varargs[string]) =
+  tk.call("event add", virtual, sequence.join(" "))
+
+proc eventDelete*(tk: Tk, virtual: string, sequence: varargs[string] = "") =
+  tk.call("event delete", virtual, sequence.join(" "))
+
+proc eventGenerate*(
+  tk: Tk,
+  w: Widget,
+  event: string,
+
+  above: Widget or string = "",
+  borderwidth: int or string = "",
+  button: int or string = "",
+  count: int or string = "",
+  data: string = "",
+  delta: int or string = "",
+  detail: string = "",
+  focus: bool or string = "",
+  height: int or string = "",
+  keycode: int or string = "",
+  keysym: Keysym or string = "",
+  mode: string = "",
+  override: bool or string = "",
+  place: string = "",
+  root: Widget or string = "",
+  rootx: int or string = "",
+  rooty: int or string = "",
+  sendevent: bool or string = "",
+  serial: int or string = "",
+  state: string = "",
+  subwindow: Widget or string = "",
+  time: int or string = "",
+  warp: bool or string = "",
+  width: int or string = "",
+  `when`: string = "",
+  x: int or string = "" 
+) =
+  tk.call(
+    "event generate",
+    repr $w,
+    event,
+    {
+      "above": above,
+      "borderwidth": borderwidth,
+      "button": button,
+      "count": count,
+      "data": data,
+      "delta": delta,
+      "detail": detail,
+      "focus": focus,
+      "height": height,
+      "keycode": keycode,
+      "keysym": keysym,
+      "mode": mode,
+      "override": override,
+      "place": place,
+      "root": root,
+      "rootx": rootx,
+      "rooty": rooty,
+      "sendevent": sendevent,
+      "serial": serial,
+      "state": state,
+      "subwindow": subwindow,
+      "time": time,
+      "warp": warp,
+      "width": width,
+      "when": `when`,
+      "x": x
+    }.toArgs()
+  )
+
+proc eventInfo*(tk: Tk): seq[string] =
+  tk.call("event info").split(' ')
+
+proc eventInfo*(tk: Tk, virtual: string): seq[string] =
+  tk.call("event info", virtual).split(' ')
 
 # --- tk_text*
 
@@ -948,8 +1018,6 @@ proc clipboardClear*(w: Widget) =
 proc clipboardGet*(w: Widget, `type`: string = "UTF8_STRING"): string =
   w.tk.call("clipboard get", {"displayof": $w, "type": `type`}.toArgs)
 
-  w.tk.result
-
 # --- selection
 
 proc selectionClear*(w: Widget, selection: string = "PRIMARY") =
@@ -957,7 +1025,6 @@ proc selectionClear*(w: Widget, selection: string = "PRIMARY") =
 
 proc selectionGet*(w: Widget, selection = "PRIMARY", `type`: string = "UTF8_STRING"): string =
   w.tk.call("selection get", {"displayof": $w, "selection": selection, "type": `type`}.toArgs)
-  w.tk.result
 
 proc selectionHandle*(w: Widget, selection = "PRIMARY", `type`: string = "UTF8_STRING", format: string = "STRING", clientdata: pointer = nil, command: TkSelectionHandleCommand) =
   var cmdname: string
@@ -1002,82 +1069,86 @@ proc waitWindow*(w: Widget) =
 
 # --- --- Common widget options
 
-proc `activebackground=`*(w: Widget, activebackground: Color) = w.configure({"activebackground": $activebackground})
-proc `activeborderwidth=`*(w: Widget, activeborderwidth: string or float or int) = w.configure({"activeborderwidth": $activeborderwidth})
-proc `activeforeground=`*(w: Widget, activeforeground: Color) = w.configure({"activeforeground": $activeforeground})
-proc `anchor=`*(w: Widget, anchor: AnchorPosition) = w.configure({"anchor": $anchor})
-proc `background=`*(w: Widget, background: Color) {.alias: "bg=".} = w.configure({"background": $background})
+proc `activebackground=`*(w: Widget, activebackground: Color)                         = w.configure({"activebackground": $activebackground})
+proc `activeborderwidth=`*(w: Widget, activeborderwidth: string or float or int)      = w.configure({"activeborderwidth": $activeborderwidth})
+proc `activeforeground=`*(w: Widget, activeforeground: Color)                         = w.configure({"activeforeground": $activeforeground})
+proc `anchor=`*(w: Widget, anchor: AnchorPosition)                                    = w.configure({"anchor": $anchor})
+proc `background=`*(w: Widget, background: Color) {.alias: "bg=".}                    = w.configure({"background": $background})
 proc `borderwidth=`*(w: Widget, borderwidth: string or float or int) {.alias: "bd=".} = w.configure({"borderwidth": $borderwidth})
-proc `cursor=`*(w: Widget, cursor: Cursor) = w.configure({"cursor": $cursor})
-proc `compound=`*(w: Widget, compound: WidgetCompound) = w.configure({"compound": $compound})
-proc `disabledforeground=`*(w: Widget, disabledforeground: Color) = w.configure({"disabledforeground": $disabledforeground})
-proc `exportselection=`*(w: Widget, exportselection: bool) = w.configure({"exportselection": $exportselection})
-# proc `font=`*(w: Widget, font) = w.configure({"font": $font})
-proc `foreground=`*(w: Widget, foreground: Color) {.alias: "fg=".} = w.configure({"foreground": $foreground})
-proc `highlightbackground=`*(w: Widget, highlightbackground: Color) = w.configure({"highlightbackground": $highlightbackground})
-proc `highlightcolor=`*(w: Widget, highlightcolor: Color) = w.configure({"highlightcolor": $highlightcolor})
-proc `highlightthickness=`*(w: Widget, highlightthickness: string or float or int) = w.configure({"highlightthickness": $highlightthickness})
-# proc `image=`*(w: Widget, image) = w.configure({"image": $image})
-proc `insertbackground=`*(w: Widget, insertbackground: Color) = w.configure({"insertbackground": $insertbackground})
-proc `insertborderwidth=`*(w: Widget, insertborderwidth: string or float or int) = w.configure({"insertborderwidth": $insertborderwidth})
-proc `insertofftime=`*(w: Widget, insertofftime: int) = w.configure({"insertofftime": $insertofftime})
-proc `insertontime=`*(w: Widget, insertontime: int) = w.configure({"insertontime": $insertontime})
-proc `insertwidth=`*(w: Widget, insertwidth: string) = w.configure({"insertwidth": $insertwidth})
-proc `jump=`*(w: Widget, jump: bool) = w.configure({"jump": $jump})
-proc `justify=`*(w: Widget, justify: TextJustify) = w.configure({"justify": $justify})
-proc `orient=`*(w: Widget, orient: WidgetOrientation) = w.configure({"orient": $orient})
-proc `padx=`*(w: Widget, padx: string or float or int) = w.configure({"padx": $padx})
-proc `pady=`*(w: Widget, pady: string or float or int) = w.configure({"pady": $pady})
-proc `relief=`*(w: Widget, relief: WidgetRelief) = w.configure({"relief": $relief})
-proc `repeatdelay=`*(w: Widget, repeatdelay: float) = w.configure({"repeatdelay": $repeatdelay})
-proc `repeatinterval=`*(w: Widget, repeatinterval: float) = w.configure({"repeatinterval": $repeatinterval})
-proc `selectbackground=`*(w: Widget, selectbackground: Color) = w.configure({"selectbackground": $selectbackground})
-proc `selectborderwidth=`*(w: Widget, selectborderwidth: string or float or int) = w.configure({"selectborderwidth": $selectborderwidth})
-proc `selectforeground=`*(w: Widget, selectforeground: Color) = w.configure({"selectforeground": $selectforeground})
-proc `setgrid=`*(w: Widget, setgrid: bool) = w.configure({"setgrid": $setgrid})
-proc `takefocus=`*(w: Widget, takefocus: bool or string) = w.configure({"takefocus": $takefocus})
-proc `text=`*(w: Widget, text: string) = w.configure({"text": repr text})
-proc `textvariable=`*(w: Widget, textvariable: TkString) = w.configure({"textvariable": $textvariable})
-proc `troughcolor=`*(w: Widget, troughcolor: Color) = w.configure({"troughcolor": $troughcolor})
-proc `underline=`*(w: Widget, underline: int) = w.configure({"underline": $underline})
-proc `wraplength=`*(w: Widget, wraplength: int) = w.configure({"wraplength": $wraplength})
+proc `cursor=`*(w: Widget, cursor: Cursor)                                            = w.configure({"cursor": $cursor})
+proc `compound=`*(w: Widget, compound: WidgetCompound)                                = w.configure({"compound": $compound})
+proc `disabledforeground=`*(w: Widget, disabledforeground: Color)                     = w.configure({"disabledforeground": $disabledforeground})
+proc `exportselection=`*(w: Widget, exportselection: bool)                            = w.configure({"exportselection": $exportselection})
+#    proc `font=`*(w: Widget, font)                                                   = w.configure({"font": $font})
+proc `foreground=`*(w: Widget, foreground: Color) {.alias: "fg=".}                    = w.configure({"foreground": $foreground})
+proc `highlightbackground=`*(w: Widget, highlightbackground: Color)                   = w.configure({"highlightbackground": $highlightbackground})
+proc `highlightcolor=`*(w: Widget, highlightcolor: Color)                             = w.configure({"highlightcolor": $highlightcolor})
+proc `highlightthickness=`*(w: Widget, highlightthickness: string or float or int)    = w.configure({"highlightthickness": $highlightthickness})
+#    proc `image=`*(w: Widget, image)                                                 = w.configure({"image": $image})
+proc `insertbackground=`*(w: Widget, insertbackground: Color)                         = w.configure({"insertbackground": $insertbackground})
+proc `insertborderwidth=`*(w: Widget, insertborderwidth: string or float or int)      = w.configure({"insertborderwidth": $insertborderwidth})
+proc `insertofftime=`*(w: Widget, insertofftime: int)                                 = w.configure({"insertofftime": $insertofftime})
+proc `insertontime=`*(w: Widget, insertontime: int)                                   = w.configure({"insertontime": $insertontime})
+proc `insertwidth=`*(w: Widget, insertwidth: int or float or string)                  = w.configure({"insertwidth": $insertwidth})
+proc `jump=`*(w: Widget, jump: bool)                                                  = w.configure({"jump": $jump})
+proc `justify=`*(w: Widget, justify: TextJustify)                                     = w.configure({"justify": $justify})
+proc `orient=`*(w: Widget, orient: WidgetOrientation)                                 = w.configure({"orient": $orient})
+proc `padx=`*(w: Widget, padx: string or float or int)                                = w.configure({"padx": $padx})
+proc `pady=`*(w: Widget, pady: string or float or int)                                = w.configure({"pady": $pady})
+proc `relief=`*(w: Widget, relief: WidgetRelief)                                      = w.configure({"relief": $relief})
+proc `repeatdelay=`*(w: Widget, repeatdelay: float)                                   = w.configure({"repeatdelay": $repeatdelay})
+proc `repeatinterval=`*(w: Widget, repeatinterval: float)                             = w.configure({"repeatinterval": $repeatinterval})
+proc `selectbackground=`*(w: Widget, selectbackground: Color)                         = w.configure({"selectbackground": $selectbackground})
+proc `selectborderwidth=`*(w: Widget, selectborderwidth: string or float or int)      = w.configure({"selectborderwidth": $selectborderwidth})
+proc `selectforeground=`*(w: Widget, selectforeground: Color)                         = w.configure({"selectforeground": $selectforeground})
+proc `setgrid=`*(w: Widget, setgrid: bool)                                            = w.configure({"setgrid": $setgrid})
+proc `takefocus=`*(w: Widget, takefocus: bool or string)                              = w.configure({"takefocus": $takefocus})
+proc `text=`*(w: Widget, text: string)                                                = w.configure({"text": repr text})
+proc `textvariable=`*(w: Widget, textvariable: TkString)                              = w.configure({"textvariable": textvariable.varname})
+proc `troughcolor=`*(w: Widget, troughcolor: Color)                                   = w.configure({"troughcolor": $troughcolor})
+proc `underline=`*(w: Widget, underline: int)                                         = w.configure({"underline": $underline})
+proc `wraplength=`*(w: Widget, wraplength: int)                                       = w.configure({"wraplength": $wraplength})
+proc `xscrollcommand=`*(w: Widget, xscrollcommand: string)                            = w.configure({"xscrollcommand": $xscrollcommand})
+proc `yscrollcommand=`*(w: Widget, yscrollcommand: string)                            = w.configure({"yscrollcommand": $yscrollcommand})
 
-proc activebackground*(w: Widget): Color = parseColor w.cget("activebackground")
-proc activeborderwidth*(w: Widget): string = w.cget("activeborderwidth")
-proc activeforeground*(w: Widget): Color = parseColor w.cget("activeforeground")
-proc anchor*(w: Widget): AnchorPosition = parseEnum[AnchorPosition] w.cget("anchor")
-proc background*(w: Widget): Color {.alias: "bg".} = parseColor w.cget("background")
+proc activebackground*(w: Widget): Color             = parseColor w.cget("activebackground")
+proc activeborderwidth*(w: Widget): string           = w.cget("activeborderwidth")
+proc activeforeground*(w: Widget): Color             = parseColor w.cget("activeforeground")
+proc anchor*(w: Widget): AnchorPosition              = parseEnum[AnchorPosition] w.cget("anchor")
+proc background*(w: Widget): Color {.alias: "bg".}   = parseColor w.cget("background")
 proc borderwidth*(w: Widget): string {.alias: "bd".} = w.cget("borderwidth")
-proc cursor*(w: Widget): Cursor = parseEnum[Cursor] w.cget("cursor")
-proc compound*(w: Widget): WidgetCompound = parseEnum[WidgetCompound] w.cget("compound")
-proc disabledforeground*(w: Widget): Color = parseColor w.cget("disabledforeground")
-proc exportselection*(w: Widget): bool = w.cget("exportselection") == "1"
-# proc font*(w: Widget) = w.cget("font")
-proc foreground*(w: Widget): Color {.alias: "fg".} = parseColor w.cget("foreground")
-proc highlightbackground*(w: Widget): Color = parseColor w.cget("highlightbackground")
-proc highlightcolor*(w: Widget): Color = parseColor w.cget("highlightcolor")
-proc highlightthickness*(w: Widget): string = w.cget("highlightthickness")
-# proc image*(w: Widget) = w.cget("image")
-proc insertbackground*(w: Widget): Color = parseColor w.cget("insertbackground")
-proc insertborderwidth*(w: Widget): string = w.cget("insertborderwidth")
-proc insertofftime*(w: Widget): int = parseInt w.cget("insertofftime")
-proc insertontime*(w: Widget): int = parseInt w.cget("insertontime")
-proc insertwidth*(w: Widget): string = w.cget("insertwidth")
-proc jump*(w: Widget): bool = w.cget("jump") == "1"
-proc justify*(w: Widget): TextJustify = parseEnum[TextJustify] w.cget("justify")
-proc orient*(w: Widget): WidgetOrientation = parseEnum[WidgetOrientation] w.cget("orient")
-proc padx*(w: Widget): string = w.cget("padx")
-proc pady*(w: Widget): string = w.cget("pady")
-proc relief*(w: Widget): WidgetRelief = parseEnum[WidgetRelief] w.cget("relief")
-proc repeatdelay*(w: Widget): float = parseFloat w.cget("repeatdelay")
-proc repeatinterval*(w: Widget): float = parseFloat w.cget("repeatinterval")
-proc selectbackground*(w: Widget): Color = parseColor w.cget("selectbackground")
-proc selectborderwidth*(w: Widget): string = w.cget("selectborderwidth")
-proc selectforeground*(w: Widget): Color = parseColor w.cget("selectforeground")
-proc setgrid*(w: Widget): bool = w.cget("setgrid") == "1"
-proc takefocus*(w: Widget): string = w.cget("takefocus")
-proc text*(w: Widget): string = w.cget("text")
-proc textvariable*(w: Widget): TkString = createTkVar w.tk, w.cget("textvariable")
-proc troughcolor*(w: Widget): Color = parseColor w.cget("troughcolor")
-proc underline*(w: Widget): int = parseInt w.cget("underline")
-proc wraplength*(w: Widget): int = parseInt w.cget("wraplength")
+proc cursor*(w: Widget): Cursor                      = parseEnum[Cursor] w.cget("cursor")
+proc compound*(w: Widget): WidgetCompound            = parseEnum[WidgetCompound] w.cget("compound")
+proc disabledforeground*(w: Widget): Color           = parseColor w.cget("disabledforeground")
+proc exportselection*(w: Widget): bool               = w.cget("exportselection") == "1"
+#    proc font*(w: Widget)                           = w.cget("font")
+proc foreground*(w: Widget): Color {.alias: "fg".}   = parseColor w.cget("foreground")
+proc highlightbackground*(w: Widget): Color          = parseColor w.cget("highlightbackground")
+proc highlightcolor*(w: Widget): Color               = parseColor w.cget("highlightcolor")
+proc highlightthickness*(w: Widget): string          = w.cget("highlightthickness")
+#    proc image*(w: Widget)                          = w.cget("image")
+proc insertbackground*(w: Widget): Color             = parseColor w.cget("insertbackground")
+proc insertborderwidth*(w: Widget): string           = w.cget("insertborderwidth")
+proc insertofftime*(w: Widget): int                  = parseInt w.cget("insertofftime")
+proc insertontime*(w: Widget): int                   = parseInt w.cget("insertontime")
+proc insertwidth*(w: Widget): string                 = w.cget("insertwidth")
+proc jump*(w: Widget): bool                          = w.cget("jump") == "1"
+proc justify*(w: Widget): TextJustify                = parseEnum[TextJustify] w.cget("justify")
+proc orient*(w: Widget): WidgetOrientation           = parseEnum[WidgetOrientation] w.cget("orient")
+proc padx*(w: Widget): string                        = w.cget("padx")
+proc pady*(w: Widget): string                        = w.cget("pady")
+proc relief*(w: Widget): WidgetRelief                = parseEnum[WidgetRelief] w.cget("relief")
+proc repeatdelay*(w: Widget): float                  = parseFloat w.cget("repeatdelay")
+proc repeatinterval*(w: Widget): float               = parseFloat w.cget("repeatinterval")
+proc selectbackground*(w: Widget): Color             = parseColor w.cget("selectbackground")
+proc selectborderwidth*(w: Widget): string           = w.cget("selectborderwidth")
+proc selectforeground*(w: Widget): Color             = parseColor w.cget("selectforeground")
+proc setgrid*(w: Widget): bool                       = w.cget("setgrid") == "1"
+proc takefocus*(w: Widget): string                   = w.cget("takefocus")
+proc text*(w: Widget): string                        = w.cget("text")
+proc textvariable*(w: Widget): TkString              = createTkVar w.tk, w.cget("textvariable")
+proc troughcolor*(w: Widget): Color                  = parseColor w.cget("troughcolor")
+proc underline*(w: Widget): int                      = parseInt w.cget("underline")
+proc wraplength*(w: Widget): int                     = parseInt w.cget("wraplength")
+proc xscrollcommand*(w: Widget): string              = w.cget("xscrollcommand")
+proc yscrollcommand*(w: Widget): string              = w.cget("yscrollcommand")
