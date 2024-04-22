@@ -13,7 +13,7 @@ root.geometry(width=800, 600)
 
 let
   textvar = tk.newTkString("Your mouse is at (0, 0)")
-  label = root.newLabel()
+  label = root.newEntry()
 
 label.pack(anchor = AnchorPosition.Center, expand = true, padx = 50, pady = 50)
 label.textvariable = textvar

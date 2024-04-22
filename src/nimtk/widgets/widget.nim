@@ -22,6 +22,7 @@ type
   TkGenericCommand* = proc (clientdata: pointer)
   TkEventCommand* = proc (event: Event, clientdata: pointer)
   TkScaleCommand* = proc (widget: Widget, newvalue: float, clientdata: pointer)
+  TkEntryCommand* = proc (widget: Widget, event: EntryEvent, clientdata: pointer): bool
   
   TkCmdData[CMD] = ref object of RootObj
     clientdata*: pointer
@@ -36,6 +37,15 @@ type
              (SomeNumber, string)     or
              SomeNumber               or
              string
+  
+  EntryEvent* = object
+    actionType: int
+    charIndex*: int
+    editedValue*: string
+    currentValue*: string
+    edit*: string
+    validationMode*: ValidationMode
+    validationTrigger*: string # opt
 
   EventType* = enum
     Activate
@@ -68,20 +78,18 @@ type
     Deactivate
 
   Event* = object
-    # eventType*: EventType
-
     # event data
-    lastRequest*: int
+    serial*: int
     above*: Widget
-    buttonNumber*: int
+    button*: int
     count*: int
-    detail*: string # opt
+    userData*: string # opt
     focus*: bool
     height*: int
     window*: Widget
     keycode*: int
     mode*: string # opt
-    overrideRedirect*: bool
+    override*: bool
     place*: string # opt
     state*: string 
     time*: int # times.Time?
@@ -96,12 +104,13 @@ type
     property*: string
     root*: Widget
     subwindow*: Widget 
-    #? type*:
+    `type`*: EventType
     widget*: Widget
     xRoot*, yRoot*: int
 
   TkCmdType* = TkWidgetCommand          or
                TkScaleCommand           or
+               TkEntryCommand           or
                TkSelectionHandleCommand or
                TkGenericCommand         or
                TkEventCommand
@@ -109,6 +118,7 @@ type
 var
   widgetCmdData: seq[TkWidgetCmdData[TkWidgetCommand]]
   scaleCmdData: seq[TkWidgetCmdData[TkScaleCommand]]
+  eventCmdData: seq[TkWidgetCmdData[TkEntryCommand]]
   selectionHandleCmdData: seq[TkCmdData[TkSelectionHandleCommand]]
   genericCommandData: seq[TkCmdData[TkGenericCommand]]
   eventCommandData: seq[TkCmdData[TkEventCommand]]
@@ -197,14 +207,14 @@ proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
 
   var event: Event
 
-  event.lastRequest = args[1].parseInt()
+  event.serial = args[1].parseInt()
 
   if args[2] != "??":
     event.above = interp.newWidgetAttr(args[2].parseHexInt())
 
-  event.buttonNumber = args[3].parseInt().dontStress()
+  event.button = args[3].parseInt().dontStress()
   event.count = args[4].parseInt().dontStress()
-  event.detail = args[5]
+  event.userData = args[5]
   event.focus = args[6] == "1"
   event.height = args[7].parseInt().dontStress()
 
@@ -213,7 +223,7 @@ proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
 
   event.keycode = args[9].parseInt().dontStress()
   event.mode = args[10]
-  event.overrideRedirect = args[11] == "1"
+  event.override = args[11] == "1"
   event.place = args[12]
   event.state =  args[13]
   event.time = args[14].parseInt().dontStress()
@@ -238,7 +248,7 @@ proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
   if args[26] != "??":
     event.subwindow = interp.newWidgetAttr(args[26].parseHexInt())
 
-  #? type
+  event.`type` = parseEnum[EventType] args[27]
   if args[28] != "??":
     event.widget = interp.newWidgetAttr(args[28])
 
@@ -251,6 +261,28 @@ proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
   return TCL_OK
 
 {.pop.}
+
+proc tkintentrycmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
+  let data = cast[TkWidgetCmdData[TkEntryCommand]](clientData)
+  let args = argv.cstringArrayToSeq() # all except %K
+
+  var event: EntryEvent
+
+  event.actionType = parseInt args[1]
+  event.charIndex = parseInt args[2]
+  event.editedValue = args[3]
+  event.currentValue = args[4]
+  event.edit = args[5]
+  event.validationMode = parseEnum[ValidationMode] args[6]
+  event.validationTrigger = args[7]
+
+  if data.fun != nil:
+    let ret = data.fun(data.widget, event, data.clientdata)
+    
+    if ret: interp.setResult("1")
+    else: interp.setResult("0")
+
+  return TCL_OK
 
 template registerCmdImpl(datatype: typedesc, dataseq: typed, intcmd: proc) {.dirty.} =
   let data = new datatype
@@ -270,12 +302,19 @@ template registerCmdImpl(datatype: typedesc, dataseq: typed, intcmd: proc) {.dir
 proc registerCmd*(tk: Tk, w: Widget, clientdata1: pointer, name: string, cmd: TkCmdType) =
   when cmd is TkWidgetCommand:
     registerCmdImpl(TkWidgetCmdData[TkWidgetCommand], widgetCmdData, tkintwidgetcmd)
+
   elif cmd is TkSelectionHandleCommand:
     registerCmdImpl(TkCmdData[TkSelectionHandleCommand], selectionHandleCmdData, tkintselhandlecmd)
+
   elif cmd is TkGenericCommand:
     registerCmdImpl(TkCmdData[TkGenericCommand], genericCommandData, tkintgenericcmd)
+
   elif cmd is TkScaleCommand:
     registerCmdImpl(TkWidgetCmdData[TkScaleCommand], scaleCmdData, tkintscalecmd)
+
+  elif cmd is TkEntryCommand:
+    registerCmdImpl(TkWidgetCmdData[TkEntryCommand], eventCmdData, tkintentrycmd)
+
   else:
     registerCmdImpl(TkCmdData[TkEventCommand], eventCommandData, tkinteventcmd)
 
@@ -754,7 +793,7 @@ proc getOpenFile*(
   multiple: bool = false,
   parent: Widget = w,
   title: string = "",
-  typevariable: TkString = nil
+  typevariable: TkVar = nil
 ): string =
   getFileImpl("tk_getOpenFile")
 
@@ -767,7 +806,7 @@ proc getSaveFile*(
   initialfile: string = "",
   parent: Widget = w,
   title: string = "",
-  typevariable: TkString = nil
+  typevariable: TkVar = nil
 ): string =
   getFileImpl("tk_getSaveFile")
 
@@ -875,12 +914,12 @@ proc send*(w: Widget, async: bool, cmd: string, args: varargs[string]) =
 proc `bind`*(w: Widget, sequence: string, clientdata: pointer = nil, command: TkEventCommand) =
   let name = genName("event_command_" & sequence & "_")
 
-  w.tk.registerCmd(nil, name, command)
+  w.tk.registerCmd(nil, repr name, command)
 
   w.tk.call(
     "bind",
     w,
-    sequence,
+    repr sequence,
     "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
   )
 
@@ -891,8 +930,8 @@ proc `bind`*(tk: Tk, className: string, sequence: string, clientdata: pointer = 
 
   tk.call(
     "bind",
-    className,
-    sequence,
+    repr className,
+    repr sequence,
     "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
   )
 
@@ -904,7 +943,7 @@ proc bindAll*(tk: Tk, sequence: string, clientdata: pointer = nil, command: TkEv
   tk.call(
     "bind",
     "all",
-    sequence,
+    repr sequence,
     "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
   )
 
@@ -919,74 +958,49 @@ proc bindtags*(w: Widget): seq[string] =
 # --- event
 
 proc eventAdd*(tk: Tk, virtual: string, sequence: varargs[string]) =
-  tk.call("event add", virtual, sequence.join(" "))
+  tk.call("event add", repr virtual, sequence.join(" "))
 
 proc eventDelete*(tk: Tk, virtual: string, sequence: varargs[string] = "") =
-  tk.call("event delete", virtual, sequence.join(" "))
+  tk.call("event delete", repr virtual, sequence.join(" "))
 
 proc eventGenerate*(
   tk: Tk,
   w: Widget,
   event: string,
-
-  above: Widget or string = "",
-  borderwidth: int or string = "",
-  button: int or string = "",
-  count: int or string = "",
-  data: string = "",
-  delta: int or string = "",
-  detail: string = "",
-  focus: bool or string = "",
-  height: int or string = "",
-  keycode: int or string = "",
-  keysym: Keysym or string = "",
-  mode: string = "",
-  override: bool or string = "",
-  place: string = "",
-  root: Widget or string = "",
-  rootx: int or string = "",
-  rooty: int or string = "",
-  sendevent: bool or string = "",
-  serial: int or string = "",
-  state: string = "",
-  subwindow: Widget or string = "",
-  time: int or string = "",
-  warp: bool or string = "",
-  width: int or string = "",
-  `when`: string = "",
-  x: int or string = "" 
+  eventObj: Event,
+  warp: bool = false
 ) =
   tk.call(
     "event generate",
     repr $w,
     event,
     {
-      "above": above,
-      "borderwidth": borderwidth,
-      "button": button,
-      "count": count,
-      "data": data,
-      "delta": delta,
-      "detail": detail,
-      "focus": focus,
-      "height": height,
-      "keycode": keycode,
-      "keysym": keysym,
-      "mode": mode,
-      "override": override,
-      "place": place,
-      "root": root,
-      "rootx": rootx,
-      "rooty": rooty,
-      "sendevent": sendevent,
-      "serial": serial,
-      "state": state,
-      "subwindow": subwindow,
-      "time": time,
-      "warp": warp,
-      "width": width,
-      "when": `when`,
-      "x": x
+      "above": repr $eventObj.above,
+      "borderwidth": repr $eventObj.borderwidth,
+      "button": repr $eventObj.button,
+      "count": repr $eventObj.count,
+      "data": repr $eventObj.userData, # userdata
+      "delta": repr $eventObj.delta,
+      "detail": repr $eventObj.userData, # detail
+      "focus": repr $eventObj.focus,
+      "height": repr $eventObj.height,
+      "keycode": repr $eventObj.keycode,
+      "keysym": repr $eventObj.keysym,
+      "mode": repr $eventObj.mode,
+      "override": repr $eventObj.override,
+      "place": repr $eventObj.place,
+      "root": repr $eventObj.root,
+      "rootx": repr $eventObj.xRoot,
+      "rooty": repr $eventObj.yRoot,
+      "sendevent": repr $eventObj.sendevent,
+      "serial": repr $eventObj.serial,
+      "state": repr $eventObj.state,
+      "subwindow": repr $eventObj.subwindow,
+      "time": repr $eventObj.time,
+      "warp": $warp,
+      "width": repr $eventObj.width,
+      "when": repr $eventObj.time,
+      "x": repr $eventObj.x
     }.toArgs()
   )
 
@@ -994,7 +1008,7 @@ proc eventInfo*(tk: Tk): seq[string] =
   tk.call("event info").split(' ')
 
 proc eventInfo*(tk: Tk, virtual: string): seq[string] =
-  tk.call("event info", virtual).split(' ')
+  tk.call("event info", repr virtual).split(' ')
 
 # --- tk_text*
 
@@ -1077,10 +1091,12 @@ proc `background=`*(w: Widget, background: Color) {.alias: "bg=".}              
 proc `borderwidth=`*(w: Widget, borderwidth: string or float or int) {.alias: "bd=".} = w.configure({"borderwidth": $borderwidth})
 proc `cursor=`*(w: Widget, cursor: Cursor)                                            = w.configure({"cursor": $cursor})
 proc `compound=`*(w: Widget, compound: WidgetCompound)                                = w.configure({"compound": $compound})
-proc `disabledforeground=`*(w: Widget, disabledforeground: Color)                     = w.configure({"disabledforeground": $disabledforeground})
+proc `disabledforeground=`*(w: Widget, disabledforeground: Color or string)           = w.configure({"disabledforeground": repr $disabledforeground})
+proc `disabledbackground=`*(w: Widget, disabledbackground: Color or string)           = w.configure({"disabledbackground": repr $disabledbackground})
 proc `exportselection=`*(w: Widget, exportselection: bool)                            = w.configure({"exportselection": $exportselection})
 #    proc `font=`*(w: Widget, font)                                                   = w.configure({"font": $font})
 proc `foreground=`*(w: Widget, foreground: Color) {.alias: "fg=".}                    = w.configure({"foreground": $foreground})
+# proc `height=`*(w: Widget, height: string or float or int)                            = w.configure({"height": $height})
 proc `highlightbackground=`*(w: Widget, highlightbackground: Color)                   = w.configure({"highlightbackground": $highlightbackground})
 proc `highlightcolor=`*(w: Widget, highlightcolor: Color)                             = w.configure({"highlightcolor": $highlightcolor})
 proc `highlightthickness=`*(w: Widget, highlightthickness: string or float or int)    = w.configure({"highlightthickness": $highlightthickness})
@@ -1104,12 +1120,13 @@ proc `selectforeground=`*(w: Widget, selectforeground: Color)                   
 proc `setgrid=`*(w: Widget, setgrid: bool)                                            = w.configure({"setgrid": $setgrid})
 proc `takefocus=`*(w: Widget, takefocus: bool or string)                              = w.configure({"takefocus": $takefocus})
 proc `text=`*(w: Widget, text: string)                                                = w.configure({"text": repr text})
-proc `textvariable=`*(w: Widget, textvariable: TkString)                              = w.configure({"textvariable": textvariable.varname})
+proc `textvariable=`*(w: Widget, textvariable: TkVar)                                 = w.configure({"textvariable": textvariable.varname})
 proc `troughcolor=`*(w: Widget, troughcolor: Color)                                   = w.configure({"troughcolor": $troughcolor})
 proc `underline=`*(w: Widget, underline: int)                                         = w.configure({"underline": $underline})
+# proc `width=`*(w: Widget, width: string or float or int)                              = w.configure({"width": $width})
 proc `wraplength=`*(w: Widget, wraplength: int)                                       = w.configure({"wraplength": $wraplength})
-proc `xscrollcommand=`*(w: Widget, xscrollcommand: string)                            = w.configure({"xscrollcommand": $xscrollcommand})
-proc `yscrollcommand=`*(w: Widget, yscrollcommand: string)                            = w.configure({"yscrollcommand": $yscrollcommand})
+proc `xscrollcommand=`*(w: Widget, xscrollcommand: string)                            = w.configure({"xscrollcommand": repr $xscrollcommand})
+proc `yscrollcommand=`*(w: Widget, yscrollcommand: string)                            = w.configure({"yscrollcommand": repr $yscrollcommand})
 
 proc activebackground*(w: Widget): Color             = parseColor w.cget("activebackground")
 proc activeborderwidth*(w: Widget): string           = w.cget("activeborderwidth")
@@ -1120,9 +1137,11 @@ proc borderwidth*(w: Widget): string {.alias: "bd".} = w.cget("borderwidth")
 proc cursor*(w: Widget): Cursor                      = parseEnum[Cursor] w.cget("cursor")
 proc compound*(w: Widget): WidgetCompound            = parseEnum[WidgetCompound] w.cget("compound")
 proc disabledforeground*(w: Widget): Color           = parseColor w.cget("disabledforeground")
+proc disabledbackground*(w: Widget): Color           = parseColor w.cget("disabledbackground")
 proc exportselection*(w: Widget): bool               = w.cget("exportselection") == "1"
 #    proc font*(w: Widget)                           = w.cget("font")
 proc foreground*(w: Widget): Color {.alias: "fg".}   = parseColor w.cget("foreground")
+# proc height*(w: Widget): string                      = w.cget("height")
 proc highlightbackground*(w: Widget): Color          = parseColor w.cget("highlightbackground")
 proc highlightcolor*(w: Widget): Color               = parseColor w.cget("highlightcolor")
 proc highlightthickness*(w: Widget): string          = w.cget("highlightthickness")
@@ -1146,9 +1165,11 @@ proc selectforeground*(w: Widget): Color             = parseColor w.cget("select
 proc setgrid*(w: Widget): bool                       = w.cget("setgrid") == "1"
 proc takefocus*(w: Widget): string                   = w.cget("takefocus")
 proc text*(w: Widget): string                        = w.cget("text")
-proc textvariable*(w: Widget): TkString              = createTkVar w.tk, w.cget("textvariable")
+proc textvariable*(w: Widget): TkVar                 = createTkVar w.tk, w.cget("textvariable")
 proc troughcolor*(w: Widget): Color                  = parseColor w.cget("troughcolor")
 proc underline*(w: Widget): int                      = parseInt w.cget("underline")
+# proc width*(w: Widget): string                       = w.cget("width")
 proc wraplength*(w: Widget): int                     = parseInt w.cget("wraplength")
 proc xscrollcommand*(w: Widget): string              = w.cget("xscrollcommand")
 proc yscrollcommand*(w: Widget): string              = w.cget("yscrollcommand")
+

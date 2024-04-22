@@ -44,7 +44,7 @@ proc `variable=`*(c: CheckButton, variable: TkVar) = c.configure({"variable": va
 # proc `selectimage=`*(c: CheckButton, selectimage: Image) = c.configure({"selectimage": $selectimage})
 # proc `tristateimage=`*(c: CheckButton, tristateimage: Image) = c.configure({"tristateimage": $tristateimage})
 proc `state=`*(c: CheckButton, state: WidgetState) = c.configure({"state": $state})
-proc `tristatevalue=`*(c: CheckButton, tristatevalue: string) = c.configure({"tristatevalue": $tristatevalue})
+proc `tristatevalue=`*(c: CheckButton, tristatevalue: string) = c.configure({"tristatevalue": repr $tristatevalue})
 proc `width=`*(c: CheckButton, width: string or float or int) = c.configure({"width": $width})
 
 proc indicatoron*(c: CheckButton): bool = c.cget("indicatoron") == "1"

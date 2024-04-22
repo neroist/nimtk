@@ -1,4 +1,5 @@
 import std/strutils
+import std/colors
 
 import ../../nimtk
 import ./widget
@@ -35,23 +36,40 @@ proc selectionFrom*(e: Entry, index: Index) = e.tk.call($e, "selection from", in
 proc selectionPresent*(e: Entry): bool = e.tk.call($e, "selection present") == "1"
 proc selectionRange*(e: Entry, start, `end`: Index) = e.tk.call($e, "selection range", start, `end`)
 proc selectionTo*(e: Entry, index: Index) = e.tk.call($e, "selection to", index)
-proc validate*(e: Entry) = e.tk.call($e, "validate")
+proc validate*(e: Entry): bool = e.tk.call($e, "validate") == "1"
+proc xview*(e: Entry): array[2, float] =
+  e.tk.call($e, "xview")
 
-proc setCommand*(e: Entry, clientData: pointer, command: TkWidgetCommand) =
-  let name = genName("button_command_")
-  
+  let res = e.tk.result.split(' ')
+
+  result[0] = parseFloat res[0]
+  result[1] = parseFloat res[1]
+proc xview*(e: Entry, index: Index) = e.tk.call($e, "xview", index)
+proc xviewMoveto*(e: Entry, fraction: 0.0..1.0) = e.tk.call($e, "xview moveto", fraction)
+proc xviewScroll*(e: Entry, number: int, what: string) = e.tk.call($e, "xview scroll", number, repr what)
+
+proc setValidateCommand*(e: Entry, clientData: pointer, command: TkEntryCommand) =
+  let name = genName("entry_validate_command_")
   e.tk.registerCmd(e, clientdata, name, command)
+  e.configure({"validatecommand": "{$1 %d %i %P %s %S %v %V}" % name})
+proc setInvalidCommand*(e: Entry, clientData: pointer, command: TkEntryCommand) =
+  let name = genName("entry_invalid_command_")
+  e.tk.registerCmd(e, clientdata, name, command)
+  e.configure({"invalidcommand": "{$1 %d %i %P %s %S %v %V}" % name})
 
-  e.configure({"command": name})
-proc `command=`*(e: Entry, command: TkWidgetCommand) = e.setCommand(nil, command)
-proc `default=`*(e: Entry, default: WidgetState) = e.configure({"default": $default})
-proc `height=`*(e: Entry, height: string or float or int) = e.configure({"height": $height})
-proc `overrelief=`*(e: Entry, overrelief: WidgetRelief) = e.configure({"overrelief": $overrelief})
+proc `validatecommand=`*(e: Entry, command: TkEntryCommand) = e.setValidateCommand(nil, command)
+proc `invalidcommand=`*(e: Entry, command: TkEntryCommand) = e.setInvalidCommand(nil, command)
+proc `disabledbackground=`*(w: Widget, disabledforeground: Color or string) = w.configure({"disabledbackground": repr $disabledbackground})
+proc `readonlybackground=`*(w: Widget, readonlybackground: Color or string) = w.configure({"readonlybackground": repr $readonlybackground})
+proc `show=`*(w: Widget, show: char) = w.configure({"show": repr $show})
 proc `state=`*(e: Entry, state: WidgetState) = e.configure({"state": $state})
-proc `width=`*(e: Entry, width: string or float or int) = e.configure({"width": $width})
+proc `validationMode=`*(e: Entry, validationMode: ValidationMode) = e.configure({"validate": $validationMode})
+proc `width=`*(e: Entry, width: int) = e.configure({"width": $width})
 
-proc default*(e: Entry): WidgetState = parseEnum[WidgetState] e.cget("default")
-proc height*(e: Entry): string = e.cget("height")
-proc overrelief*(e: Entry): WidgetRelief = parseEnum[WidgetRelief] e.cget("overrelief")
+proc disabledbackground*(w: Widget): Color = parseColor w.cget("disabledbackground")
+proc readonlybackground*(w: Widget): Color = parseColor w.cget("readonlybackground")
+proc show*(w: Widget): char = w.cget("show")[0]
 proc state*(e: Entry): WidgetState = parseEnum[WidgetState] e.cget("state")
-proc width*(e: Entry): string = e.cget("width")
+proc overrelief*(e: Entry): WidgetRelief = parseEnum[WidgetRelief] e.cget("overrelief")
+proc validationMode*(e: Entry): ValidationMode = parseEnum[ValidationMode] e.cget("validate")
+proc width*(e: Entry): int = parseInt e.cget("width")

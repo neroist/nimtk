@@ -28,7 +28,9 @@ proc winfo_fpixels*(w: Widget, number: int or float or string): float {.alias: "
 proc winfo_geometry*(w: Widget): tuple[width, height, x, y: int] {.alias: "geometry".} =
   w.tk.call("winfo geometry", w)
 
-  let res = w.tk.result.split(' ')
+  let res = w.tk.result.split("x")
+
+  result.width = res[0].parseInt()
 
   lucky("+")
 proc winfo_height*(w: Widget): int {.alias: "height".} = parseInt w.tk.call("winfo height", w)

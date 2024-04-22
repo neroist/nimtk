@@ -10,11 +10,10 @@ type
 
   TkString* = ref object of TkVar
   TkFloat* = ref object of TkVar
+  TkInt* = ref object of TkVar
   TkBool* = ref object of TkVar
 
-  TkVarType* = TkString or TkFloat or TkBool
-  
-proc `$`*(`var`: TkVarType): string
+  TkVarType* = TkString or TkFloat or TkInt or TkBool
 
 proc genName*(): string =
   $genOid()
@@ -31,11 +30,13 @@ template createTkVar*(tk1: Tk, name: string) {.dirty.} =
   result.varname = name
   result.tk = tk1
 
-template newTkVarImpl(tk: Tk, val1: float or bool or string) {.dirty.} =
+template newTkVarImpl(tk: Tk, val1: typed) {.dirty.} =
   new result
 
   when val1 is float:
     result.varname = genName("float_")
+  elif val1 is int:
+    result.varname = genName("int_")
   elif val1 is bool:
     result.varname = genName("bool_")
   else:
@@ -53,17 +54,20 @@ template getImpl(v: TkVar, endproc: proc) =
 
 template tkString*(v: TkVar): TkString = cast[TkString](v)
 template tkFloat*(v: TkVar): TkFloat = cast[TkFloat](v)
+template tkInt*(v: TkVar): TkInt = cast[TkInt](v)
 template tkBool*(v: TkVar): TkBool = cast[TkBool](v)
 
 proc newTkString*(tk: Tk, val: string = ""): TkString = newTkVarImpl(tk, (repr val))
 proc newTkFloat*(tk: Tk, val: float = 0): TkFloat = newTkVarImpl(tk, val)
 proc newTkBool*(tk: Tk, val: bool = false): TkBool = newTkVarImpl(tk, val)
+proc newTkInt*(tk: Tk, val: int = 0): TkInt = newTkVarImpl(tk, val)
 
 proc get*(`var`: TkString or TkVar): string = getImpl(`var`, `$`)
 proc get*(`var`: TkFloat): float = getImpl(`var`, parseFloat)
 proc get*(`var`: TkBool): bool = getImpl(`var`, parseBool)
+proc get*(`var`: TkInt): int = getImpl(`var`, parseInt)
 
-proc set*(`var`: TkVar, val: string | float | bool) =
+proc set*(`var`: TkVar, val: string | float | bool | int) =
   if `var`.tk == nil: return
 
   when val is string:
@@ -74,10 +78,11 @@ proc set*(`var`: TkVar, val: string | float | bool) =
 proc add*(`var`: TkString, val: string) =
   `var`.set(`var`.get() & val)
 
-proc `$`*(`var`: TkVarType): string =
+proc `$`*(`var`: TkVar): string =
   if `var` == nil or `var`.tk == nil: ""
   else: $`var`.get()
 
 converter tkStringToStr*(`var`: TkString): string = `var`.get()
 converter tkFloatToFloat*(`var`: TkFloat): float = `var`.get()
 converter tkBoolToBool*(`var`: TkBool): bool = `var`.get()
+converter tkIntToInt*(`var`: TkInt): int = `var`.get()

@@ -268,7 +268,13 @@ type
     Focusout = "focusout"
     Key = "key"
     All = "all"
-  
+
+  # ValidationTrigger* {.pure.} = enum 
+  #   Focusin = "focusin"
+  #   Focusout = "focusout"
+  #   Key = "key"
+  #   Forced = "forced"
+
   Tk* = ref object
     interp*: ptr Interp
 
