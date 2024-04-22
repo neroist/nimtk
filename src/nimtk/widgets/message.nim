@@ -1,7 +1,8 @@
 import std/strutils
 
-import ./widget
+import ../private/escaping
 import ../../nimtk
+import ./widget
 
 type
   Message* = ref object of Widget
@@ -15,7 +16,7 @@ proc newMessage*(parent: Widget, text: string = ""): Message =
   discard result.tk.call("message", result.pathname)
 
   if text.len > 0:
-    result.configure({"text": repr text})
+    result.configure({"text": tclEscape text})
 
 proc `aspect=`*(m: Message, aspect: int) = m.configure({"aspect": $aspect})
 

@@ -1,7 +1,7 @@
 import std/strutils
 import std/colors
-import std/macros
 
+import ../private/escaping
 import ../../nimtk
 import ./widget
 
@@ -16,7 +16,7 @@ proc newRadioButton*(parent: Widget, text: string = "", configuration: openArray
 
   result.tk.call("radiobutton", result.pathname)
 
-  result.configure({"text": repr text, "value": "1"})
+  result.configure({"text": tclEscape text, "value": "1"})
 
   if configuration.len > 0:
     result.configure(configuration)

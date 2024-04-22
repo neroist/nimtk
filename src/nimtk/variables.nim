@@ -1,6 +1,7 @@
 import std/strutils
 import std/oids
 
+import ./private/escaping
 import ../nimtk
 
 type
@@ -13,7 +14,13 @@ type
   TkInt* = ref object of TkVar
   TkBool* = ref object of TkVar
 
+<<<<<<< HEAD
   TkVarType* = TkString or TkFloat or TkInt or TkBool
+=======
+  TkVarType* = TkString or TkFloat or TkBool
+  
+proc `$`*(`var`: TkVar): string
+>>>>>>> 2b988a3fa2b85ad5c8baf98a9e89e8628697b9b4
 
 proc genName*(): string =
   $genOid()
@@ -57,21 +64,31 @@ template tkFloat*(v: TkVar): TkFloat = cast[TkFloat](v)
 template tkInt*(v: TkVar): TkInt = cast[TkInt](v)
 template tkBool*(v: TkVar): TkBool = cast[TkBool](v)
 
-proc newTkString*(tk: Tk, val: string = ""): TkString = newTkVarImpl(tk, (repr val))
+proc newTkString*(tk: Tk, val: string = ""): TkString = newTkVarImpl(tk, (tclEscape val))
 proc newTkFloat*(tk: Tk, val: float = 0): TkFloat = newTkVarImpl(tk, val)
 proc newTkBool*(tk: Tk, val: bool = false): TkBool = newTkVarImpl(tk, val)
 proc newTkInt*(tk: Tk, val: int = 0): TkInt = newTkVarImpl(tk, val)
 
-proc get*(`var`: TkString or TkVar): string = getImpl(`var`, `$`)
-proc get*(`var`: TkFloat): float = getImpl(`var`, parseFloat)
-proc get*(`var`: TkBool): bool = getImpl(`var`, parseBool)
-proc get*(`var`: TkInt): int = getImpl(`var`, parseInt)
+proc get*(`var`: TkString or TkVar): string =
+  getImpl(`var`, `$`) # errors should not be possible here
+
+proc get*(`var`: TkFloat): float =
+  try:
+    getImpl(`var`, parseFloat)
+  except ValueError:
+    raise newException(TkError, "Error when parsing TkFloat as a float: $1 cannot be parsed as a float" % tclEscape $cast[TkString](`var`))
+
+proc get*(`var`: TkBool): bool =
+  try:
+    getImpl(`var`, parseBool)
+  except ValueError:
+    raise newException(TkError, "Error when parsing TkBool as a bool: $1 cannot be parsed as a bool" % $cast[TkString](`var`))
 
 proc set*(`var`: TkVar, val: string | float | bool | int) =
   if `var`.tk == nil: return
 
   when val is string:
-    `var`.tk.call("set", `var`.varname, repr val)
+    `var`.tk.call("set", `var`.varname, tclEscape val)
   else:
     `var`.tk.call("set", `var`.varname, $val)
 

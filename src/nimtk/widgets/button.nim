@@ -1,5 +1,6 @@
 import std/strutils
 
+import ../private/escaping
 import ../../nimtk
 import ./widget
 
@@ -15,7 +16,7 @@ proc newButton*(parent: Widget, text: string = "", configuration: openArray[(str
   result.tk.call("button", result.pathname)
 
   if text.len > 0:
-    result.configure({"text": repr text})
+    result.configure({"text": tclEscape text})
   
   if configuration.len > 0:
     result.configure(configuration)

@@ -354,6 +354,9 @@ proc newTk*(): Tk =
 
   result.init()
 
-export with
+export
+  exceptions,
+  with
+
 macro config*(arg: typed; calls: varargs[untyped]) = quote do: with(`arg`, `calls`)
   

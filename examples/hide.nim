@@ -6,6 +6,8 @@ let
   tk = newTk()
   root = tk.getRoot()
 
+root.title = "Hide"
+
 root.protocol("WM_DELETE_WINDOW", nil) do (_: Widget, _: pointer):
   root.deiconify()
   root.withdraw()

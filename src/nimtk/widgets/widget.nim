@@ -5,6 +5,7 @@ import std/times
 
 import nimtcl except Time
 
+import ../private/escaping
 import ../private/alias
 import ../variables
 import ../../nimtk
@@ -487,17 +488,18 @@ proc placeInfo*(w: Widget): Table[string, string] =
 
 # --- grid
 
+# two seperate PX and PY generics do not force them to be the same type
 proc grid*[PX, PY: Padding](
   w: Widget,
   column: string or int = "",
+  row: string or int = "",
   columnspan: string or int = "",
+  rowspan: string or int = "",
   `in`: Widget = nil,
   ipadx: float = 0,
   ipady: float = 0,
   padx: PX = 0,
   pady: PY = 0,
-  row: string or int = "",
-  rowspan: string or int = "",
   sticky: FillStyle or AnchorPosition or string = ""
 ) =
   w.tk.call(
@@ -606,7 +608,7 @@ proc busyCget*(w: Widget): string =
   w.tk.result
 
 proc busyConfigure*(w: Widget, cursorName: string or Cursor) =
-  w.tk.call("tk busy configure", w, {"cursor": repr $cursorName}.toArgs())
+  w.tk.call("tk busy configure", w, {"cursor": tclEscape $cursorName}.toArgs())
 
 proc busyConfigure*(w: Widget): seq[string] =
   w.tk.call("tk busy configure", w)[1..^2].split()[3..^1]
@@ -625,7 +627,7 @@ proc busyStatus*(w: Widget): bool =
 # --- appname
 
 proc appname*(tk: Tk, appname: string) {.alias: "appname=".} =
-  tk.call("tk appname", repr appname)
+  tk.call("tk appname", tclEscape appname)
 
 proc appname*(tk: Tk): string =
   tk.call("tk appname")
@@ -692,9 +694,9 @@ proc chooseDirectory*(
     "tk_chooseDirectory",
     {
       "parent": $parent,
-      "initialdir": repr initialdir,
+      "initialdir": tclEscape initialdir,
       "mustexist": $mustexist,
-      "title": repr title,
+      "title": tclEscape title,
     }.toArgs()
   )
 
@@ -711,7 +713,7 @@ proc chooseColor*(
     {
       "parent": $parent,
       "initialcolor": $initialColor,
-      "title": repr title,
+      "title": tclEscape title,
     }.toArgs()
   ).parseColor()
 
@@ -775,11 +777,11 @@ template getFileImpl(cmd: string): string {.dirty.} =
       "confirmoverwrite": $confirmoverwrite,
       "defaultextension": $defaultextension,
       "filetypes": filetypesList.toTclList(),
-      "initialdir": repr initialdir,
-      "initialfile": repr initialfile,
+      "initialdir": tclEscape initialdir,
+      "initialfile": tclEscape initialfile,
       "multiple": $multiple,
       "parent": $parent,
-      "title": repr title,
+      "title": tclEscape title,
       "typevariable": $typevariable
     }.toArgs()
   )
@@ -821,16 +823,16 @@ proc messageBox*(
   icon: IconImage = Info,
   parent: Widget = w,
   title: string = "",
-) =
-  w.tk.call(
+): ButtonName =
+  parseEnum[ButtonName] w.tk.call(
     "tk_messageBox",
     {
       "default": $default,
-      "detail": repr detail,
+      "detail": tclEscape detail,
       "icon": $icon,
-      "message": repr message,
+      "message": tclEscape message,
       "parent": $parent,
-      "title": repr title,
+      "title": tclEscape title,
       "type": $`type`
     }.toArgs
   )
@@ -850,7 +852,7 @@ proc setPalette*(tk: Tk, options: openArray[tuple[name: string, value: Color]]) 
 
   for option in options:
     opts.add option[0]
-    opts.add repr $option[1]
+    opts.add tclEscape $option[1]
 
   tk.call("tk_setPalette", opts.join(" "))
 
@@ -972,7 +974,7 @@ proc eventGenerate*(
 ) =
   tk.call(
     "event generate",
-    repr $w,
+    tclEscape $w,
     event,
     {
       "above": repr $eventObj.above,
@@ -1023,7 +1025,7 @@ proc clipboardAdd*(w: Widget, data: string; format = "STRING", `type`: string = 
     "clipboard append",
     {"displayof": $w, "format": format, "type": `type`}.toArgs,
     "--",
-    repr data
+    tclEscape data
   )
 
 proc clipboardClear*(w: Widget) =
@@ -1047,7 +1049,7 @@ proc selectionHandle*(w: Widget, selection = "PRIMARY", `type`: string = "UTF8_S
     cmdname = genName("selection_handle_command_")
     w.tk.registerCmd(nil, cmdname, command)
   else:
-    cmdname = repr ""
+    cmdname = tclEscape ""
   
   w.tk.call("selection handle", {"selection": selection, "type": `type`}.toArgs, w, cmdname)
 
@@ -1119,8 +1121,8 @@ proc `selectborderwidth=`*(w: Widget, selectborderwidth: string or float or int)
 proc `selectforeground=`*(w: Widget, selectforeground: Color)                         = w.configure({"selectforeground": $selectforeground})
 proc `setgrid=`*(w: Widget, setgrid: bool)                                            = w.configure({"setgrid": $setgrid})
 proc `takefocus=`*(w: Widget, takefocus: bool or string)                              = w.configure({"takefocus": $takefocus})
-proc `text=`*(w: Widget, text: string)                                                = w.configure({"text": repr text})
-proc `textvariable=`*(w: Widget, textvariable: TkVar)                                 = w.configure({"textvariable": textvariable.varname})
+proc `text=`*(w: Widget, text: string)                                                = w.configure({"text": tclEscape text})
+proc `textvariable=`*(w: Widget, textvariable: TkString)                              = w.configure({"textvariable": textvariable.varname})
 proc `troughcolor=`*(w: Widget, troughcolor: Color)                                   = w.configure({"troughcolor": $troughcolor})
 proc `underline=`*(w: Widget, underline: int)                                         = w.configure({"underline": $underline})
 # proc `width=`*(w: Widget, width: string or float or int)                              = w.configure({"width": $width})

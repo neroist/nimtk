@@ -1,6 +1,7 @@
 import std/strutils
 import std/colors
 
+import ../private/escaping
 import ../../nimtk
 import ./widget
 
@@ -17,7 +18,7 @@ proc newEntry*(parent: Widget, text: string = "", configuration: openArray[(stri
   result.tk.call("entry", result.pathname)
 
   if text.len > 0:
-    result.configure({"text": repr text})
+    result.configure({"text": tclEscape text})
   
   if configuration.len > 0:
     result.configure(configuration)
