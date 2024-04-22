@@ -9,16 +9,18 @@ import ../src/nimtk
 
 randomize()
 
+const
+  padx = 4
+  pady = 4
+
+# TODO feat: menu item for copying password
+
 let
   tk = newTK()
   root = tk.getRoot()
 
 root.title = "\"Password Generator\""
 root.resizable = false
-
-const
-  padx = 4
-  pady = 4
 
 let
   lenVar = tk.newTkString($rand(16..64))
