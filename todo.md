@@ -6,7 +6,9 @@ These should be sorted by urgency/importance
     
     In summary, dont use default values and instead use `""`
 
-- [ ] For all strings passed to Tcl, use `repr`, or some kind of escaping function
+- [ ] For all strings passed to Tcl, use `tclEscape`, or some kind of escaping function
+
+- [ ] Use multiple aliases in procs (even though it breaks the syntax highlighting)
 
 - [ ] Reduce code duplication and use templates & macros when needed
 

@@ -2,9 +2,10 @@ import std/strutils
 
 import std/colors
 
-import ./label
-import ./widget
+import ../private/escaping
 import ../../nimtk
+import ./widget
+import ./label
 
 type
   LabelFrame* = ref object of Widget
@@ -18,7 +19,7 @@ proc newLabelFrame*(parent: Widget, text: string, class: string = "", visual: st
   discard result.tk.call(
     "labelframe",
     result.pathname,
-    {"text": repr text}.toArgs(),
+    {"text": tclEscape text}.toArgs(),
     {"class": class, "visual": visual, "colormap": colormap}.toArgs()
   )
 

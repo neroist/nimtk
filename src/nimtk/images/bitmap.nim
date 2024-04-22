@@ -1,5 +1,6 @@
 import std/colors
 
+import ../private/escaping
 import ../../nimtk
 import ../widgets
 import ./image
@@ -15,7 +16,7 @@ proc newBitmap*(tk: Tk, file: string, config: openArray[(string, string)] = {:})
 
   tk.call("image create bitmap", result.name)
 
-  result.configure({"file": repr file})
+  result.configure({"file": tclEscape file})
 
   if config.len > 0:
     result.configure(config)
@@ -28,7 +29,7 @@ proc newBitmap*(tk: Tk, data: string, config: openArray[(string, string)] = {:})
 
   tk.call("image create bitmap", result.name)
 
-  result.configure({"data": repr data})
+  result.configure({"data": tclEscape data})
 
   if config.len > 0:
     result.configure(config)

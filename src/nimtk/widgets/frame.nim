@@ -1,5 +1,6 @@
 import std/colors
 
+import ../private/escaping
 import ./widget
 import ../../nimtk
 

@@ -9,6 +9,7 @@ let
   tk = newTk()
   root = tk.getRoot()
 
+root.title = "Mouse"
 root.geometry(width=800, 600)
 
 let

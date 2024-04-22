@@ -3,6 +3,7 @@ import std/macros
 
 import std/colors
 
+import ./private/escaping
 import ./private/alias
 import ./widgets
 import ../nimtk
@@ -249,7 +250,7 @@ proc wm_protocol*(w: Window, name: string, clientdata: pointer, command: TkWidge
   
   w.tk.registerCmd(w, clientdata, cmdname, command)
 
-  w.tk.call("wm protocol", w, repr name, cmdname)
+  w.tk.call("wm protocol", w, tclEscape name, cmdname)
 
 proc wm_resizable*(w: Window, width, height: bool) {.alias: "resizable".} = w.tk.call("wm resizable", w, width, height)
 proc wm_resizable*(w: Window, both: bool) {.alias: "resizable=".} = w.tk.call("wm resizable", w, both, both)

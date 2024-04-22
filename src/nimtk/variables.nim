@@ -1,6 +1,7 @@
 import std/strutils
 import std/oids
 
+import ./private/escaping
 import ../nimtk
 
 type
@@ -14,7 +15,7 @@ type
 
   TkVarType* = TkString or TkFloat or TkBool
   
-proc `$`*(`var`: TkVarType): string
+proc `$`*(`var`: TkVar): string
 
 proc genName*(): string =
   $genOid()
@@ -55,26 +56,37 @@ template tkString*(v: TkVar): TkString = cast[TkString](v)
 template tkFloat*(v: TkVar): TkFloat = cast[TkFloat](v)
 template tkBool*(v: TkVar): TkBool = cast[TkBool](v)
 
-proc newTkString*(tk: Tk, val: string = ""): TkString = newTkVarImpl(tk, (repr val))
+proc newTkString*(tk: Tk, val: string = ""): TkString = newTkVarImpl(tk, (tclEscape val))
 proc newTkFloat*(tk: Tk, val: float = 0): TkFloat = newTkVarImpl(tk, val)
 proc newTkBool*(tk: Tk, val: bool = false): TkBool = newTkVarImpl(tk, val)
 
-proc get*(`var`: TkString or TkVar): string = getImpl(`var`, `$`)
-proc get*(`var`: TkFloat): float = getImpl(`var`, parseFloat)
-proc get*(`var`: TkBool): bool = getImpl(`var`, parseBool)
+proc get*(`var`: TkString or TkVar): string =
+  getImpl(`var`, `$`) # errors should not be possible here
+
+proc get*(`var`: TkFloat): float =
+  try:
+    getImpl(`var`, parseFloat)
+  except ValueError:
+    raise newException(TkError, "Error when parsing TkFloat as a float: $1 cannot be parsed as a float" % tclEscape $cast[TkString](`var`))
+
+proc get*(`var`: TkBool): bool =
+  try:
+    getImpl(`var`, parseBool)
+  except ValueError:
+    raise newException(TkError, "Error when parsing TkBool as a bool: $1 cannot be parsed as a bool" % $cast[TkString](`var`))
 
 proc set*(`var`: TkVar, val: string | float | bool) =
   if `var`.tk == nil: return
 
   when val is string:
-    `var`.tk.call("set", `var`.varname, repr val)
+    `var`.tk.call("set", `var`.varname, tclEscape val)
   else:
     `var`.tk.call("set", `var`.varname, $val)
 
 proc add*(`var`: TkString, val: string) =
   `var`.set(`var`.get() & val)
 
-proc `$`*(`var`: TkVarType): string =
+proc `$`*(`var`: TkVar): string =
   if `var` == nil or `var`.tk == nil: ""
   else: $`var`.get()
 

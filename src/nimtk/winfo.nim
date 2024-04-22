@@ -1,6 +1,7 @@
 import std/strutils
 import std/colors
 
+import ./private/escaping
 import ./widgets/widget
 import ./private/alias
 import ../nimtk

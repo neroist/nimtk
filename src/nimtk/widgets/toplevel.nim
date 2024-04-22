@@ -1,7 +1,8 @@
 import std/colors
 
-import ./widget
+import ../private/escaping
 import ../../nimtk
+import ./widget
 
 type
   Toplevel* = ref object of Widget
