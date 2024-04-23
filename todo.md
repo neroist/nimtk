@@ -6,11 +6,14 @@ These should be sorted by urgency/importance
     
     In summary, dont use default values and instead use `""`
 
+- [ ] Should we keep the `clientdata` parameters in `Tk*Command` proc types?
+
 - [ ] For all strings passed to Tcl, use `tclEscape`, or some kind of escaping function
 
 - [ ] Use multiple aliases in procs (even though it breaks the syntax highlighting)
 
 - [ ] Reduce code duplication and use templates & macros when needed
+    - [ ] Create a `setCommand` template similar to the procs in `widgets/**`
 
 - [x] `configure` macro that transforms code like this
 

@@ -9,6 +9,7 @@ import
   ./widgets/checkbutton,
   ./widgets/radiobutton,
   ./widgets/scale,
+  ./widgets/entry,
   ./widgets/widget
 
 export
@@ -22,4 +23,5 @@ export
   checkbutton,
   radiobutton,
   scale,
+  entry,
   widget

@@ -47,11 +47,11 @@ proc bitmap*(w: Widget): Bitmap =
   result.tk = w.tk
 
 proc `background=`*(b: Bitmap, background: Color) = b.configure({"background": $background})
-proc `data=`*(b: Bitmap, data: string) = b.configure({"data": $data})
-proc `file=`*(b: Bitmap, file: string) = b.configure({"file": $file})
+proc `data=`*(b: Bitmap, data: string) = b.configure({"data": repr $data})
+proc `file=`*(b: Bitmap, file: string) = b.configure({"file": repr $file})
 proc `foreground=`*(b: Bitmap, foreground: Color) = b.configure({"foreground": $foreground})
-proc `maskdata=`*(b: Bitmap, maskdata: string) = b.configure({"maskdata": $maskdata})
-proc `maskfile=`*(b: Bitmap, maskfile: string) = b.configure({"maskfile": $maskfile})
+proc `maskdata=`*(b: Bitmap, maskdata: string) = b.configure({"maskdata": repr $maskdata})
+proc `maskfile=`*(b: Bitmap, maskfile: string) = b.configure({"maskfile": repr $maskfile})
 
 proc background*(b: Bitmap): Color = parseColor b.cget("background")
 proc data*(b: Bitmap): string = b.cget("data")
