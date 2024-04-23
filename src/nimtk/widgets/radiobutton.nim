@@ -28,7 +28,6 @@ proc select*(r: RadioButton) = r.tk.call($r, "select")
 proc toggle*(r: RadioButton) = r.tk.call($r, "toggle")
 proc deselect*(r: RadioButton) = r.tk.call($r, "deselect")
 
-
 proc setCommand*(r: RadioButton, clientData: pointer, command: TkWidgetCommand) =
   let name = genName("checkbutton_command_")
   

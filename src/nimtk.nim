@@ -248,6 +248,7 @@ type
     Normal = "normal"
     Active = "active"
     Disabled = "disabled"
+    ReadOnly = "readonly"
 
   AfterEventHandler* {.pure.} = enum
     Idle

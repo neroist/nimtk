@@ -6,6 +6,8 @@ These should be sorted by urgency/importance
     
     In summary, dont use default values and instead use `""`
 
+- [ ] On creation of a new widget, always create a default `textvariable` for the widget (and `variable` too, if applicable). This allows `set` and `get` procs for getting the value of the widget (varible) without needing to create a new TkVar
+
 - [ ] Should we keep the `clientdata` parameters in `Tk*Command` proc types?
 
 - [ ] For all strings passed to Tcl, use `tclEscape`, or some kind of escaping function

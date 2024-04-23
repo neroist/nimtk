@@ -2,6 +2,7 @@ import std/strutils
 import std/colors
 
 import ../private/escaping
+import ../private/alias
 import ../../nimtk
 import ./widget
 
@@ -18,6 +19,8 @@ proc newEntry*(parent: Widget, text: string = "", configuration: openArray[(stri
 
   result.tk.call("entry", result.pathname)
 
+  result.configure({"textvariable": genName("DEFAULTVAR_string_")})
+
   if text.len > 0:
     result.tk.call("set", result.cget("textvariable"), tclEscape text)
   
@@ -27,8 +30,8 @@ proc newEntry*(parent: Widget, text: string = "", configuration: openArray[(stri
 #! bbox
 
 proc delete*(e: Entry, first: Index; last: Index = "") = e.tk.call($e, "delete", first, last)
-proc get*(e: Entry): string = e.tk.call($e, "get")
-proc set*(e: Entry, text: string) = e.tk.call("set", e.cget("textvariable"), tclEscape text)
+proc get*(e: Entry): string {.alias: "text".} = e.tk.call($e, "get")
+proc set*(e: Entry, text: string) {.alias: "text=".} = e.tk.call("set", e.cget("textvariable"), tclEscape text)
 proc icursor*(e: Entry, index: Index) = e.tk.call($e, "icursor", index)
 proc index*(e: Entry, index: string): int = parseInt e.tk.call($e, "index", index)
 proc scanMark*(e: Entry, x: int) = e.tk.call($e, "scan mark", x)

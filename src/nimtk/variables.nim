@@ -14,13 +14,9 @@ type
   TkInt* = ref object of TkVar
   TkBool* = ref object of TkVar
 
-<<<<<<< HEAD
   TkVarType* = TkString or TkFloat or TkInt or TkBool
-=======
-  TkVarType* = TkString or TkFloat or TkBool
-  
+
 proc `$`*(`var`: TkVar): string
->>>>>>> 2b988a3fa2b85ad5c8baf98a9e89e8628697b9b4
 
 proc genName*(): string =
   $genOid()
@@ -76,7 +72,13 @@ proc get*(`var`: TkFloat): float =
   try:
     getImpl(`var`, parseFloat)
   except ValueError:
-    raise newException(TkError, "Error when parsing TkFloat as a float: $1 cannot be parsed as a float" % tclEscape $cast[TkString](`var`))
+    raise newException(TkError, "Error when parsing TkFloat as a float: $1 cannot be parsed as a float" % $cast[TkString](`var`))
+
+proc get*(`var`: TkInt): int =
+  try:
+    getImpl(`var`, parseInt)
+  except ValueError:
+    raise newException(TkError, "Error when parsing TkInt as a int: $1 cannot be parsed as an int" % $cast[TkString](`var`))
 
 proc get*(`var`: TkBool): bool =
   try:

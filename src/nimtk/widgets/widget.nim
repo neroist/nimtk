@@ -6,6 +6,7 @@ import std/times
 import nimtcl except Time
 
 import ../private/escaping
+import ../private/tcllist
 import ../private/alias
 import ../variables
 import ../../nimtk
@@ -123,13 +124,6 @@ var
   selectionHandleCmdData: seq[TkCmdData[TkSelectionHandleCommand]]
   genericCommandData: seq[TkCmdData[TkGenericCommand]]
   eventCommandData: seq[TkCmdData[TkEventCommand]]
-
-proc toTclList(padding: int or float or string): string =
-  $padding
-proc toTclList(padding: tuple): string =
-  "{$1 $2}" % [$padding[0], $padding[1]]
-proc toTclList[T](arr: openArray[T]): string =
-  '{' & arr.join(" ") & '}'
 
 proc tkintwidgetcmd*(clientData: ClientData, _: ptr Interp, _: cint, _: cstringArray): cint {.cdecl.} =
   var data = cast[TkWidgetCmdData[TkWidgetCommand]](clientData)
