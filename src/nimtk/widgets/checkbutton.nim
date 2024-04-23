@@ -29,6 +29,7 @@ proc select*(c: CheckButton) = c.tk.call($c, "select")
 proc toggle*(c: CheckButton) = c.tk.call($c, "toggle")
 proc deselect*(c: CheckButton) = c.tk.call($c, "deselect")
 proc get*(c: CheckButton): bool = c.tk.call("set", c.cget("variable")) == "1"
+proc set*(c: CheckButton, state: bool) = c.tk.call("set", c.cget("variable"), $int(state))
 
 proc setCommand*(c: CheckButton, clientData: pointer, command: TkWidgetCommand) =
   let name = genName("checkbutton_command_")

@@ -6,6 +6,7 @@ import ./widget
 
 type
   Entry* = ref object of Widget
+
   Index = string or int
 
 proc newEntry*(parent: Widget, text: string = "", configuration: openArray[(string, string)] = {:}): Entry =
@@ -17,7 +18,7 @@ proc newEntry*(parent: Widget, text: string = "", configuration: openArray[(stri
   result.tk.call("entry", result.pathname)
 
   if text.len > 0:
-    result.configure({"text": tclEscape text})
+    result.tk.call("set", result.cget("textvariable"), tclEscape text)
   
   if configuration.len > 0:
     result.configure(configuration)
@@ -26,6 +27,7 @@ proc newEntry*(parent: Widget, text: string = "", configuration: openArray[(stri
 
 proc delete*(e: Entry, first: Index; last: Index = "") = e.tk.call($e, "delete", first, last)
 proc get*(e: Entry): string = e.tk.call($e, "get")
+proc set*(e: Entry, text: string) = e.tk.call("set", e.cget("textvariable"), tclEscape text)
 proc icursor*(e: Entry, index: Index) = e.tk.call($e, "icursor", index)
 proc index*(e: Entry, index: string): int = parseInt e.tk.call($e, "index", index)
 proc scanMark*(e: Entry, x: int) = e.tk.call($e, "scan mark", x)
