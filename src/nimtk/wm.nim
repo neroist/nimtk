@@ -248,9 +248,9 @@ proc wm_overrideredirect*(w: Window, overrideredirect: bool) {.alias: "overrider
 proc wm_overrideredirect*(w: Window): bool {.alias: "overrideredirect".} =
   w.tk.call("wm overridedirect", w) == "1"
 
-proc wm_positionfrom*(w: Window, who: PositionFrom) {.alias: "positionfrom=".} = w.tk.call("wm positionfrom", w, who)
-proc wm_positionfrom*(w: Window): PositionFrom {.alias: "positionfrom".} =
-  parseEnum[PositionFrom] w.tk.call("wm positionfrom", w)
+proc wm_positionfrom*(w: Window, who: GeometryFrom) {.alias: "positionfrom=".} = w.tk.call("wm positionfrom", w, who)
+proc wm_positionfrom*(w: Window): GeometryFrom {.alias: "positionfrom".} =
+  parseEnum[GeometryFrom] w.tk.call("wm positionfrom", w)
 
 proc wm_protocol*(w: Window, name: string, clientdata: pointer, command: TkWidgetCommand) {.alias: "protocol".} =
   let cmdname = genName("wm_protocol_command_")
@@ -269,9 +269,9 @@ proc wm_resizable*(w: Window): tuple[width, height: bool] {.alias: "resizable".}
   result.width = res[0] == "1"
   result.height = res[1] == "1"
 
-proc wm_sizefrom*(w: Window, who: PositionFrom) {.alias: "sizefrom".} = w.tk.call("wm sizefrom", w, $who)
-proc wm_sizefrom*(w: Window): PositionFrom {.alias: "sizefrom".} =
-  parseEnum[PositionFrom] w.tk.call("wm sizefrom", $w)
+proc wm_sizefrom*(w: Window, who: GeometryFrom) {.alias: "sizefrom".} = w.tk.call("wm sizefrom", w, $who)
+proc wm_sizefrom*(w: Window): GeometryFrom {.alias: "sizefrom".} =
+  parseEnum[GeometryFrom] w.tk.call("wm sizefrom", $w)
 
 proc wm_stackorder*(w: Window, isbelow: Window): seq[Widget] {.alias: "stackorder".} =
   w.tk.call("wm stackorder", w, "isbelow", isbelow)

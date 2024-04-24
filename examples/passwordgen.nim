@@ -20,7 +20,7 @@ let
   root = tk.getRoot()
 
 root.title = "Password Generator"
-# root.resizable = false
+root.resizable = false
 
 let
   mainframe = root.newFrame()

@@ -27,20 +27,31 @@ proc newEntry*(parent: Widget, text: string = "", configuration: openArray[(stri
   if configuration.len > 0:
     result.configure(configuration)
 
-#! bbox
+proc bbox*(e: Entry, index: Index): tuple[offsetX, offsetY, width, height: int] =
+  e.tk.call($e, "bbox", index)
 
-proc delete*(e: Entry, first: Index; last: Index = "") = e.tk.call($e, "delete", first, last)
+  if e.tk.result.len == 0:
+    return
+  
+  let nums = e.tk.result.split()
+
+  result.offsetX = nums[0].parseInt()
+  result.offsetY = nums[1].parseInt()
+  result.width = nums[2].parseInt()
+  result.height = nums[3].parseInt()
+proc delete*[I1, I2: Index](e: Entry, first: I1; last: I2 = "") = e.tk.call($e, "delete", first, last)
 proc get*(e: Entry): string {.alias: "text".} = e.tk.call($e, "get")
 proc set*(e: Entry, text: string) {.alias: "text".} = e.tk.call("set", e.cget("textvariable"), tclEscape text)
 proc icursor*(e: Entry, index: Index) = e.tk.call($e, "icursor", index)
 proc index*(e: Entry, index: string): int = parseInt e.tk.call($e, "index", index)
+proc insert*(e: Entry, index: string, str: string): int = parseInt e.tk.call($e, "insert", index, tclEscape str)
 proc scanMark*(e: Entry, x: int) = e.tk.call($e, "scan mark", x)
 proc scanDragTo*(e: Entry, x: int) = e.tk.call($e, "scan dragto", x)
 proc selectionAdjust*(e: Entry, index: Index) = e.tk.call($e, "selection adjust", index)
 proc selectionClear*(e: Entry) = e.tk.call($e, "selection clear")
 proc selectionFrom*(e: Entry, index: Index) = e.tk.call($e, "selection from", index)
 proc selectionPresent*(e: Entry): bool = e.tk.call($e, "selection present") == "1"
-proc selectionRange*(e: Entry, start, `end`: Index) = e.tk.call($e, "selection range", start, `end`)
+proc selectionRange*[I1, I2: Index](e: Entry, start: I1, `end`: I2) = e.tk.call($e, "selection range", start, `end`)
 proc selectionTo*(e: Entry, index: Index) = e.tk.call($e, "selection to", index)
 proc validate*(e: Entry): bool = e.tk.call($e, "validate") == "1"
 proc xview*(e: Entry): array[2, float] =

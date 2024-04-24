@@ -13,17 +13,15 @@ root.title = "Mouse"
 root.geometry(width=800, 600)
 
 let
-  textvar = tk.newTkString("Your mouse is at (0, 0)")
-  label = root.newEntry()
+  entry = root.newEntry()
 
-label.pack(anchor = AnchorPosition.Center, expand = true, padx = 50, pady = 50)
-label.textvariable = textvar
+entry.pack(anchor = AnchorPosition.Center, expand = true, padx = 50, pady = 50)
 
 proc onMouseMove(_: Event, _: pointer) =
   # event.x and event.y may be used instead
   let (x, y) = root.pointerxy()
 
-  textvar.set(fmt"Your mouse is at ({x}, {y})")
+  entry.set(fmt"Your mouse is at ({x}, {y})")
 
 tk.eventAdd("<<Mousemove>>", "<Motion>")
 root.bind("<<Mousemove>>", nil, onMouseMove)

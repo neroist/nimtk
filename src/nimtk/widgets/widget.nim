@@ -361,6 +361,8 @@ template bboxImpl(w: Widget) {.dirty.} =
 template infoImpl(w: Widget) {.dirty.} =
   let res = w.tk.result.split()
 
+  echo res
+
   for idx in 0..<res.len:
     if idx mod 2 != 0: continue
 
@@ -377,16 +379,16 @@ template slavesImpl(w: Widget) {.dirty.} =
 proc pack*[PX, PY: Padding](
   w: Widget,
   after: Widget = nil,
-  anchor: AnchorPosition = AnchorPosition.Center,
+  anchor: AnchorPosition or string = "",
   before: Widget = nil,
-  expand: bool = false,
-  fill: FillStyle = FillStyle.None,
+  expand: bool or string = "",
+  fill: FillStyle or string = "",
   `in`: Widget = nil,
   ipadx: int or float or string = 0,
   ipady: int or float or string = 0,
-  padx: PX = 0,
-  pady: PY = 0,
-  side: Side = Side.Top
+  padx: PX = "",
+  pady: PY = "",
+  side: Side or string = ""
 ) =
 
   w.tk.call(
@@ -415,7 +417,7 @@ proc packSlaves*(w: Widget): seq[Widget] =
 
   w.slavesImpl()
 
-proc packContent*(w: Widget): seq[Widget] =
+template packContent*(w: Widget): seq[Widget] =
   w.packSlaves()
 
 proc packPropagate*(w: Widget, propagate: bool = true) =
@@ -424,23 +426,25 @@ proc packPropagate*(w: Widget, propagate: bool = true) =
 proc packInfo*(w: Widget): Table[string, string] =
   result = initTable[string, string]()
 
+  w.tk.call("pack info", w)
+
   w.infoImpl()
 
 # --- place
 
 proc place*(
   w: Widget,
-  anchor: AnchorPosition = Northwest,
-  bordermode: BorderMode = Inside,
-  height: int or float or string,
+  x: float or int or string = "",
+  y: float or int or string = "",
+  anchor: AnchorPosition or string = "",
+  bordermode: BorderMode or string = "",
+  height: int or float or string = "",
   `in`: Widget = nil,
-  relheight: float = 1,
-  relwidth: float = 1,
-  relx: float = 0,
-  rely: float = 0,
-  width: int or float or string,
-  x: string or float,
-  y: string or float
+  relheight: float or string = "",
+  relwidth: float or string = "",
+  relx: float or string = "",
+  rely: float or string = "",
+  width: int or float or string = ""
 ) =
 
   w.tk.call(
@@ -478,6 +482,8 @@ proc placePropagate*(w: Widget, propagate: bool = true) =
 proc placeInfo*(w: Widget): Table[string, string] =
   result = initTable[string, string]()
 
+  w.tk.call("place info", w)
+
   w.infoImpl()
 
 # --- grid
@@ -490,10 +496,10 @@ proc grid*[PX, PY: Padding](
   columnspan: string or int = "",
   rowspan: string or int = "",
   `in`: Widget = nil,
-  ipadx: float = 0,
-  ipady: float = 0,
-  padx: PX = 0,
-  pady: PY = 0,
+  ipadx: float or string = "",
+  ipady: float or string = "",
+  padx: PX = "",
+  pady: PY = "",
   sticky: FillStyle or AnchorPosition or string = ""
 ) =
   w.tk.call(
@@ -790,7 +796,7 @@ proc getOpenFile*(
   parent: Widget = w,
   title: string = "",
   typevariable: TkVar = nil
-): string =
+): string {.discardable.} =
   getFileImpl("tk_getOpenFile")
 
 proc getSaveFile*(
@@ -803,7 +809,7 @@ proc getSaveFile*(
   parent: Widget = w,
   title: string = "",
   typevariable: TkVar = nil
-): string =
+): string {.discardable.} =
   getFileImpl("tk_getSaveFile")
 
 # --- tk_messageBox
@@ -817,7 +823,7 @@ proc messageBox*(
   icon: IconImage = Info,
   parent: Widget = w,
   title: string = "",
-): ButtonName =
+): ButtonName {.discardable.} =
   parseEnum[ButtonName] w.tk.call(
     "tk_messageBox",
     {
@@ -1096,7 +1102,7 @@ proc `foreground=`*(w: Widget, foreground: Color) {.alias: "fg=".}              
 proc `highlightbackground=`*(w: Widget, highlightbackground: Color)                   = w.configure({"highlightbackground": $highlightbackground})
 proc `highlightcolor=`*(w: Widget, highlightcolor: Color)                             = w.configure({"highlightcolor": $highlightcolor})
 proc `highlightthickness=`*(w: Widget, highlightthickness: string or float or int)    = w.configure({"highlightthickness": $highlightthickness})
-#    proc `image=`*(w: Widget, image)                                                 = w.configure({"image": $image})
+# proc `image=`*(w: Widget, image)                                                    = w.configure({"image": $image}) # TODO
 proc `insertbackground=`*(w: Widget, insertbackground: Color)                         = w.configure({"insertbackground": $insertbackground})
 proc `insertborderwidth=`*(w: Widget, insertborderwidth: string or float or int)      = w.configure({"insertborderwidth": $insertborderwidth})
 proc `insertofftime=`*(w: Widget, insertofftime: int)                                 = w.configure({"insertofftime": $insertofftime})

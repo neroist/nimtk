@@ -10,6 +10,7 @@ import
   ./widgets/radiobutton,
   ./widgets/scale,
   ./widgets/entry,
+  ./widgets/listbox,
   ./widgets/widget
 
 export
@@ -24,4 +25,5 @@ export
   radiobutton,
   scale,
   entry,
+  listbox,
   widget
