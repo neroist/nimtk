@@ -31,7 +31,7 @@ proc newEntry*(parent: Widget, text: string = "", configuration: openArray[(stri
 
 proc delete*(e: Entry, first: Index; last: Index = "") = e.tk.call($e, "delete", first, last)
 proc get*(e: Entry): string {.alias: "text".} = e.tk.call($e, "get")
-proc set*(e: Entry, text: string) {.alias: "text=".} = e.tk.call("set", e.cget("textvariable"), tclEscape text)
+proc set*(e: Entry, text: string) {.alias: "text".} = e.tk.call("set", e.cget("textvariable"), tclEscape text)
 proc icursor*(e: Entry, index: Index) = e.tk.call($e, "icursor", index)
 proc index*(e: Entry, index: string): int = parseInt e.tk.call($e, "index", index)
 proc scanMark*(e: Entry, x: int) = e.tk.call($e, "scan mark", x)
@@ -52,7 +52,7 @@ proc xview*(e: Entry): array[2, float] =
   result[1] = parseFloat res[1]
 proc xview*(e: Entry, index: Index) = e.tk.call($e, "xview", index)
 proc xviewMoveto*(e: Entry, fraction: 0.0..1.0) = e.tk.call($e, "xview moveto", fraction)
-proc xviewScroll*(e: Entry, number: int, what: string) = e.tk.call($e, "xview scroll", number, repr what)
+proc xviewScroll*(e: Entry, number: int, what: string) = e.tk.call($e, "xview scroll", number, tclEscape what)
 
 proc setValidateCommand*(e: Entry, clientData: pointer, command: TkEntryCommand) =
   let name = genName("entry_validate_command_")
@@ -65,9 +65,9 @@ proc setInvalidCommand*(e: Entry, clientData: pointer, command: TkEntryCommand) 
 
 proc `validatecommand=`*(e: Entry, command: TkEntryCommand) = e.setValidateCommand(nil, command)
 proc `invalidcommand=`*(e: Entry, command: TkEntryCommand) = e.setInvalidCommand(nil, command)
-proc `disabledbackground=`*(w: Widget, disabledforeground: Color or string) = w.configure({"disabledbackground": repr $disabledbackground})
-proc `readonlybackground=`*(w: Widget, readonlybackground: Color or string) = w.configure({"readonlybackground": repr $readonlybackground})
-proc `show=`*(w: Widget, show: char) = w.configure({"show": repr $show})
+proc `disabledbackground=`*(w: Widget, disabledforeground: Color or string) = w.configure({"disabledbackground": tclEscape $disabledbackground})
+proc `readonlybackground=`*(w: Widget, readonlybackground: Color or string) = w.configure({"readonlybackground": tclEscape $readonlybackground})
+proc `show=`*(w: Widget, show: char) = w.configure({"show": tclEscape $show})
 proc `state=`*(e: Entry, state: WidgetState) = e.configure({"state": $state})
 proc `validationMode=`*(e: Entry, validationMode: ValidationMode) = e.configure({"validate": $validationMode})
 proc `width=`*(e: Entry, width: int) = e.configure({"width": $width})

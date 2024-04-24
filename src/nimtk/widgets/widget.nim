@@ -243,7 +243,7 @@ proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
   if args[26] != "??":
     event.subwindow = interp.newWidgetAttr(args[26].parseHexInt())
 
-  event.`type` = parseEnum[EventType] args[27]
+  event.`type` = EventType parseInt args[27]
   if args[28] != "??":
     event.widget = interp.newWidgetAttr(args[28])
 
@@ -908,26 +908,26 @@ proc send*(w: Widget, async: bool, cmd: string, args: varargs[string]) =
 # --- bind
 
 proc `bind`*(w: Widget, sequence: string, clientdata: pointer = nil, command: TkEventCommand) =
-  let name = genName("event_command_" & sequence & "_")
+  let name = genName("event_command_")
 
-  w.tk.registerCmd(nil, repr name, command)
+  w.tk.registerCmd(clientdata, name, command)
 
   w.tk.call(
     "bind",
     w,
-    repr sequence,
+    tclEscape sequence,
     "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
   )
 
 proc `bind`*(tk: Tk, className: string, sequence: string, clientdata: pointer = nil, command: TkEventCommand) =
   let name = genName("event_command_" & className & "_")
 
-  tk.registerCmd(nil, name, command)
+  tk.registerCmd(clientdata, name, command)
 
   tk.call(
     "bind",
-    repr className,
-    repr sequence,
+    tclEscape className,
+    tclEscape sequence,
     "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
   )
 
@@ -939,7 +939,7 @@ proc bindAll*(tk: Tk, sequence: string, clientdata: pointer = nil, command: TkEv
   tk.call(
     "bind",
     "all",
-    repr sequence,
+    tclEscape sequence,
     "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
   )
 
@@ -954,10 +954,10 @@ proc bindtags*(w: Widget): seq[string] =
 # --- event
 
 proc eventAdd*(tk: Tk, virtual: string, sequence: varargs[string]) =
-  tk.call("event add", repr virtual, sequence.join(" "))
+  tk.call("event add", tclEscape virtual, sequence.join(" "))
 
 proc eventDelete*(tk: Tk, virtual: string, sequence: varargs[string] = "") =
-  tk.call("event delete", repr virtual, sequence.join(" "))
+  tk.call("event delete", tclEscape virtual, sequence.join(" "))
 
 proc eventGenerate*(
   tk: Tk,
@@ -971,32 +971,32 @@ proc eventGenerate*(
     tclEscape $w,
     event,
     {
-      "above": repr $eventObj.above,
-      "borderwidth": repr $eventObj.borderwidth,
-      "button": repr $eventObj.button,
-      "count": repr $eventObj.count,
-      "data": repr $eventObj.userData, # userdata
-      "delta": repr $eventObj.delta,
-      "detail": repr $eventObj.userData, # detail
-      "focus": repr $eventObj.focus,
-      "height": repr $eventObj.height,
-      "keycode": repr $eventObj.keycode,
-      "keysym": repr $eventObj.keysym,
-      "mode": repr $eventObj.mode,
-      "override": repr $eventObj.override,
-      "place": repr $eventObj.place,
-      "root": repr $eventObj.root,
-      "rootx": repr $eventObj.xRoot,
-      "rooty": repr $eventObj.yRoot,
-      "sendevent": repr $eventObj.sendevent,
-      "serial": repr $eventObj.serial,
-      "state": repr $eventObj.state,
-      "subwindow": repr $eventObj.subwindow,
-      "time": repr $eventObj.time,
+      "above": tclEscape $eventObj.above,
+      "borderwidth": tclEscape $eventObj.borderwidth,
+      "button": tclEscape $eventObj.button,
+      "count": tclEscape $eventObj.count,
+      "data": tclEscape $eventObj.userData, # userdata
+      "delta": tclEscape $eventObj.delta,
+      "detail": tclEscape $eventObj.userData, # detail
+      "focus": tclEscape $eventObj.focus,
+      "height": tclEscape $eventObj.height,
+      "keycode": tclEscape $eventObj.keycode,
+      "keysym": tclEscape $eventObj.keysym,
+      "mode": tclEscape $eventObj.mode,
+      "override": tclEscape $eventObj.override,
+      "place": tclEscape $eventObj.place,
+      "root": tclEscape $eventObj.root,
+      "rootx": tclEscape $eventObj.xRoot,
+      "rooty": tclEscape $eventObj.yRoot,
+      "sendevent": tclEscape $eventObj.sendevent,
+      "serial": tclEscape $eventObj.serial,
+      "state": tclEscape $eventObj.state,
+      "subwindow": tclEscape $eventObj.subwindow,
+      "time": tclEscape $eventObj.time,
       "warp": $warp,
-      "width": repr $eventObj.width,
-      "when": repr $eventObj.time,
-      "x": repr $eventObj.x
+      "width": tclEscape $eventObj.width,
+      "when": tclEscape $eventObj.time,
+      "x": tclEscape $eventObj.x
     }.toArgs()
   )
 
@@ -1004,7 +1004,7 @@ proc eventInfo*(tk: Tk): seq[string] =
   tk.call("event info").split(' ')
 
 proc eventInfo*(tk: Tk, virtual: string): seq[string] =
-  tk.call("event info", repr virtual).split(' ')
+  tk.call("event info", tclEscape virtual).split(' ')
 
 # --- tk_text*
 
@@ -1087,8 +1087,8 @@ proc `background=`*(w: Widget, background: Color) {.alias: "bg=".}              
 proc `borderwidth=`*(w: Widget, borderwidth: string or float or int) {.alias: "bd=".} = w.configure({"borderwidth": $borderwidth})
 proc `cursor=`*(w: Widget, cursor: Cursor)                                            = w.configure({"cursor": $cursor})
 proc `compound=`*(w: Widget, compound: WidgetCompound)                                = w.configure({"compound": $compound})
-proc `disabledforeground=`*(w: Widget, disabledforeground: Color or string)           = w.configure({"disabledforeground": repr $disabledforeground})
-proc `disabledbackground=`*(w: Widget, disabledbackground: Color or string)           = w.configure({"disabledbackground": repr $disabledbackground})
+proc `disabledforeground=`*(w: Widget, disabledforeground: Color or string)           = w.configure({"disabledforeground": tclEscape $disabledforeground})
+proc `disabledbackground=`*(w: Widget, disabledbackground: Color or string)           = w.configure({"disabledbackground": tclEscape $disabledbackground})
 proc `exportselection=`*(w: Widget, exportselection: bool)                            = w.configure({"exportselection": $exportselection})
 #    proc `font=`*(w: Widget, font)                                                   = w.configure({"font": $font})
 proc `foreground=`*(w: Widget, foreground: Color) {.alias: "fg=".}                    = w.configure({"foreground": $foreground})
@@ -1121,8 +1121,8 @@ proc `troughcolor=`*(w: Widget, troughcolor: Color)                             
 proc `underline=`*(w: Widget, underline: int)                                         = w.configure({"underline": $underline})
 # proc `width=`*(w: Widget, width: string or float or int)                              = w.configure({"width": $width})
 proc `wraplength=`*(w: Widget, wraplength: int)                                       = w.configure({"wraplength": $wraplength})
-proc `xscrollcommand=`*(w: Widget, xscrollcommand: string)                            = w.configure({"xscrollcommand": repr $xscrollcommand})
-proc `yscrollcommand=`*(w: Widget, yscrollcommand: string)                            = w.configure({"yscrollcommand": repr $yscrollcommand})
+proc `xscrollcommand=`*(w: Widget, xscrollcommand: string)                            = w.configure({"xscrollcommand": tclEscape $xscrollcommand})
+proc `yscrollcommand=`*(w: Widget, yscrollcommand: string)                            = w.configure({"yscrollcommand": tclEscape $yscrollcommand})
 
 proc activebackground*(w: Widget): Color             = parseColor w.cget("activebackground")
 proc activeborderwidth*(w: Widget): string           = w.cget("activeborderwidth")

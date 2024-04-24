@@ -54,7 +54,7 @@ proc wm_aspect*(w: Window): array[4, int] {.alias: "aspect".} =
     result[idx] = num.parseInt()
 
 proc wm_attributes*(w: Window, option: string): string {.alias: "attributes".} = w.tk.call("wm attributes", w, '-' & option)
-proc wm_attributes*(w: Window, option, val: string) {.alias: "[]=".} = w.tk.call("wm attributes", w, '-' & option, repr val)
+proc wm_attributes*(w: Window, option, val: string) {.alias: "[]=".} = w.tk.call("wm attributes", w, '-' & option, tclEscape val)
 proc wm_attributes*(w: Window, dict: openArray[(string, string)]) {.alias: "attributes".} = w.tk.call("wm attributes", w, dict.toArgs())
 
 #! these
@@ -94,8 +94,8 @@ when defined(macos):
 
 elif defined(macos):
   proc `modified=`*(w: Window, modified: bool) = w.wm_attributes("modified", $modified)
-  proc `notify=`*(w: Window, notify: string) = w.wm_attributes("notify", repr $notify)
-  proc `titlepath=`*(w: Window, titlepath: string) = w.wm_attributes("titlepath", repr $titlepath)
+  proc `notify=`*(w: Window, notify: string) = w.wm_attributes("notify", tclEscape $notify)
+  proc `titlepath=`*(w: Window, titlepath: string) = w.wm_attributes("titlepath", tclEscape $titlepath)
   proc `transparent=`*(w: Window, transparent: bool) = w.wm_attributes("transparent", $transparent)
 
 else:
@@ -105,7 +105,7 @@ proc `zoomed=`*(w: Window, zoomed: bool) = w.wm_attributes("zoomed", $zoomed)
 
 # -- others...
 
-proc wm_client*(w: Window, name: string) {.alias: "client=".} = w.tk.call("wm client", w, repr name)
+proc wm_client*(w: Window, name: string) {.alias: "client=".} = w.tk.call("wm client", w, tclEscape name)
 proc wm_client*(w: Window): string {.alias: "client".} =
   w.tk.call("wm client", w)
 
@@ -133,7 +133,7 @@ proc wm_forget*(w: Window) {.alias: "forget".} = w.tk.call("wm forget", w)
 
 proc wm_frame*(w: Window) {.alias: "frame".} = w.tk.call("wm frame", w)
 
-proc wm_geometry*(w: Window, newGeometry: string) {.alias: ["geometry=", "geometry"].} = w.tk.call("wm geometry", w, repr newGeometry) # "
+proc wm_geometry*(w: Window, newGeometry: string) {.alias: ["geometry=", "geometry"].} = w.tk.call("wm geometry", w, tclEscape newGeometry) # "
 proc wm_geometry*(w: Window, width, height: int) {.alias: "geometry".} = w.tk.call("wm geometry", w, $width & 'x' & $height)
 proc wm_geometry*(w: Window, x, y: int) {.alias: "geometry".} =
   let
@@ -179,26 +179,26 @@ proc wm_group*(w: Window): Widget {.alias: "group".} =
 
 proc wm_iconbitmap*(w: Window, bitmap: string, default: bool = false) {.alias: "iconbitmap=".} =
   if default:
-    w.tk.call("wm iconbitmap", w, "-default", repr bitmap)
+    w.tk.call("wm iconbitmap", w, "-default", tclEscape bitmap)
   else:
-    w.tk.call("wm iconbitmap", w, repr bitmap)
+    w.tk.call("wm iconbitmap", w, tclEscape bitmap)
 
 proc wm_iconify*(w: Window) {.alias: "iconify".} = w.tk.call("wm iconify", w)
 
-proc wm_iconmask*(w: Window, bitmap: string) {.alias: "iconmask=".} = w.tk.call("wm iconmask", w, repr bitmap)
+proc wm_iconmask*(w: Window, bitmap: string) {.alias: "iconmask=".} = w.tk.call("wm iconmask", w, tclEscape bitmap)
 proc wm_iconmask*(w: Window): string {.alias: "iconmask".} =
   w.tk.call("wm iconmask", w)
 
-proc wm_iconname*(w: Window, newName: string) {.alias: "iconname=".} = w.tk.call("wm iconname", w, repr newName)
+proc wm_iconname*(w: Window, newName: string) {.alias: "iconname=".} = w.tk.call("wm iconname", w, tclEscape newName)
 proc wm_iconname*(w: Window): string {.alias: "iconname".} =
   w.tk.call("wm iconname", w)
 
-proc wm_iconphoto*(w: Window, image: string) {.alias: "iconphoto=".} = w.tk.call("wm iconphoto", w, repr image)
+proc wm_iconphoto*(w: Window, image: string) {.alias: "iconphoto=".} = w.tk.call("wm iconphoto", w, tclEscape image)
 proc wm_iconphoto*(w: Window, images: varargs[string]) {.alias: "iconphoto".} =
   var imgs_safe: seq[string]
 
   for i in images:
-    imgs_safe.add repr i
+    imgs_safe.add tclEscape i
 
   w.tk.call("wm iconphoto", w, imgs_safe.join(" "))
 proc wm_iconphoto*(w: Window, default: bool, images: varargs[string]) {.alias: "iconphoto".} = w.tk.call("wm iconphoto", w, "-default", images.join(" "))
@@ -284,7 +284,7 @@ proc wm_state*(w: Window, newstate: WindowState) {.alias: "state=".} = w.tk.call
 proc wm_state*(w: Window): WindowState {.alias: "state".} =
   parseEnum[WindowState] w.tk.call("wm state", w)
 
-proc wm_title*(w: Window, title: string) {.alias: "title=".} = w.tk.call("wm title", w, repr title)
+proc wm_title*(w: Window, title: string) {.alias: "title=".} = w.tk.call("wm title", w, tclEscape title)
 proc wm_title*(w: Window): string {.alias: "title".} = w.tk.call("wm title", w)
 
 proc wm_transient*(w: Window, container: Widget) {.alias: "transient=".} = w.tk.call("wm transient", w, container)

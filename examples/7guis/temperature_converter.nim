@@ -26,7 +26,7 @@ eqLabel.grid(2, 0, padx=5, pady=5)
 fahrenheitEntry.grid(3, 0, padx=5, pady=5)
 fahrenheitLabel.grid(4, 0, padx=5, pady=5)
 
-fahrenheitEntry.textvariable.trace([toWrite], nil) do (_: pointer):
+fahrenheitEntry.bind("<Key>", nil) do (_: Event, _: pointer):
   let fahrenheit = 
     try:
       parseFloat fahrenheitEntry.get()
@@ -35,7 +35,7 @@ fahrenheitEntry.textvariable.trace([toWrite], nil) do (_: pointer):
   
   celsiusEntry.set $((fahrenheit - 32) * 5/9)
 
-celsiusEntry.textvariable.trace([toWrite], nil) do (_: pointer):
+celsiusEntry.bind("<Key>", nil) do (_: Event, _: pointer):
   let celsius =
     try: 
       parseFloat celsiusEntry.get()

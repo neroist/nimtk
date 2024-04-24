@@ -19,17 +19,14 @@ let
   tk = newTK()
   root = tk.getRoot()
 
-root.title = "\"Password Generator\""
-root.resizable = false
+root.title = "Password Generator"
+# root.resizable = false
 
 let
-  lenVar = tk.newTkString($rand(16..64))
-  passwordVar = tk.newTkString()
-
   mainframe = root.newFrame()
 
   lenLabel = mainframe.newLabel("How many characters should be in the password?")
-  lenEntry = mainframe.newEntry()
+  lenEntry = mainframe.newEntry($rand(16..64))
 
   passwordLabel = mainframe.newLabel("Password:")
   passwordEntry = mainframe.newEntry()
@@ -68,11 +65,6 @@ nodupesCheckButton.grid(1, 4)
 for checkbutton in [uppercharsCheckbutton, lowercharsCheckbutton, digitsCheckbutton, specialcharsCheckbutton]:
   checkbutton.select()
 
-lenEntry.textvariable = lenVar
-passwordEntry.textvariable = passwordVar
-
-# lenEntry.text = $rand(16..32)
-
 proc generatePassword(
   passwordLen: int,
   upperchars: bool = true,
@@ -92,7 +84,7 @@ proc generatePassword(
   if nodupes and (chars.len < passwordLen):
     raise newException(
       ValueError,
-      "The password length is too long to warrant the generation of a password with " &
+      "The password length is too long to alloq the generation of a password with " &
       "no duplicate characters"
     )
 
@@ -102,11 +94,12 @@ proc generatePassword(
     while i < passwordLen:
       let char0 = chars.sample()
 
-      if char0 notin result:
-        result.add char0
-        inc i
-      else:
+      if char0 in result:
+        chars.excl char0
         continue
+
+      result.add char0
+      inc i
 
   else:
     for _ in 0..<passwordLen:
@@ -114,7 +107,7 @@ proc generatePassword(
 
 generateButton.setCommand(nil) do (_: Widget, _: pointer):
   let (len, upperchars, lowerchars, digits, specialchars, nodupes) = (
-    parseInt $lenVar,
+    parseInt lenEntry.get(),
 
     uppercharsCheckbutton.get(),
     lowercharsCheckbutton.get(),
@@ -124,7 +117,10 @@ generateButton.setCommand(nil) do (_: Widget, _: pointer):
   )
 
   try:
-    passwordVar.set generatePassword(
+    root.busy()
+    tk.update()
+
+    passwordEntry.set generatePassword(
       len,
 
       upperchars,
@@ -135,6 +131,7 @@ generateButton.setCommand(nil) do (_: Widget, _: pointer):
     )
   except ValueError as err:
     discard root.messageBox(err.msg, title="Error", icon=IconImage.Error)
-    return
+  finally:
+    root.busyForget()
 
 tk.mainloop()
