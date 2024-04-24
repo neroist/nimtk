@@ -13,6 +13,7 @@ root.geometry(width=800, 600)
 
 let
   listbox = root.newListbox(["i", "love", "you"])
+  scrollbar = root.newScrollbar()
 
 listbox.pack()
 listbox.selectionSet(0..2)
@@ -22,8 +23,9 @@ listbox.selectionSet(0..2)
 #
 # Example:
 # listbox.itemconfigureRange(0, "end", selectbackground=colBlack)
-listbox.itemconfigure(first=0, "end", selectbackground=colBlack)
+listbox.itemconfigure(first=0, "end", selectbackground=colBlack, selectforeground=colWhite)
 listbox.itemconfigure(1, selectbackground=colHotPink)
+
 echo listbox.get(0..1)
 
 tk.mainloop()

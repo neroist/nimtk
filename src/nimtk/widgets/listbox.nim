@@ -59,6 +59,7 @@ proc insert*(l: Listbox, index: Index, elements: varargs[string]) =
     safeElements.add tclEscape unsafeElement
 
   l.tk.call($l, "insert", index, safeElements.join())
+proc add*(l: Listbox, elements: varargs[string]) = l.insert("end", elements)
 proc itemcget*(l: Listbox, index: Index, option: string): Color = fromTclColor l, l.tk.call($l, "itemcget", index, {option: " "}.toArgs())
 proc itemconfigure*(
   l: Listbox,

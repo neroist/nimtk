@@ -633,8 +633,47 @@ proc gridSize*(w: Widget): tuple[cols, rows: int] =
   result.cols = nums[0].parseInt()
   result.rows = nums[1].parseInt()
 
-#! row configure
-#! column configure
+proc gridColumnconfigure*(
+  w: Widget,
+  index: int or string or openArray[int],
+  minsize: int or string = "",
+  weight: int or string = "",
+  uniform: bool or string = "",
+  pad: int or string = "" 
+) =
+  w.tk.call(
+    "grid columnconfigure",
+    w,
+    index.toTclList(),
+    {
+      "index": index,
+      "minsize": minsize,
+      "weight": weight,
+      "uniform": uniform,
+      "pad": pad
+    }.toArgs()
+  )
+
+proc gridRowconfigure*(
+  w: Widget,
+  index: int or string = "",
+  minsize: int or string = "",
+  weight: int or string = "",
+  uniform: bool or string = "",
+  pad: int or string = "" 
+) =
+  w.tk.call(
+    "grid rowconfigure",
+    w,
+    index,
+    {
+      "index": index,
+      "minsize": minsize,
+      "weight": weight,
+      "uniform": uniform,
+      "pad": pad
+    }.toArgs()
+  )
 
 # --- busy
 
