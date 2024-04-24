@@ -1,9 +1,22 @@
 import std/strutils
 
+import ./private/tcllist
 import ./private/escaping
 import ./widgets/widget
 import ./private/alias
 import ../nimtk
+
+type
+  TraceOps* = enum
+    # toRename = "rename"
+    # toDelete = "delete"
+    # toEnterstep = "enterstep"
+    # toLeavestep = "leavestep"
+    
+    # toArray = "array"
+    toRead = "read"
+    toWrite = "write"
+    toUnset = "unset"
 
 # --- after
 
@@ -49,3 +62,20 @@ proc update*(tk: Tk, idletasks: bool = false) =
     tk.call("update idletasks")
   else:
     tk.call("update")
+
+# --- trace
+
+proc traceAdd*(v: TkVar, ops: openArray[TraceOps], clientdata: pointer, command: TkGenericCommand): string {.discardable, alias: "trace".} =
+  let cmdname = genName("trace_command_" & ops.join("_").replace("to", "") & "_")
+  
+  v.tk.registerCmd(clientdata, cmdname, command)
+
+  v.tk.call("trace add variable", v.varname, ops.toTclList(), cmdname)
+
+  return cmdname
+
+proc traceRemove*(v: TkVar, ops: openArray[TraceOps], command: string) =
+  v.tk.call("trace remove variable", v.varname, ops.toTclList(), command)
+
+# proc traceInfo*(v: TkVar): seq[tuple[opList: seq[TraceOps], command: string]] =
+

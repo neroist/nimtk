@@ -15,7 +15,7 @@ type
   TkBool* = ref object of TkVar
 
   TkVarType* = TkString or TkFloat or TkInt or TkBool
-  
+
 proc `$`*(`var`: TkVar): string
 
 proc genName*(): string =
@@ -72,7 +72,13 @@ proc get*(`var`: TkFloat): float =
   try:
     getImpl(`var`, parseFloat)
   except ValueError:
-    raise newException(TkError, "Error when parsing TkFloat as a float: $1 cannot be parsed as a float" % tclEscape $cast[TkString](`var`))
+    raise newException(TkError, "Error when parsing TkFloat as a float: $1 cannot be parsed as a float" % $cast[TkString](`var`))
+
+proc get*(`var`: TkInt): int =
+  try:
+    getImpl(`var`, parseInt)
+  except ValueError:
+    raise newException(TkError, "Error when parsing TkInt as a int: $1 cannot be parsed as an int" % $cast[TkString](`var`))
 
 proc get*(`var`: TkBool): bool =
   try:
