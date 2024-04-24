@@ -17,13 +17,13 @@ let
 
 entry.pack(anchor = AnchorPosition.Center, expand = true, padx = 50, pady = 50)
 
-proc onMouseMove(_: Event, _: pointer) =
+proc onMouseMove(_: Event) =
   # event.x and event.y may be used instead
   let (x, y) = root.pointerxy()
 
   entry.set(fmt"Your mouse is at ({x}, {y})")
 
 tk.eventAdd("<<Mousemove>>", "<Motion>")
-root.bind("<<Mousemove>>", nil, onMouseMove)
+root.bind("<<Mousemove>>", onMouseMove)
 
 tk.mainloop()

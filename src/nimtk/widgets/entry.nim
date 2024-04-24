@@ -65,17 +65,17 @@ proc xview*(e: Entry, index: Index) = e.tk.call($e, "xview", index)
 proc xviewMoveto*(e: Entry, fraction: 0.0..1.0) = e.tk.call($e, "xview moveto", fraction)
 proc xviewScroll*(e: Entry, number: int, what: string) = e.tk.call($e, "xview scroll", number, tclEscape what)
 
-proc setValidateCommand*(e: Entry, clientData: pointer, command: TkEntryCommand) =
+proc setValidateCommand*(e: Entry, command: TkEntryCommand) =
   let name = genName("entry_validate_command_")
-  e.tk.registerCmd(e, clientdata, name, command)
+  e.tk.registerCmd(e, name, command)
   e.configure({"validatecommand": "{$1 %d %i %P %s %S %v %V}" % name})
-proc setInvalidCommand*(e: Entry, clientData: pointer, command: TkEntryCommand) =
+proc setInvalidCommand*(e: Entry, command: TkEntryCommand) =
   let name = genName("entry_invalid_command_")
-  e.tk.registerCmd(e, clientdata, name, command)
+  e.tk.registerCmd(e, name, command)
   e.configure({"invalidcommand": "{$1 %d %i %P %s %S %v %V}" % name})
 
-proc `validatecommand=`*(e: Entry, command: TkEntryCommand) = e.setValidateCommand(nil, command)
-proc `invalidcommand=`*(e: Entry, command: TkEntryCommand) = e.setInvalidCommand(nil, command)
+proc `validatecommand=`*(e: Entry, command: TkEntryCommand) = e.setValidateCommand(command)
+proc `invalidcommand=`*(e: Entry, command: TkEntryCommand) = e.setInvalidCommand(command)
 proc `disabledbackground=`*(e: Entry, disabledbackground: Color or string) = e.configure({"disabledbackground": tclEscape $disabledbackground})
 proc `disabledforeground=`*(e: Entry, disabledforeground: Color or string) = e.configure({"disabledforeground": tclEscape $disabledforeground})
 proc `readonlybackground=`*(e: Entry, readonlybackground: Color or string) = e.configure({"readonlybackground": tclEscape $readonlybackground})
@@ -84,9 +84,9 @@ proc `state=`*(e: Entry, state: WidgetState) = e.configure({"state": $state})
 proc `validationMode=`*(e: Entry, validationMode: ValidationMode) = e.configure({"validate": $validationMode})
 proc `width=`*(e: Entry, width: int) = e.configure({"width": $width})
 
-proc disabledbackground*(e: Entry): Color = parseColor e.cget("disabledbackground")
-proc disabledforeground*(e: Entry): Color = parseColor e.cget("disabledforeground")
-proc readonlybackground*(e: Entry): Color = parseColor e.cget("readonlybackground")
+proc disabledbackground*(e: Entry): Color = fromTclColor e, e.cget("disabledbackground")
+proc disabledforeground*(e: Entry): Color = fromTclColor e, e.cget("disabledforeground")
+proc readonlybackground*(e: Entry): Color = fromTclColor e, e.cget("readonlybackground")
 proc show*(e: Entry): char = e.cget("show")[0]
 proc state*(e: Entry): WidgetState = parseEnum[WidgetState] e.cget("state")
 proc validationMode*(e: Entry): ValidationMode = parseEnum[ValidationMode] e.cget("validate")

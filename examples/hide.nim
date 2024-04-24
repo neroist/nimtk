@@ -8,7 +8,7 @@ let
 
 root.title = "Hide"
 
-root.protocol("WM_DELETE_WINDOW", nil) do (_: Widget, _: pointer):
+root.protocol("WM_DELETE_WINDOW") do (_: Widget):
   root.deiconify()
   root.withdraw()
 

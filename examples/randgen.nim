@@ -53,7 +53,7 @@ genButton.grid(column=1, row=4)
 beginEntry.textvariable = beginVar
 endEntry.textvariable = endVar
 
-proc validate(_: Widget, event: EntryEvent, _: pointer): bool =
+proc validate(_: Widget, event: EntryEvent): bool =
   try:
     discard parseInt(event.editedValue)
   except ValueError:
@@ -61,7 +61,7 @@ proc validate(_: Widget, event: EntryEvent, _: pointer): bool =
 
   return true
 
-proc invalid(w: Widget, _: EntryEvent, _: pointer): bool =
+proc invalid(w: Widget, _: EntryEvent): bool =
   w.bell()
 
 beginEntry.validatecommand = validate
@@ -70,7 +70,7 @@ endEntry.validatecommand = validate
 beginEntry.invalidcommand = invalid
 endEntry.invalidcommand = invalid
 
-genButton.setCommand(nil) do (w: Widget, _: pointer):
+genButton.setCommand() do (w: Widget):
   if not (beginEntry.validate() and endEntry.validate()):
     return
 

@@ -1,8 +1,8 @@
 import std/strutils
-
 import std/colors
 
 import ../private/escaping
+import ../private/toargs
 import ../../nimtk
 import ./widget
 import ./label
@@ -25,14 +25,14 @@ proc newLabelFrame*(parent: Widget, text: string, class: string = "", visual: st
 
 proc `labelwidget=`*(l: LabelFrame, labelwidget: Label) = l.configure({"labelwidget": $labelwidget})
 proc `labelanchor=`*(l: LabelFrame, anchor: AnchorPosition) = l.configure({"labelanchor": $anchor})
-proc `background=`*(f: LabelFrame, background: Color or string) = f.configure({"background": $background & ' '})
-proc `height=`*(f: LabelFrame, height: string or float or int) = f.configure({"height": $height})
-proc `width=`*(f: LabelFrame, width: string or float or int) = f.configure({"width": $width})
+proc `background=`*(l: LabelFrame, background: Color or string) = l.configure({"background": $background & ' '})
+proc `height=`*(l: LabelFrame, height: string or float or int) = l.configure({"height": $height})
+proc `width=`*(l: LabelFrame, width: string or float or int) = l.configure({"width": $width})
 
 proc anchor*(l: LabelFrame): AnchorPosition = parseEnum[AnchorPosition] l.cget("labelanchor")
-proc background*(f: LabelFrame): Color = parseColor f.cget("background")
-proc height*(f: LabelFrame): string = f.cget("height")
-proc width*(f: LabelFrame): string = f.cget("width")
+proc background*(l: LabelFrame): Color = fromTclColor l, l.cget("background")
+proc height*(l: LabelFrame): string = l.cget("height")
+proc width*(l: LabelFrame): string = l.cget("width")
 proc labelwidget*(l: LabelFrame): Label =
   new result
 

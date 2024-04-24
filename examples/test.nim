@@ -12,7 +12,7 @@ setCurrentDir(getAppDir())
 
 let foo = "This is a string with some data in it... blah blah\n"
 
-proc handle*(offset, maxChars: int, _: pointer): string =
+proc handle*(offset, maxChars: int): string =
   echo "offset: ", offset
   echo "maxChars: ", maxChars
 
@@ -47,7 +47,7 @@ button.bitmap = bitmap # add image to button
 button.compound = WidgetCompound.Left # set image to show left of text
 button.background = colSpringGreen # set background color
 button.cursor = Heart # set cursor
-button.setCommand(nil) do (w: Widget, _: pointer):
+button.setCommand() do (w: Widget):
   let btn = cast[Button](w)
 
   btn.messageBox("I love you <3", title = "alert!")
@@ -61,7 +61,7 @@ checkbutton.overrelief = WidgetRelief.Raised
 checkbutton.relief = WidgetRelief.Sunken
 checkbutton.cursor = Gobbler # set button2 cursor
 checkbutton.padx = "3c" # set button2 horizontal padding
-checkbutton.setCommand(nil) do (w: Widget, _: pointer):
+checkbutton.setCommand() do (w: Widget):
   echo checkvar.get, '\n'
 
 msg.grid(padx = 25, pady = 25)
@@ -75,10 +75,10 @@ scale.orient = Horizontal
 scale.cursor = Exchange
 
 root.selectionHandle("SECONDARY", command=handle)
-root.selectionOwn("SECONDARY", nil) do (_: pointer): echo "lost!"
+root.selectionOwn("SECONDARY") do (): echo "lost!"
 echo root.selectionGet("SECONDARY")
 
-root.bind("<Button-1>", nil) do (e: Event, _: pointer):
+root.bind("<Button-1>") do (e: Event):
   echo "Clicked widget $1 at ($2, $3)\n" % [$e.widget, $e.x, $e.y]
 
 tk.setPalette({"background": colPink}) # add palette to entire app

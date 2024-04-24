@@ -1,4 +1,5 @@
 import std/strutils
+import std/math
 
 import ../../src/nimtk/widgets
 import ../../src/nimtk/tcl
@@ -26,7 +27,7 @@ eqLabel.grid(2, 0, padx=5, pady=5)
 fahrenheitEntry.grid(3, 0, padx=5, pady=5)
 fahrenheitLabel.grid(4, 0, padx=5, pady=5)
 
-fahrenheitEntry.bind("<Key>", nil) do (_: Event, _: pointer):
+fahrenheitEntry.bind("<Key>") do (_: Event):
   let fahrenheit = 
     try:
       parseFloat fahrenheitEntry.get()
@@ -35,7 +36,7 @@ fahrenheitEntry.bind("<Key>", nil) do (_: Event, _: pointer):
   
   celsiusEntry.set $((fahrenheit - 32) * 5/9)
 
-celsiusEntry.bind("<Key>", nil) do (_: Event, _: pointer):
+celsiusEntry.bind("<Key>") do (_: Event):
   let celsius =
     try: 
       parseFloat celsiusEntry.get()

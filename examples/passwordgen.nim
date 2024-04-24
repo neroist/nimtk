@@ -105,7 +105,7 @@ proc generatePassword(
     for _ in 0..<passwordLen:
       result.add chars.sample()
 
-generateButton.setCommand(nil) do (_: Widget, _: pointer):
+generateButton.setCommand() do (_: Widget):
   let (len, upperchars, lowerchars, digits, specialchars, nodupes) = (
     parseInt lenEntry.get(),
 

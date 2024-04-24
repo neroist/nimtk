@@ -18,7 +18,7 @@ root.geometry(width=800, 600)
 let
   button = root.newButton("Click!")
 
-proc placeButton(_: Widget = nil, _: pointer = nil) =
+proc placeButton(_: Widget = nil) =
   tk.update()
 
   let root_geo = root.geometry()

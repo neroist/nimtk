@@ -31,13 +31,13 @@ proc deselect*(c: CheckButton) = c.tk.call($c, "deselect")
 proc get*(c: CheckButton): bool = c.tk.call("set", c.cget("variable")) == "1"
 proc set*(c: CheckButton, state: bool) = c.tk.call("set", c.cget("variable"), $int(state))
 
-proc setCommand*(c: CheckButton, clientData: pointer, command: TkWidgetCommand) =
+proc setCommand*(c: CheckButton, command: TkWidgetCommand) =
   let name = genName("checkbutton_command_")
   
-  c.tk.registerCmd(c, clientdata, name, command)
+  c.tk.registerCmd(c, name, command)
 
   c.configure({"command": name})
-proc `command=`*(c: CheckButton, command: TkWidgetCommand) = c.setCommand(nil, command)
+proc `command=`*(c: CheckButton, command: TkWidgetCommand) = c.setCommand(command)
 proc `indicatoron=`*(c: CheckButton, indicatoron: bool) = c.configure({"indicatoron": $indicatoron})
 proc `height=`*(c: CheckButton, height: string or float or int) = c.configure({"height": $height})
 proc `offrelief=`*(c: CheckButton, offrelief: WidgetRelief) = c.configure({"offrelief": $offrelief})
@@ -54,7 +54,7 @@ proc indicatoron*(c: CheckButton): bool = c.cget("indicatoron") == "1"
 proc height*(c: CheckButton): string = c.cget("height")
 proc offrelief*(c: CheckButton): WidgetRelief = parseEnum[WidgetRelief] c.cget("offrelief")
 proc overrelief*(c: CheckButton): WidgetRelief = parseEnum[WidgetRelief] c.cget("overrelief")
-proc selectcolor*(c: CheckButton): Color = parseColor c.cget("selectcolor")
+proc selectcolor*(c: CheckButton): Color = fromTclColor c, c.cget("selectcolor")
 proc variable*(c: CheckButton): TkBool = createTkVar c.tk, c.cget("variable")
 proc state*(c: CheckButton): WidgetState = parseEnum[WidgetState] c.cget("state")
 proc tristatevalue*(c: CheckButton): string = c.cget("tristatevalue")

@@ -24,13 +24,13 @@ proc newButton*(parent: Widget, text: string = "", configuration: openArray[(str
 proc invoke*(b: Button) = b.tk.call($b, "invoke")
 proc flash*(b: Button) = b.tk.call($b, "flash")
 
-proc setCommand*(b: Button, clientData: pointer, command: TkWidgetCommand) =
+proc setCommand*(b: Button, command: TkWidgetCommand) =
   let name = genName("button_command_")
   
-  b.tk.registerCmd(b, clientdata, name, command)
+  b.tk.registerCmd(b, name, command)
 
   b.configure({"command": name})
-proc `command=`*(b: Button, command: TkWidgetCommand) = b.setCommand(nil, command)
+proc `command=`*(b: Button, command: TkWidgetCommand) = b.setCommand(command)
 proc `default=`*(b: Button, default: WidgetState) = b.configure({"default": $default})
 proc `height=`*(b: Button, height: int) = b.configure({"height": $height})
 proc `overrelief=`*(b: Button, overrelief: WidgetRelief) = b.configure({"overrelief": $overrelief})

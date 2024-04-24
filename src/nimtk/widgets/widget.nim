@@ -1,4 +1,5 @@
 import std/strutils
+import std/sequtils
 import std/tables
 import std/colors
 import std/times
@@ -7,10 +8,10 @@ import nimtcl except Time
 
 import ../private/escaping
 import ../private/tcllist
+import ../private/toargs
 import ../private/alias
 import ../variables
 import ../../nimtk
-import ../keysyms
 
 export variables
 
@@ -19,15 +20,15 @@ type
     pathname*: string
     tk*: Tk
   
-  TkWidgetCommand* = proc (widget: Widget, clientdata: pointer)
-  TkSelectionHandleCommand* = proc (offset, maxChars: int, clientdata: pointer): string
-  TkGenericCommand* = proc (clientdata: pointer)
-  TkEventCommand* = proc (event: Event, clientdata: pointer)
-  TkScaleCommand* = proc (widget: Widget, newvalue: float, clientdata: pointer)
-  TkEntryCommand* = proc (widget: Widget, event: EntryEvent, clientdata: pointer): bool
+  TkWidgetCommand* = proc (widget: Widget)
+  TkSelectionHandleCommand* = proc (offset, maxChars: int): string
+  TkGenericCommand* = proc ()
+  TkEventCommand* = proc (event: Event)
+  TkScaleCommand* = proc (widget: Widget, newvalue: float)
+  TkEntryCommand* = proc (widget: Widget, event: EntryEvent): bool
+  TkSpinboxCommand* = proc (widget: Widget, button: string)
   
   TkCmdData[CMD] = ref object of RootObj
-    clientdata*: pointer
     fun*: CMD
 
   TkWidgetCmdData*[CMD] = ref object of TkCmdData[CMD]
@@ -113,6 +114,7 @@ type
   TkCmdType* = TkWidgetCommand          or
                TkScaleCommand           or
                TkEntryCommand           or
+               TkSpinboxCommand         or
                TkSelectionHandleCommand or
                TkGenericCommand         or
                TkEventCommand
@@ -120,16 +122,17 @@ type
 var
   widgetCmdData: seq[TkWidgetCmdData[TkWidgetCommand]]
   scaleCmdData: seq[TkWidgetCmdData[TkScaleCommand]]
-  eventCmdData: seq[TkWidgetCmdData[TkEntryCommand]]
+  entryCmdData: seq[TkWidgetCmdData[TkEntryCommand]]
   selectionHandleCmdData: seq[TkCmdData[TkSelectionHandleCommand]]
-  genericCommandData: seq[TkCmdData[TkGenericCommand]]
-  eventCommandData: seq[TkCmdData[TkEventCommand]]
+  genericCmdData: seq[TkCmdData[TkGenericCommand]]
+  eventCmdData: seq[TkCmdData[TkEventCommand]]
+  spinboxCmdData: seq[TkCmdData[TkSpinboxCommand]]
 
 proc tkintwidgetcmd*(clientData: ClientData, _: ptr Interp, _: cint, _: cstringArray): cint {.cdecl.} =
   var data = cast[TkWidgetCmdData[TkWidgetCommand]](clientData)
 
   if data != nil:
-    data.fun(data.widget, data.clientdata)
+    data.fun(data.widget)
 
   return TCL_OK
 
@@ -138,7 +141,7 @@ proc tkintscalecmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
   let args = argv.cstringArrayToSeq()
 
   if data.fun != nil:
-    data.fun(data.widget, args[1].parseFloat(), data.clientdata)
+    data.fun(data.widget, args[1].parseFloat())
 
   return TCL_OK
 
@@ -147,7 +150,7 @@ proc tkintselhandlecmd*(clientData: ClientData, interp: ptr Interp, _: cint, arg
   let args = argv.cstringArrayToSeq()
 
   if data.fun != nil:
-    interp.setResult cstring data.fun(args[1].parseInt(), args[2].parseInt(), data.clientdata)
+    interp.setResult cstring data.fun(args[1].parseInt(), args[2].parseInt())
 
   return TCL_OK
 
@@ -155,7 +158,7 @@ proc tkintgenericcmd*(clientData: ClientData, _: ptr Interp, _: cint, _: cstring
   let data = cast[TkCmdData[TkGenericCommand]](clientData)
 
   if data.fun != nil:
-    data.fun(data.clientdata)
+    data.fun()
 
   return TCL_OK
 
@@ -251,7 +254,7 @@ proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
   event.yRoot = args[30].parseInt().dontStress()
 
   if data.fun != nil:
-    data.fun(event, data.clientdata)
+    data.fun(event)
 
   return TCL_OK
 
@@ -272,16 +275,24 @@ proc tkintentrycmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
   event.validationTrigger = args[7]
 
   if data.fun != nil:
-    let ret = data.fun(data.widget, event, data.clientdata)
+    let ret = data.fun(data.widget, event)
     
     if ret: interp.setResult("1")
     else: interp.setResult("0")
 
   return TCL_OK
 
+proc tkintspinboxcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
+  let data = cast[TkWidgetCmdData[TkSpinboxCommand]](clientData)
+  let args = argv.cstringArrayToSeq() # all except %K
+
+  if data.fun != nil:
+    data.fun(data.widget, args[1])
+
+  return TCL_OK
+
 template registerCmdImpl(datatype: typedesc, dataseq: typed, intcmd: proc) {.dirty.} =
   let data = new datatype
-  data.clientdata = clientdata1
 
   # dirty
   when datatype is TkWidgetCmdData:
@@ -294,7 +305,7 @@ template registerCmdImpl(datatype: typedesc, dataseq: typed, intcmd: proc) {.dir
   # dirty
   tk.createCommand(name, cast[pointer](dataseq[^1]), intcmd)
 
-proc registerCmd*(tk: Tk, w: Widget, clientdata1: pointer, name: string, cmd: TkCmdType) =
+proc registerCmd*(tk: Tk, w: Widget, name: string, cmd: TkCmdType) =
   when cmd is TkWidgetCommand:
     registerCmdImpl(TkWidgetCmdData[TkWidgetCommand], widgetCmdData, tkintwidgetcmd)
 
@@ -302,28 +313,32 @@ proc registerCmd*(tk: Tk, w: Widget, clientdata1: pointer, name: string, cmd: Tk
     registerCmdImpl(TkCmdData[TkSelectionHandleCommand], selectionHandleCmdData, tkintselhandlecmd)
 
   elif cmd is TkGenericCommand:
-    registerCmdImpl(TkCmdData[TkGenericCommand], genericCommandData, tkintgenericcmd)
+    registerCmdImpl(TkCmdData[TkGenericCommand], genericCmdData, tkintgenericcmd)
 
   elif cmd is TkScaleCommand:
     registerCmdImpl(TkWidgetCmdData[TkScaleCommand], scaleCmdData, tkintscalecmd)
 
   elif cmd is TkEntryCommand:
-    registerCmdImpl(TkWidgetCmdData[TkEntryCommand], eventCmdData, tkintentrycmd)
+    registerCmdImpl(TkWidgetCmdData[TkEntryCommand], entryCmdData, tkintentrycmd)
 
+  elif cmd is TkSpinboxCommand:
+    registerCmdImpl(TkWidgetCmdData[TkSpinboxCommand], spinboxCmdData, tkintspinboxcmd)
+  
   else:
-    registerCmdImpl(TkCmdData[TkEventCommand], eventCommandData, tkinteventcmd)
+    registerCmdImpl(TkCmdData[TkEventCommand], eventCmdData, tkinteventcmd)
 
-proc registerCmd*(tk: Tk, clientdata1: pointer, name: string, cmd: TkCmdType) =
-  registerCmd(tk, nil, clientdata1, name, cmd)
+proc registerCmd*(tk: Tk, name: string, cmd: TkCmdType) =
+  registerCmd(tk, nil, name, cmd)
 
 proc `$`*(w: Widget): string = 
   if w != nil: w.pathname
   else: ""
 
 proc `==`*(w1, w2: Widget): bool =
-  if w1 == nil and w2 == nil: return true
-  elif w1 == nil xor w2 == nil: return false
-  else: w1.pathname == w2.pathname
+  if w1.isNil() and w2.isNil(): return true
+  elif w1.isNil() xor w2.isNil(): return false
+  
+  return w1.pathname == w2.pathname
 
 proc newWidgetFromPathname*(tk: Tk, pathname: string): Widget =
   new result
@@ -347,6 +362,33 @@ proc destroy*(w: Widget) =
   ## Destroys a widget and its children
   
   w.tk.call("destroy", w)
+
+# --- helpers
+
+proc fromTclColor*[W](w: W, tclColor: string): Color =
+  ## Get `colors.Color` from color string returned from Tk
+  ## 
+  ## This is needed if Tk returns, for example, "systemDefault" from a command,
+  ## which cannot be parsed via just `parseColor`
+  ##
+  ## For all colors returned from Tk, please use this proc and not `parseColor`.
+
+  # if the color is already a normal HTML code color...
+  if tclColor[0] == '#':
+    return parseColor tclColor
+
+  # else, use winfo to get the exact 16-bit rgb values
+  let rgb = w.tk.call("winfo", w, tclEscape tclColor)
+    .split(' ')
+    .map(parseInt)
+  
+  # the values returned are 16-bit, so we shift them right by 8 bits
+  # to get the 8 bit value we need for `colors.rgb`
+  return colors.rgb(
+    (rgb[0] shr 8).clamp(0, 255),
+    (rgb[1] shr 8).clamp(0, 255),
+    (rgb[2] shr 8).clamp(0, 255)
+  )
 
 # --- --- Geometry Managers
 
@@ -913,10 +955,10 @@ proc send*(w: Widget, async: bool, cmd: string, args: varargs[string]) =
 
 # --- bind
 
-proc `bind`*(w: Widget, sequence: string, clientdata: pointer = nil, command: TkEventCommand) =
+proc `bind`*(w: Widget, sequence: string = nil, command: TkEventCommand) =
   let name = genName("event_command_")
 
-  w.tk.registerCmd(clientdata, name, command)
+  w.tk.registerCmd(name, command)
 
   w.tk.call(
     "bind",
@@ -925,10 +967,10 @@ proc `bind`*(w: Widget, sequence: string, clientdata: pointer = nil, command: Tk
     "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
   )
 
-proc `bind`*(tk: Tk, className: string, sequence: string, clientdata: pointer = nil, command: TkEventCommand) =
+proc `bind`*(tk: Tk, className: string, sequence: string = nil, command: TkEventCommand) =
   let name = genName("event_command_" & className & "_")
 
-  tk.registerCmd(clientdata, name, command)
+  tk.registerCmd(name, command)
 
   tk.call(
     "bind",
@@ -937,10 +979,10 @@ proc `bind`*(tk: Tk, className: string, sequence: string, clientdata: pointer = 
     "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
   )
 
-proc bindAll*(tk: Tk, sequence: string, clientdata: pointer = nil, command: TkEventCommand) =
+proc bindAll*(tk: Tk, sequence: string = nil, command: TkEventCommand) =
   let name = genName("event_command_ALL_")
 
-  tk.registerCmd(nil, name, command)
+  tk.registerCmd(name, command)
 
   tk.call(
     "bind",
@@ -955,7 +997,7 @@ proc bindtags*(w: Widget, tagList: varargs[string, `$`]) =
   w.tk.call("bindtags", w, tagList.toTclList())
 
 proc bindtags*(w: Widget): seq[string] =
-  w.tk.call("bindtags", w).split(" ")
+  w.tk.call("bindtags", w).split(' ')
 
 # --- event
 
@@ -1042,12 +1084,12 @@ proc selectionClear*(w: Widget, selection: string = "PRIMARY") =
 proc selectionGet*(w: Widget, selection = "PRIMARY", `type`: string = "UTF8_STRING"): string =
   w.tk.call("selection get", {"displayof": $w, "selection": selection, "type": `type`}.toArgs)
 
-proc selectionHandle*(w: Widget, selection = "PRIMARY", `type`: string = "UTF8_STRING", format: string = "STRING", clientdata: pointer = nil, command: TkSelectionHandleCommand) =
+proc selectionHandle*(w: Widget, selection = "PRIMARY", `type`: string = "UTF8_STRING", format: string = "STRING", command: TkSelectionHandleCommand) =
   var cmdname: string
 
   if command != nil:
     cmdname = genName("selection_handle_command_")
-    w.tk.registerCmd(nil, cmdname, command)
+    w.tk.registerCmd(cmdname, command)
   else:
     cmdname = tclEscape ""
   
@@ -1061,12 +1103,12 @@ proc selectionOwn*(w: Widget, selection: string = "PRIMARY"): Widget =
 
   return w.tk.newWidgetFromPathname(w.tk.result)
 
-proc selectionOwn*(w: Widget, selection: string = "PRIMARY", clientdata: pointer = nil, command: TkGenericCommand) =
+proc selectionOwn*(w: Widget, selection: string = "PRIMARY", command: TkGenericCommand) =
   var cmdname: string
 
   if command != nil:
     cmdname = genName("selection_own_command_")
-    w.tk.registerCmd(nil, cmdname, command)
+    w.tk.registerCmd(cmdname, command)
   else:
     cmdname = ""
 
@@ -1130,25 +1172,25 @@ proc `wraplength=`*(w: Widget, wraplength: int)                                 
 proc `xscrollcommand=`*(w: Widget, xscrollcommand: string)                            = w.configure({"xscrollcommand": tclEscape $xscrollcommand})
 proc `yscrollcommand=`*(w: Widget, yscrollcommand: string)                            = w.configure({"yscrollcommand": tclEscape $yscrollcommand})
 
-proc activebackground*(w: Widget): Color             = parseColor w.cget("activebackground")
+proc activebackground*(w: Widget): Color             = fromTclColor w, w.cget("activebackground")
 proc activeborderwidth*(w: Widget): string           = w.cget("activeborderwidth")
-proc activeforeground*(w: Widget): Color             = parseColor w.cget("activeforeground")
+proc activeforeground*(w: Widget): Color             = fromTclColor w, w.cget("activeforeground")
 proc anchor*(w: Widget): AnchorPosition              = parseEnum[AnchorPosition] w.cget("anchor")
-proc background*(w: Widget): Color {.alias: "bg".}   = parseColor w.cget("background")
+proc background*(w: Widget): Color {.alias: "bg".}   = fromTclColor w, w.cget("background")
 proc borderwidth*(w: Widget): string {.alias: "bd".} = w.cget("borderwidth")
 proc cursor*(w: Widget): Cursor                      = parseEnum[Cursor] w.cget("cursor")
 proc compound*(w: Widget): WidgetCompound            = parseEnum[WidgetCompound] w.cget("compound")
-proc disabledforeground*(w: Widget): Color           = parseColor w.cget("disabledforeground")
-proc disabledbackground*(w: Widget): Color           = parseColor w.cget("disabledbackground")
+proc disabledforeground*(w: Widget): Color           = fromTclColor w, w.cget("disabledforeground")
+proc disabledbackground*(w: Widget): Color           = fromTclColor w, w.cget("disabledbackground")
 proc exportselection*(w: Widget): bool               = w.cget("exportselection") == "1"
 #    proc font*(w: Widget)                           = w.cget("font")
-proc foreground*(w: Widget): Color {.alias: "fg".}   = parseColor w.cget("foreground")
+proc foreground*(w: Widget): Color {.alias: "fg".}   = fromTclColor w, w.cget("foreground")
 # proc height*(w: Widget): string                      = w.cget("height")
-proc highlightbackground*(w: Widget): Color          = parseColor w.cget("highlightbackground")
-proc highlightcolor*(w: Widget): Color               = parseColor w.cget("highlightcolor")
+proc highlightbackground*(w: Widget): Color          = fromTclColor w, w.cget("highlightbackground")
+proc highlightcolor*(w: Widget): Color               = fromTclColor w, w.cget("highlightcolor")
 proc highlightthickness*(w: Widget): string          = w.cget("highlightthickness")
 #    proc image*(w: Widget)                          = w.cget("image")
-proc insertbackground*(w: Widget): Color             = parseColor w.cget("insertbackground")
+proc insertbackground*(w: Widget): Color             = fromTclColor w, w.cget("insertbackground")
 proc insertborderwidth*(w: Widget): string           = w.cget("insertborderwidth")
 proc insertofftime*(w: Widget): int                  = parseInt w.cget("insertofftime")
 proc insertontime*(w: Widget): int                   = parseInt w.cget("insertontime")
@@ -1161,14 +1203,14 @@ proc pady*(w: Widget): string                        = w.cget("pady")
 proc relief*(w: Widget): WidgetRelief                = parseEnum[WidgetRelief] w.cget("relief")
 proc repeatdelay*(w: Widget): float                  = parseFloat w.cget("repeatdelay")
 proc repeatinterval*(w: Widget): float               = parseFloat w.cget("repeatinterval")
-proc selectbackground*(w: Widget): Color             = parseColor w.cget("selectbackground")
+proc selectbackground*(w: Widget): Color             = fromTclColor w, w.cget("selectbackground")
 proc selectborderwidth*(w: Widget): string           = w.cget("selectborderwidth")
-proc selectforeground*(w: Widget): Color             = parseColor w.cget("selectforeground")
+proc selectforeground*(w: Widget): Color             = fromTclColor w, w.cget("selectforeground")
 proc setgrid*(w: Widget): bool                       = w.cget("setgrid") == "1"
 proc takefocus*(w: Widget): string                   = w.cget("takefocus")
 proc text*(w: Widget): string                        = w.cget("text")
 proc textvariable*(w: Widget): TkVar                 = createTkVar w.tk, w.cget("textvariable")
-proc troughcolor*(w: Widget): Color                  = parseColor w.cget("troughcolor")
+proc troughcolor*(w: Widget): Color                  = fromTclColor w, w.cget("troughcolor")
 proc underline*(w: Widget): int                      = parseInt w.cget("underline")
 # proc width*(w: Widget): string                       = w.cget("width")
 proc wraplength*(w: Widget): int                     = parseInt w.cget("wraplength")

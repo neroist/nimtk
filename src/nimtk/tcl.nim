@@ -25,18 +25,18 @@ type
 proc after*(tk: Tk, ms: int) {.alias: "sleep".} =
   tk.call("after", ms)
 
-proc after*(tk: Tk, ms: int, clientdata: pointer, fn: TkGenericCommand): int =
+proc after*(tk: Tk, ms: int, fn: TkGenericCommand): int =
   let name = genName("after_generic_command_")
   
-  tk.registerCmd(clientdata, name, fn)
+  tk.registerCmd(name, fn)
 
   tk.call("after", ms, name)
   tk.result.parseInt()
 
-proc afterIdle*(tk: Tk, clientdata: pointer, fn: TkGenericCommand): int =
+proc afterIdle*(tk: Tk, fn: TkGenericCommand): int =
   let name = genName("after_generic_command_")
   
-  tk.registerCmd(clientdata, name, fn)
+  tk.registerCmd(name, fn)
 
   tk.call("after idle", name)
   tk.result.parseInt()
@@ -47,13 +47,13 @@ proc afterCancel*(tk: Tk, id: int) =
 proc afterInfo*(tk: Tk): seq[int] =
   tk.call("after info")
 
-  for id in tk.result.split(" "):
+  for id in tk.result.split(' '):
     result.add id.parseInt()
 
 proc afterInfo*(tk: Tk, id: int): AfterEventHandler =
   tk.call("after info", id)
 
-  AfterEventHandler tk.result.split(" ")[1] == "timer"
+  AfterEventHandler tk.result.split(' ')[1] == "timer"
 
 # --- update
 
@@ -65,10 +65,10 @@ proc update*(tk: Tk, idletasks: bool = false) =
 
 # --- trace
 
-proc traceAdd*(v: TkVar, ops: openArray[TraceOps], clientdata: pointer, command: TkGenericCommand): string {.discardable, alias: "trace".} =
+proc traceAdd*(v: TkVar, ops: openArray[TraceOps], command: TkGenericCommand): string {.discardable, alias: "trace".} =
   let cmdname = genName("trace_command_" & ops.join("_").replace("to", "") & "_")
   
-  v.tk.registerCmd(clientdata, cmdname, command)
+  v.tk.registerCmd(cmdname, command)
 
   v.tk.call("trace add variable", v.varname, ops.toTclList(), cmdname)
 

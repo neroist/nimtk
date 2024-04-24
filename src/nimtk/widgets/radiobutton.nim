@@ -28,13 +28,13 @@ proc select*(r: RadioButton) = r.tk.call($r, "select")
 proc toggle*(r: RadioButton) = r.tk.call($r, "toggle")
 proc deselect*(r: RadioButton) = r.tk.call($r, "deselect")
 
-proc setCommand*(r: RadioButton, clientData: pointer, command: TkWidgetCommand) =
+proc setCommand*(r: RadioButton, command: TkWidgetCommand) =
   let name = genName("checkbutton_command_")
   
-  r.tk.registerCmd(r, clientdata, name, command)
+  r.tk.registerCmd(r, name, command)
 
   r.configure({"command": name})
-proc `command=`*(r: RadioButton, command: TkWidgetCommand) = r.setCommand(nil, command)
+proc `command=`*(r: RadioButton, command: TkWidgetCommand) = r.setCommand(command)
 proc `indicatoron=`*(r: RadioButton, indicatoron: bool) = r.configure({"indicatoron": $indicatoron})
 proc `height=`*(r: RadioButton, height: string or float or int) = r.configure({"height": $height})
 proc `offrelief=`*(r: RadioButton, offrelief: WidgetRelief) = r.configure({"offrelief": $offrelief})
@@ -52,7 +52,7 @@ proc indicatoron*(r: RadioButton): bool = r.cget("indicatoron") == "1"
 proc height*(r: RadioButton): string = r.cget("height")
 proc offrelief*(r: RadioButton): WidgetRelief = parseEnum[WidgetRelief] r.cget("offrelief")
 proc overrelief*(r: RadioButton): WidgetRelief = parseEnum[WidgetRelief] r.cget("overrelief")
-proc selectcolor*(r: RadioButton): Color = parseColor r.cget("selectcolor")
+proc selectcolor*(r: RadioButton): Color = fromTclColor r, r.cget("selectcolor")
 proc variable*(r: RadioButton): TkVar = createTkVar r.tk, r.cget("variable")
 proc value*(r: RadioButton): string = r.cget("value")
 proc tristatevalue*(r: RadioButton): string = r.cget("tristatevalue")

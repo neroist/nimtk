@@ -2,6 +2,7 @@ import std/strutils
 import std/colors
 
 import ../private/escaping
+import ../private/toargs
 import ../private/alias
 import ../../nimtk
 import ./widget
@@ -42,13 +43,13 @@ proc bbox*(l: Listbox, index: Index): tuple[offsetX, offsetY, width, height: int
 proc curselection*(l: Listbox): seq[int] =
   l.tk.call($l, "curselection")
 
-  for selectedElement in l.tk.result.split(" "):
+  for selectedElement in l.tk.result.split(' '):
     result.add parseInt(selectedElement)
 proc delete*(l: Listbox, rng: Slice[int]) = l.tk.call($l, "delete", rng.a, rng.b)
 proc delete*[I1, I2: Index](l: Listbox, first: I1, last: I2) = l.tk.call($l, "delete", first, last)
 proc delete*(l: Listbox, first: Index) = l.tk.call($l, "delete", first)
-proc get*(l: Listbox, rng: Slice[int]): seq[string] = l.tk.call($l, "get", rng.a, rng.b).split(" ")
-proc get*[I1, I2: Index](l: Listbox, first: I1, last: I2): seq[string] = l.tk.call($l, "get", first, last).split(" ")
+proc get*(l: Listbox, rng: Slice[int]): seq[string] = l.tk.call($l, "get", rng.a, rng.b).split(' ')
+proc get*[I1, I2: Index](l: Listbox, first: I1, last: I2): seq[string] = l.tk.call($l, "get", first, last).split(' ')
 proc get*(l: Listbox, first: Index): string = l.tk.call($l, "get", first)
 proc index*(l: Listbox, index: Index): int = parseInt l.tk.call($l, "index", $index)
 proc insert*(l: Listbox, index: Index, elements: varargs[string]) =
@@ -58,7 +59,7 @@ proc insert*(l: Listbox, index: Index, elements: varargs[string]) =
     safeElements.add tclEscape unsafeElement
 
   l.tk.call($l, "insert", index, safeElements.join())
-proc itemcget*(l: Listbox, index: Index, option: string): Color = parseColor l.tk.call($l, "itemcget", index, {option: " "}.toArgs())
+proc itemcget*(l: Listbox, index: Index, option: string): Color = fromTclColor l, l.tk.call($l, "itemcget", index, {option: " "}.toArgs())
 proc itemconfigure*(
   l: Listbox,
   index: Index,

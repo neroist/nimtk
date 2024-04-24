@@ -17,7 +17,7 @@ let
 counterEntry.grid(0, 0, padx=5, pady=5)
 counterButton.grid(1, 0, padx=5, pady=5)
 
-counterButton.setCommand(nil) do (_: Widget, _: pointer):
+counterButton.setCommand() do (_: Widget):
   let currentCount = parseInt counterEntry.get()
 
   counterEntry.set $(currentCount + 1)

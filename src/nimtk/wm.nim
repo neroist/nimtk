@@ -3,6 +3,7 @@ import std/macros
 
 import std/colors
 
+import ./private/toargs
 import ./private/escaping
 import ./private/alias
 import ./widgets
@@ -41,14 +42,14 @@ template stackorder() {.dirty.} =
   if w.tk.result.len == 0:
     return nil
 
-  for pathname in w.tk.result.split(" "):
+  for pathname in w.tk.result.split(' '):
     result.add w.tk.newWidgetFromPathname(pathname)
 
 proc wm_aspect*(w: Window, minNumer, minDenom, maxNumer, maxDenom: int or string) {.alias: "aspect".} = w.tk.call("wm aspect", w, $minNumer, $minDenom, $maxNumer, $maxDenom)
 proc wm_aspect*(w: Window): array[4, int] {.alias: "aspect".} =
   w.tk.call("wm aspect", w)
 
-  let res = w.tk.result.split(" ")
+  let res = w.tk.result.split(' ')
 
   for idx, num in res:
     result[idx] = num.parseInt()
@@ -68,7 +69,7 @@ proc topmost*(w: Window): bool = parseBool w.wm_attributes("topmost")
 when defined(windows):
   proc disabled*(w: Window): bool = parseBool w.wm_attributes("disabled")
   proc toolwindow*(w: Window): bool = parseBool w.wm_attributes("toolwindow")
-  proc transparentcolor*(w: Window): Color = parseColor w.wm_attributes("transparentcolor")
+  proc transparentcolor*(w: Window): string = w.wm_attributes("transparentcolor")
 
 elif defined(macos):
   proc modified*(w: Window): bool = parseBool w.wm_attributes("modified")
@@ -90,7 +91,7 @@ proc `topmost=`*(w: Window, topmost: bool) = w.wm_attributes("topmost", $topmost
 when defined(macos):
   proc `disabled=`*(w: Window, disabled: bool) = w.wm_attributes("disabled", $disabled)
   proc `toolwindow=`*(w: Window, toolwindow: bool) = w.wm_attributes("toolwindow", $toolwindow)
-  proc `transparentcolor=`*(w: Window, transparentcolor: Color) = w.wm_attributes("transparentcolor", $transparentcolor)
+  proc `transparentcolor=`*(w: Window, transparentcolor: string) = w.wm_attributes("transparentcolor", transparentcolor)
 
 elif defined(macos):
   proc `modified=`*(w: Window, modified: bool) = w.wm_attributes("modified", $modified)
@@ -116,7 +117,7 @@ proc wm_colormapwindows*(w: Window): seq[Widget] {.alias: "colormapwindows".} =
   if w.tk.result == "0":
     return @[]
 
-  for win in w.tk.result.split(" "):
+  for win in w.tk.result.split(' '):
     result.add w.tk.newWidgetFromPathname(win)
 
 proc wm_command*(w: Window, value: string) {.alias: "command=".} = w.tk.call("wm command", w, value)
@@ -165,7 +166,7 @@ proc wm_grid*(w: Window, baseWidth, baseHeight, widthInc, heightInc: int) {.alia
 proc wm_grid*(w: Window): array[4, int] {.alias: "grid".} = # TODO why is this an array
   w.tk.call("wm grid", w)
 
-  let res = w.tk.result.split(" ")
+  let res = w.tk.result.split(' ')
 
   for idx, num in res:
     result[idx] = num.parseInt()
@@ -210,7 +211,7 @@ proc wm_iconposition*(w: Window): tuple[x, y: int, nohints: bool] {.alias: "icon
   if w.tk.result.len == 0:
     result.nohints = true
   else:
-    let xy = w.tk.result.split(" ")
+    let xy = w.tk.result.split(' ')
 
     result.x = xy[0].parseInt()
     result.y = xy[1].parseInt()
@@ -229,7 +230,7 @@ proc wm_maxsize*(w: Window, width, height: int) {.alias: "maxsize".} = w.tk.call
 proc wm_maxsize*(w: Window): tuple[width, height: int] {.alias: "maxsize".} =
   w.tk.call("wm maxsize")
 
-  let wh = w.tk.result.split(" ")
+  let wh = w.tk.result.split(' ')
 
   result.width = wh[0].parseInt()
   result.height = wh[1].parseInt()
@@ -239,7 +240,7 @@ proc wm_minsize*(w: Window, width, height: int) {.alias: "minsize=".} = w.tk.cal
 proc wm_minsize*(w: Window): tuple[width, height: int] {.alias: "minsize=".} =
   w.tk.call("wm minsize")
 
-  let wh = w.tk.result.split(" ")
+  let wh = w.tk.result.split(' ')
 
   result.width = wh[0].parseInt()
   result.height = wh[1].parseInt()
@@ -252,10 +253,10 @@ proc wm_positionfrom*(w: Window, who: GeometryFrom) {.alias: "positionfrom=".} =
 proc wm_positionfrom*(w: Window): GeometryFrom {.alias: "positionfrom".} =
   parseEnum[GeometryFrom] w.tk.call("wm positionfrom", w)
 
-proc wm_protocol*(w: Window, name: string, clientdata: pointer, command: TkWidgetCommand) {.alias: "protocol".} =
+proc wm_protocol*(w: Window, name: string, command: TkWidgetCommand) {.alias: "protocol".} =
   let cmdname = genName("wm_protocol_command_")
   
-  w.tk.registerCmd(w, clientdata, cmdname, command)
+  w.tk.registerCmd(w, cmdname, command)
 
   w.tk.call("wm protocol", w, tclEscape name, cmdname)
 
@@ -264,7 +265,7 @@ proc wm_resizable*(w: Window, both: bool) {.alias: "resizable=".} = w.tk.call("w
 proc wm_resizable*(w: Window): tuple[width, height: bool] {.alias: "resizable".} =
   w.tk.call("wm resizable", w)
 
-  let res = w.tk.result.split(" ")
+  let res = w.tk.result.split(' ')
 
   result.width = res[0] == "1"
   result.height = res[1] == "1"

@@ -53,9 +53,9 @@ proc `foreground=`*(b: Bitmap, foreground: Color) = b.configure({"foreground": $
 proc `maskdata=`*(b: Bitmap, maskdata: string) = b.configure({"maskdata": tclEscape $maskdata})
 proc `maskfile=`*(b: Bitmap, maskfile: string) = b.configure({"maskfile": tclEscape $maskfile})
 
-proc background*(b: Bitmap): Color = parseColor b.cget("background")
+proc background*(b: Bitmap): Color = fromTclColor b, b.cget("background")
 proc data*(b: Bitmap): string = b.cget("data")
 proc file*(b: Bitmap): string = b.cget("file")
-proc foreground*(b: Bitmap): Color = parseColor b.cget("foreground")
+proc foreground*(b: Bitmap): Color = fromTclColor b, b.cget("foreground")
 proc maskdata*(b: Bitmap): string = b.cget("maskdata")
 proc maskfile*(b: Bitmap): string = b.cget("maskfile")

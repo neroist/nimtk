@@ -6,11 +6,13 @@ These should be sorted by urgency/importance
     
     In summary, dont use default values and instead use `""`
 
-- [ ] On creation of a new widget, always create a default `textvariable` for the widget (and `variable` too, if applicable). This allows `set` and `get` procs for getting the value of the widget (varible) without needing to create a new TkVar
+- [x] Should we keep the `clientdata` parameters in `Tk*Command` proc types? (no, though having done it i have slight regret)
 
-- [ ] Should we keep the `clientdata` parameters in `Tk*Command` proc types?
+- [x] On creation of a new widget (that doesn't support `-text` but `-textvariable`), always create a default `textvariable` for the widget (and `variable` too, if applicable). This allows `set` and `get` procs for getting the value of the widget (varible) without needing to create a new TkVar
 
 - [ ] For all strings passed to Tcl, use `tclEscape`, or some kind of escaping function
+
+- [ ] Some color commands in Tcl return a colorname instead of being NORMAL and returning a hex code or something similar
 
 - [ ] Use multiple aliases in procs (even though it breaks the syntax highlighting)
 

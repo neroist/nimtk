@@ -25,6 +25,8 @@ let
   returnDateEntry = mainframe.newEntry((now() + initDuration(days=2)).format(dateFmt))
   bookButton = mainframe.newButton("Book")
 
+  defaultEntryBackground = startDateEntry.background()
+
 mainframe.pack(expand=true, padx=10, pady=10)
 
 flightSpinbox.wrap = true
@@ -35,41 +37,48 @@ startDateEntry.grid(padx=5, pady=5)
 returnDateEntry.grid(padx=5, pady=5)
 bookButton.grid(padx=5, pady=5)
 
-proc validation(widget: Widget, event: EntryEvent, _: pointer): bool =
+proc validation(widget: Widget, event: EntryEvent): bool =
+  # til, for example, if this func is being called on `returnDateEntry`
+  # you musnt call `returnDateEntry.get()
+  
   result = true
 
   try:
-    discard event.editedValue.parse(dateFmt)
+    let currDate = event.editedValue.parse(dateFmt)
 
-    # if returnDateEntry.get().parse(dateFmt) > startDateEntry.get().parse(dateFmt):
-    #   bookButton.state = WidgetState.Disabled
-    #   returnDateEntry.background = colRed
+    # TODO fix this...
+    if widget == startDateEntry:
+      if currDate > returnDateEntry.get().parse(dateFmt):
+        bookButton.state = WidgetState.Disabled
+        widget.background = colRed
 
-    #   return
-    # else:
-    #   returnDateEntry.background = colWhite
+        return
+    else:
+      if currDate < startDateEntry.get().parse(dateFmt):
+        bookButton.state = WidgetState.Disabled
+        widget.background = colRed
+
+        return
 
     bookButton.state = WidgetState.Normal
-    widget.background = colWhite
+    widget.background = defaultEntryBackground
   except TimeParseError:
     bookButton.state = WidgetState.Disabled
     widget.background = colRed
 
-
 for entry in [startDateEntry, returnDateEntry]:
   entry.config(
     validatecommand = validation,
-    validationMode = ValidationMode.Key,
-    background = colWhite
+    validationMode = ValidationMode.Key
   )
 
-flightSpinbox.setCommand(nil) do (_: Widget, _: pointer):
+flightSpinbox.setCommand() do (_: Widget, dir: string):
   if flightSpinbox.get() == "return flight":
     returnDateEntry.state = WidgetState.Normal
   else:
     returnDateEntry.state = WidgetState.Readonly
 
-bookButton.setCommand(nil) do (_: Widget, _: pointer):
+bookButton.setCommand() do (_: Widget):
   root.messageBox(
     "Flight Booked",
     "You have booked a $1 flight on $2" % [flightSpinbox.get(), startDateEntry.get()]

@@ -14,7 +14,7 @@ proc winfo_cells*(w: Widget): int {.alias: "cells".} = parseInt w.tk.call("winfo
 proc winfo_children*(w: Widget): seq[Widget] {.alias: "children".} =
   w.tk.call("winfo children", w)
 
-  for pathname in w.tk.result.split(" "):
+  for pathname in w.tk.result.split(' '):
     result.add w.tk.newWidgetFromPathname(pathname)
 proc winfo_class*(w: Widget): string {.alias: "class".} = w.tk.call("winfo class", w)
 proc winfo_colormapfull*(w: Widget): bool {.alias: "colormapfull".} = w.tk.call("winfo colormapfull", w) == "1"

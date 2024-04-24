@@ -24,7 +24,7 @@ proc newScale*(parent: Widget, fromto: Slice[int or float], configuration: openA
 proc coords*(s: Scale, value: int or float): tuple[x, y: int] = 
   s.tk.call($s, "coords", value)
 
-  let res = s.tk.result.split(" ")
+  let res = s.tk.result.split(' ')
 
   result.x = res[0].parseInt()
   result.y = res[1].parseInt()
@@ -32,7 +32,7 @@ proc coords*(s: Scale, value: int or float): tuple[x, y: int] =
 proc coords*(s: Scale): tuple[x, y: int] = 
   s.tk.call($s, "coords")
 
-  let res = s.tk.result.split(" ")
+  let res = s.tk.result.split(' ')
 
   result.x = res[0].parseInt()
   result.y = res[1].parseInt()
@@ -49,13 +49,13 @@ proc identify*(s: Scale, x, y: int): string =
 proc set*(s: Scale, value: int or float) {.alias: "value=".} =
   s.tk.call($s, "set", value)
 
-proc setCommand*(s: Scale, clientData: pointer, command: TkScaleCommand) =
+proc setCommand*(s: Scale, command: TkScaleCommand) =
   let name = genName("scale_command_")
   
-  s.tk.registerCmd(s, clientdata, name, command)
+  s.tk.registerCmd(s, name, command)
 
   s.configure({"command": name})
-proc `command=`*(s: Scale, command: TkScaleCommand) = s.setCommand(nil, command)
+proc `command=`*(s: Scale, command: TkScaleCommand) = s.setCommand(command)
 
 proc `bigincrement=`*(s: Scale, bigincrement: int or float)           = s.configure({"bigincrement": $bigincrement})
 proc `digits=`*(s: Scale, digits: int)                                = s.configure({"digits": $digits})
