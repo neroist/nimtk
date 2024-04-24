@@ -1,7 +1,9 @@
+import std/sequtils
 import std/strutils
 import std/colors
 
 import ../private/escaping
+import ../private/tcllist
 import ../private/alias
 import ../../nimtk
 import ./widget
@@ -11,7 +13,7 @@ type
 
   Index = string or int
 
-proc newSpinbox*(parent: Widget, text: string = "", configuration: openArray[(string, string)] = {:}): Spinbox =
+proc newSpinbox*(parent: Widget, values: openArray[string] = [], configuration: openArray[(string, string)] = {:}): Spinbox =
   new result
 
   result.pathname = pathname(parent.pathname, genName("spinbox_"))
@@ -21,8 +23,8 @@ proc newSpinbox*(parent: Widget, text: string = "", configuration: openArray[(st
 
   result.configure({"textvariable": genName("DEFAULTVAR_string_")})
 
-  if text.len > 0:
-    result.tk.call("set", result.cget("textvariable"), tclEscape text)
+  if values.len > 0:
+    result.configure({"values": values.map(tclEscape).toTclList()})
   
   if configuration.len > 0:
     result.configure(configuration)
@@ -68,27 +70,51 @@ proc xviewMoveto*(s: Spinbox, fraction: 0.0..1.0) = s.tk.call($s, "xview moveto"
 proc xviewScroll*(s: Spinbox, number: int, what: string) = s.tk.call($s, "xview scroll", number, tclEscape what)
 
 proc setValidateCommand*(s: Spinbox, clientData: pointer, command: TkEntryCommand) =
-  let name = genName("entry_validate_command_")
+  let name = genName("spinbox_validate_command_")
   s.tk.registerCmd(s, clientdata, name, command)
   s.configure({"validatecommand": "{$1 %d %i %P %s %S %v %V}" % name})
 proc setInvalidCommand*(s: Spinbox, clientData: pointer, command: TkEntryCommand) =
-  let name = genName("entry_invalid_command_")
+  let name = genName("spinbox_invalid_command_")
   s.tk.registerCmd(s, clientdata, name, command)
   s.configure({"invalidcommand": "{$1 %d %i %P %s %S %v %V}" % name})
+proc setCommand*(s: Spinbox, clientData: pointer, command: TkWidgetCommand) =
+  let name = genName("spinbox_command_")
+  s.tk.registerCmd(s, clientdata, name, command)
+  s.configure({"command": "{$1 %d}" % name})
 
 proc `validatecommand=`*(s: Spinbox, command: TkEntryCommand) = s.setValidateCommand(nil, command)
 proc `invalidcommand=`*(s: Spinbox, command: TkEntryCommand) = s.setInvalidCommand(nil, command)
-proc `disabledbackground=`*(w: Widget, disabledforeground: Color or string) = w.configure({"disabledbackground": tclEscape $disabledbackground})
-proc `readonlybackground=`*(w: Widget, readonlybackground: Color or string) = w.configure({"readonlybackground": tclEscape $readonlybackground})
-proc `show=`*(w: Widget, show: char) = w.configure({"show": tclEscape $show})
+proc `buttonbackground=`*(s: Spinbox, buttonbackground: Color or string) = s.configure({"buttonbackground": tclEscape $buttonbackground})
+proc `buttoncursor=`*(s: Spinbox, buttoncursor: Cursor or string) = s.configure({"buttoncursor": tclEscape $buttoncursor})
+proc `buttondownrelief=`*(s: Spinbox, buttondownrelief: WidgetRelief) = s.configure({"buttondownrelief": $buttondownrelief})
+proc `buttonuprelief=`*(s: Spinbox, buttonuprelief: WidgetRelief) = s.configure({"buttonuprelief": $buttonuprelief})
+proc `command=`*(s: Spinbox, command: TkWidgetCommand) = s.setCommand(nil, command)
+proc `disabledbackground=`*(s: Spinbox, disabledforeground: Color or string) = s.configure({"disabledbackground": tclEscape $disabledbackground})
+proc `disabledforeground=`*(s: Spinbox, disabledforeground: Color or string) = s.configure({"disabledforeground": tclEscape $disabledforeground})
+proc `format=`*(s: Spinbox, format: string) = s.configure({"format": tclEscape $format})
+proc `from=`*(s: Spinbox, num: float) = s.configure({"from": $num})
+proc `increment=`*(s: Spinbox, increment: float) = s.configure({"increment": $increment})
+proc `readonlybackground=`*(s: Spinbox, readonlybackground: Color or string) = s.configure({"readonlybackground": tclEscape $readonlybackground})
 proc `state=`*(s: Spinbox, state: WidgetState) = s.configure({"state": $state})
+proc `to=`*(s: Spinbox, to: float) = s.configure({"to": $to})
 proc `validationMode=`*(s: Spinbox, validationMode: ValidationMode) = s.configure({"validate": $validationMode})
+proc `values=`*(s: Spinbox, values: openArray[string]) = s.configure({"values": values.map(tclEscape).toTclList()})
 proc `width=`*(s: Spinbox, width: int) = s.configure({"width": $width})
+proc `wrap=`*(s: Spinbox, wrap: bool) = s.configure({"wrap": $wrap})
 
-proc disabledbackground*(w: Widget): Color = parseColor w.cget("disabledbackground")
-proc readonlybackground*(w: Widget): Color = parseColor w.cget("readonlybackground")
-proc show*(w: Widget): char = w.cget("show")[0]
+proc buttonbackground*(s: Spinbox): Color = parseColor s.cget("buttonbackground")
+proc buttoncursor*(s: Spinbox): Cursor = parseEnum[Cursor] s.cget("buttoncursor")
+proc buttondownrelief*(s: Spinbox): WidgetRelief = parseEnum[WidgetRelief] s.cget("buttondownrelief")
+proc buttonuprelief*(s: Spinbox): WidgetRelief = parseEnum[WidgetRelief] s.cget("buttonuprelief")
+proc disabledbackground*(s: Spinbox): Color = parseColor s.cget("disabledbackground")
+proc disabledforeground*(s: Spinbox): Color = parseColor s.cget("disabledforeground")
+proc format*(s: Spinbox): string = s.cget("format")
+proc `from`*(s: Spinbox): float = parseFloat s.cget("from")
+proc increment*(s: Spinbox): float = parseFloat s.cget("increment")
+proc readonlybackground*(s: Spinbox): Color = parseColor s.cget("readonlybackground")
 proc state*(s: Spinbox): WidgetState = parseEnum[WidgetState] s.cget("state")
-proc overrelief*(s: Spinbox): WidgetRelief = parseEnum[WidgetRelief] s.cget("overrelief")
+proc to*(s: Spinbox): float = parseFloat s.cget("to")
 proc validationMode*(s: Spinbox): ValidationMode = parseEnum[ValidationMode] s.cget("validate")
+proc values*(s: Spinbox): seq[string] = s.cget("values").split(" ")
 proc width*(s: Spinbox): int = parseInt s.cget("width")
+proc wrap*(s: Spinbox): bool = s.cget("wrap") == "1"

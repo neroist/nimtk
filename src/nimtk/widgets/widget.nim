@@ -816,13 +816,13 @@ proc getSaveFile*(
 
 proc messageBox*(
   w: Widget,
+  title: string = "",
   message: string = "",
   `type`: MessageBoxType = Ok,
   detail: string = "",
   default: ButtonName = Default,
-  icon: IconImage = Info,
-  parent: Widget = w,
-  title: string = "",
+  icon: IconImage = Info, 
+  # parent: Widget = w,
 ): ButtonName {.discardable.} =
   parseEnum[ButtonName] w.tk.call(
     "tk_messageBox",
@@ -831,7 +831,7 @@ proc messageBox*(
       "detail": tclEscape detail,
       "icon": $icon,
       "message": tclEscape message,
-      "parent": $parent,
+      "parent": $w,
       "title": tclEscape title,
       "type": $`type`
     }.toArgs
