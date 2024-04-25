@@ -1,4 +1,5 @@
 import std/strutils
+import std/sequtils
 import std/colors
 
 import ../private/escaping
@@ -43,8 +44,12 @@ proc bbox*(l: Listbox, index: Index): tuple[offsetX, offsetY, width, height: int
 proc curselection*(l: Listbox): seq[int] =
   l.tk.call($l, "curselection")
 
-  for selectedElement in l.tk.result.split(' '):
-    result.add parseInt(selectedElement)
+  # this relies on the implicit return of an empty seq
+  # if this turns out to be false
+  if l.tk.result.len != 0:
+    l.tk.result
+      .split(' ')
+      .map(parseInt)
 proc delete*(l: Listbox, rng: Slice[int]) = l.tk.call($l, "delete", rng.a, rng.b)
 proc delete*[I1, I2: Index](l: Listbox, first: I1, last: I2) = l.tk.call($l, "delete", first, last)
 proc delete*(l: Listbox, first: Index) = l.tk.call($l, "delete", first)

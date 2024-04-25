@@ -7,8 +7,7 @@ import ../../src/nimtk/tcl
 import ../../src/nimtk/wm
 import ../../src/nimtk
 
-const
-  dateFmt = "dd-MM-yyyy"
+const dateFmt = "dd-MM-yyyy"
 
 let
   tk = newTk()
