@@ -1,3 +1,5 @@
+import std/strutils
+
 import ../../src/nimtk/widgets
 import ../../src/nimtk/tcl
 import ../../src/nimtk/wm
@@ -44,7 +46,19 @@ createButton.grid(0, 3, pady=15)
 updateButton.grid(1, 3)
 deleteButton.grid(2, 3)
 
-root.bind("<<ListboxSelect>>") do (_: Event):
-  echo namesListbox.get(namesListbox.curselection[0])
+namesListbox.bind("<<ListboxSelect>>") do (_: Event):
+  let selection = namesListbox.selection
+
+  if selection.len != 0:
+    let nameSeq = selection[0].split(", ")
+    let (name, surname) = (nameSeq[0], nameSeq[1])
+
+    nameEntry.set name
+    surnameEntry.set surname
+  else:
+    nameEntry.clear()
+    surnameEntry.clear()
+
+surnameEntry.bi
 
 tk.mainloop()

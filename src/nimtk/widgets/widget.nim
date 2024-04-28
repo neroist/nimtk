@@ -42,7 +42,7 @@ type
              string
   
   EntryEvent* = object
-    actionType: int
+    actionType*: int
     charIndex*: int
     editedValue*: string
     currentValue*: string
@@ -50,6 +50,8 @@ type
     validationMode*: ValidationMode
     validationTrigger*: string # opt
 
+  # yes this is ripped straight from tkinter...
+  # not sure where the undocumented events are from!
   EventType* = enum
     KeyPress = 2
     # Key = KeyPress
@@ -129,6 +131,10 @@ type
                TkSelectionHandleCommand or
                TkGenericCommand         or
                TkEventCommand
+
+# const
+#   Button* = ButtonPress
+#   Key* = KeyPress
 
 var
   widgetCmdData: seq[TkWidgetCmdData[TkWidgetCommand]]

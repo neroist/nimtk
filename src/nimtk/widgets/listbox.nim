@@ -47,17 +47,17 @@ proc curselection*(l: Listbox): seq[int] =
   # this relies on the implicit return of an empty seq
   # if this turns out to be false
   if l.tk.result.len != 0:
-    l.tk.result
+    return l.tk.result
       .split(' ')
       .map(parseInt)
 proc delete*(l: Listbox, rng: Slice[int]) = l.tk.call($l, "delete", rng.a, rng.b)
 proc delete*[I1, I2: Index](l: Listbox, first: I1, last: I2) = l.tk.call($l, "delete", first, last)
 proc delete*(l: Listbox, first: Index) = l.tk.call($l, "delete", first)
-proc get*(l: Listbox, rng: Slice[int]): seq[string] = l.tk.call($l, "get", rng.a, rng.b).split(' ')
+proc get*(l: Listbox, rng: Slice[int]): seq[string] {.alias: "[]".} = l.tk.call($l, "get", rng.a, rng.b).split(' ')
 proc get*[I1, I2: Index](l: Listbox, first: I1, last: I2): seq[string] = l.tk.call($l, "get", first, last).split(' ')
-proc get*(l: Listbox, first: Index): string = l.tk.call($l, "get", first)
+proc get*(l: Listbox, first: Index): string {.alias: "[]".} = l.tk.call($l, "get", first)
 proc index*(l: Listbox, index: Index): int = parseInt l.tk.call($l, "index", $index)
-proc insert*(l: Listbox, index: Index, elements: varargs[string]) =
+proc insert*(l: Listbox, index: Index, elements: varargs[string]) {.alias: "[]=".} =
   var safeElements: seq[string]
 
   for unsafeElement in elements:
@@ -120,6 +120,14 @@ proc selectionClear*[I1, I2: Index](l: Listbox, first: I1, last: I2 = "end") = l
 proc selectionIncludes*(l: Listbox, index: Index): bool = l.tk.call($l, "selection includes ", index) == "1"
 proc selectionSet*(l: Listbox, rng: Slice[int]) = l.tk.call($l, "selection set", rng.a, rng.b)
 proc selectionSet*[I1, I2: Index](l: Listbox, first: I1, last: I2 = "end") = l.tk.call($l, "selection set", first, last)
+proc selectionGet*(l: Listbox): seq[string] {.alias: "selection".} =
+  let cursel = l.curselection
+
+  if cursel.len == 0:
+    return @[]
+
+  for selectionIndex in cursel:
+    result.add l.get(selectionIndex)
 proc size*(l: Listbox): int {.alias: "len".} = parseInt l.tk.call($l, "size")
 proc xview*(l: Listbox): array[2, float] =
   l.tk.call($l, "xview")
