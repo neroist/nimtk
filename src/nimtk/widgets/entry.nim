@@ -11,6 +11,8 @@ type
 
   Index = string or int
 
+proc isEntry*(w: Widget): bool = "entry" in w.pathname.split('.')[^1]
+
 proc newEntry*(parent: Widget, text: string = "", configuration: openArray[(string, string)] = {:}): Entry =
   new result
 

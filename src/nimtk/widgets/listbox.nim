@@ -13,6 +13,8 @@ type
 
   Index = string or int
 
+proc isListbox*(w: Widget): bool = "listbox" in w.pathname.split('.')[^1]
+
 proc newListbox*(parent: Widget, texts: openArray[string] = [], configuration: openArray[(string, string)] = {:}): Listbox =
   new result
 

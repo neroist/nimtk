@@ -117,8 +117,9 @@ generateButton.setCommand() do (_: Widget):
   )
 
   try:
-    root.busy()
-    tk.update()
+    if len >= 5000:
+      root.busy()
+      tk.update()
 
     passwordEntry.set generatePassword(
       len,
@@ -129,9 +130,15 @@ generateButton.setCommand() do (_: Widget):
       specialchars,
       nodupes
     )
+
   except ValueError as err:
-    discard root.messageBox(err.msg, title="Error", icon=IconImage.Error)
+    discard root.messageBox(title="Error", message=err.msg, icon=IconImage.Error)
+
   finally:
-    root.busyForget()
+    if len >= 5000:
+      root.busyForget()
+
+lenEntry.bind("<Return>") do (_: Event):
+  generateButton.invoke()
 
 tk.mainloop()

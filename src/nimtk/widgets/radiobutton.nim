@@ -8,6 +8,8 @@ import ./widget
 type
   RadioButton* = ref object of Widget
 
+proc isRadioButton*(w: Widget): bool = "radiobutton" in w.pathname.split('.')[^1]
+
 proc newRadioButton*(parent: Widget, text: string = "", configuration: openArray[(string, string)] = {:}): RadioButton =
   new result
 
@@ -20,7 +22,6 @@ proc newRadioButton*(parent: Widget, text: string = "", configuration: openArray
 
   if configuration.len > 0:
     result.configure(configuration)
-
 
 proc invoke*(r: RadioButton) = r.tk.call($r, "invoke")
 proc flash*(r: RadioButton) = r.tk.call($r, "flash")

@@ -13,7 +13,7 @@ root.title = "Mouse"
 root.geometry(width=800, 600)
 
 let
-  entry = root.newEntry()
+  entry = root.newEntry("Your mouse is at (0, 0)")
 
 entry.pack(anchor = AnchorPosition.Center, expand = true, padx = 50, pady = 50)
 

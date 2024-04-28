@@ -15,6 +15,7 @@ type
 const
   nimtkDebug* {.booldefine: "nimtk.debug".} = false
   nimtkIgnoreTclErrors* {.booldefine: "nimtk.ignoreTclErrors".} = false
+  nimtkExitOnError* {.booldefine: "nimtk.ExitOnError".} = true
 
 proc eval*(tk: Tk, cmd: string): int {.discardable.} =
   result = tk.interp.eval(cstring cmd)
@@ -24,7 +25,10 @@ proc eval*(tk: Tk, cmd: string): int {.discardable.} =
     echo "[TK RETURN] ", result
     echo "[TK RESULT] ", tk.interp.getStringResult(), "\n"
 
-  if result != TCL_OK and not nimtkIgnoreTclErrors:
+  if result == TCL_ERROR and not nimtkIgnoreTclErrors:
+    when nimtkExitOnError:
+      tk.interp.eval("exit 1")
+    
     raise newException(
       TkError,
       "Error when evaluating Tcl!\n\n" &

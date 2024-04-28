@@ -50,8 +50,8 @@ button.cursor = Heart # set cursor
 button.setCommand() do (w: Widget):
   let btn = cast[Button](w)
 
-  btn.messageBox("I love you <3", title = "alert!")
   btn.flash()
+  btn.messageBox("alert!", "I love you <3")
 
 checkbutton.grid(padx = 25, pady = 25) # add button2 to grid
 checkbutton.variable = checkvar

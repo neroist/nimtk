@@ -7,6 +7,9 @@ import ./widget
 type
   Button* = ref object of Widget
 
+proc isButton*(w: Widget): bool = "button" in w.pathname.split('.')[^1]
+# template button*(w: Widget): Button = cast[Button](w)
+
 proc newButton*(parent: Widget, text: string = "", configuration: openArray[(string, string)] = {:}): Button =
   new result
 

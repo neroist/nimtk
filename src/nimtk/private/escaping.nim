@@ -2,7 +2,7 @@ from std/strutils import replace
 
 const
   escChars* = {'[', ']', '{' ,'}', '$'}
-    ## These characters, in Tcl strings, must be escaped
+    ## These characters in Tcl strings must be escaped
 
 proc tclEscape*(str: string): string =
   ## Escape strings in a way that is acceptable to Tcl
@@ -10,7 +10,7 @@ proc tclEscape*(str: string): string =
   ## Characters such as '[', ']', and '$' are integral parts of Tcl's syntax and may
   ## cause errors when unescaped.
 
-  # lets have tclEscape do some of the work for us
+  # lets have repr do some of the work for us
   result = repr str
 
   # escape the characters in `escChars` ("[" -> "\[")

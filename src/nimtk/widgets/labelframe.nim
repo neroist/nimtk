@@ -10,6 +10,8 @@ import ./label
 type
   LabelFrame* = ref object of Widget
 
+proc isLabelFrame*(w: Widget): bool = "labelframe" in w.pathname.split('.')[^1]
+
 proc newLabelFrame*(parent: Widget, text: string, class: string = "", visual: string = "default", colormap: string = "new"): LabelFrame =
   new result
 

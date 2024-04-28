@@ -12,6 +12,8 @@ type
     Active = "active"
     Disabled = "disabled"
 
+proc isLabel*(w: Widget): bool = "label" in w.pathname.split('.')[^1]
+
 proc newLabel*(parent: Widget, text: string = ""): Label =
   new result
 

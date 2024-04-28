@@ -9,6 +9,8 @@ import ./widget
 type
   CheckButton* = ref object of Widget
 
+proc isCheckButton*(w: Widget): bool = "checkbutton" in w.pathname.split('.')[^1]
+
 proc newCheckButton*(parent: Widget, text: string = "", configuration: openArray[(string, string)] = {:}): CheckButton =
   new result
 

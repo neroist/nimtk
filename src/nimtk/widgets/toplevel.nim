@@ -1,3 +1,4 @@
+import std/strutils
 import std/colors
 
 import ../private/escaping
@@ -7,6 +8,8 @@ import ./widget
 
 type
   Toplevel* = ref object of Widget
+
+proc isToplevel*(w: Widget): bool = "toplevel" in w.pathname.split('.')[^1]
 
 proc newToplevel*(parent: Widget, class: string = "", container: bool = false, visual: string = "", colormap: string = "new", screen: string = "", use: string = ""): Toplevel =
   new result

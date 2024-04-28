@@ -13,6 +13,8 @@ type
 
   Index = string or int
 
+proc isSpinbox*(w: Widget): bool = "spinbox" in w.pathname.split('.')[^1]
+
 proc newSpinbox*(parent: Widget, values: openArray[string] = [], configuration: openArray[(string, string)] = {:}): Spinbox =
   new result
 

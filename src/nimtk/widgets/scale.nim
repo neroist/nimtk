@@ -8,6 +8,8 @@ import ./widget
 type
   Scale* = ref object of Widget
 
+proc isScale*(w: Widget): bool = "scale" in w.pathname.split('.')[^1]
+
 proc newScale*(parent: Widget, fromto: Slice[int or float], configuration: openArray[(string, string)] = {:}): Scale =
   new result
 

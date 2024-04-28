@@ -71,7 +71,7 @@ for entry in [startDateEntry, returnDateEntry]:
     validationMode = ValidationMode.Key
   )
 
-flightSpinbox.setCommand() do (_: Widget, dir: string):
+flightSpinbox.setCommand() do (_: Widget, _: string):
   if flightSpinbox.get() == "return flight":
     returnDateEntry.state = WidgetState.Normal
   else:

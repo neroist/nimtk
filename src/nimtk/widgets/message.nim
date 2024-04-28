@@ -7,6 +7,8 @@ import ./widget
 type
   Message* = ref object of Widget
 
+proc isMessage*(w: Widget): bool = "message" in w.pathname.split('.')[^1]
+
 proc newMessage*(parent: Widget, text: string = ""): Message =
   new result
 

@@ -396,7 +396,7 @@ proc fromTclColor*[W](w: W, tclColor: string): Color =
     return parseColor tclColor
 
   # else, use winfo to get the exact 16-bit rgb values
-  let rgb = w.tk.call("winfo", w, tclEscape tclColor)
+  let rgb = w.tk.call("winfo rgb", w, tclEscape tclColor)
     .split(' ')
     .map(parseInt)
   
@@ -436,7 +436,7 @@ template slavesImpl(w: Widget) {.dirty.} =
 
 # --- pack
 
-proc pack*[PX, PY: Padding](
+proc pack*[IPX, IPY, PX, PY: Padding](
   w: Widget,
   after: Widget = nil,
   anchor: AnchorPosition or string = "",
@@ -444,8 +444,8 @@ proc pack*[PX, PY: Padding](
   expand: bool or string = "",
   fill: FillStyle or string = "",
   `in`: Widget = nil,
-  ipadx: int or float or string = 0,
-  ipady: int or float or string = 0,
+  ipadx: IPX = "",
+  ipady: IPY = "",
   padx: PX = "",
   pady: PY = "",
   side: Side or string = ""
@@ -549,15 +549,15 @@ proc placeInfo*(w: Widget): Table[string, string] =
 # --- grid
 
 # two seperate PX and PY generics do not force them to be the same type
-proc grid*[PX, PY: Padding](
+proc grid*[IPX, IPY, PX, PY: Padding](
   w: Widget,
   column: string or int = "",
   row: string or int = "",
   columnspan: string or int = "",
   rowspan: string or int = "",
   `in`: Widget = nil,
-  ipadx: float or string = "",
-  ipady: float or string = "",
+  ipadx: IPX = "",
+  ipady: IPY = "",
   padx: PX = "",
   pady: PY = "",
   sticky: FillStyle or AnchorPosition or string = ""
@@ -1181,6 +1181,26 @@ proc waitVisibility*(w: Widget) =
 
 proc waitWindow*(w: Widget) =
   w.tk.call("tkwait window", w)
+
+# --- option
+
+const
+  WidgetDefault* = 20
+  StartupFile* = 40
+  UserDefault* = 60
+  Interactive* = 80
+
+proc optionAdd*(tk: Tk, pattern, value: string, priority: int) =
+  tk.call("option add", tclEscape pattern, tclEscape value, priority)
+
+proc optionClear*(tk: Tk) =
+  tk.call("option clear")
+
+proc optionGet*(w: Widget, name, class: string): string =
+  w.tk.call("option get", w, tclEscape name, tclEscape class)
+
+proc optionReadfile*(tk: Tk, filename: string, priority: int) =
+  tk.call("option readfile", tclEscape filename, priority)
 
 # --- --- Common widget options
 

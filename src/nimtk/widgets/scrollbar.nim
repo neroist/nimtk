@@ -11,7 +11,7 @@ import ./widget
 type
   Scrollbar* = ref object of Widget
 
-  Index = string or int
+proc isScrollbar*(w: Widget): bool = "scrollbar" in w.pathname.split('.')[^1]
 
 proc newScrollbar*(parent: Widget, values: openArray[string] = [], configuration: openArray[(string, string)] = {:}): Scrollbar =
   new result
@@ -23,6 +23,14 @@ proc newScrollbar*(parent: Widget, values: openArray[string] = [], configuration
   
   if configuration.len > 0:
     result.configure(configuration)
+
+template linkX*(w: Widget, s: Scrollbar) {.alias: "xscrollbar=".} =
+  w.yscrollcommand = $s & " set"
+  s.command = $w & " xview"
+
+template linkY*(w: Widget, s: Scrollbar) {.alias: "yscrollbar=".} =
+  w.yscrollcommand = $s & " set"
+  s.command = $w & " yview"
 
 proc activate*(s: Scrollbar, element: ScrollbarElement) = s.tk.call($s, "activate", element)
 proc activate*(s: Scrollbar): ScrollbarElement = parseEnum[ScrollbarElement] s.tk.call($s, "activate")
@@ -43,7 +51,7 @@ proc `command=`*(s: Scrollbar, command: string) = s.configure({"command": '{' & 
 proc `elementborderwidth=`*(s: Scrollbar, elementborderwidth: int or string) = s.configure({"elementborderwidth": $elementborderwidth})
 proc `width=`*(s: Scrollbar, width: int or string) = s.configure({"width": $width})
 
-proc activerelief(s: Scrollbar): WidgetRelief = parseEnum[WidgetRelief] s.cget("activerelief")
-proc command(s: Scrollbar): string = s.cget("command")
-proc elementborderwidth(s: Scrollbar): string = s.cget("elementborderwidth")
-proc width(s: Scrollbar): string = s.cget("width")
+proc activerelief*(s: Scrollbar): WidgetRelief = parseEnum[WidgetRelief] s.cget("activerelief")
+proc command*(s: Scrollbar): string = s.cget("command")
+proc elementborderwidth*(s: Scrollbar): string = s.cget("elementborderwidth")
+proc width*(s: Scrollbar): string = s.cget("width")

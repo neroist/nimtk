@@ -1,12 +1,14 @@
+import std/strutils
 import std/colors
 
-import ../private/escaping
 import ../private/toargs
 import ../../nimtk
 import ./widget
 
 type
   Frame* = ref object of Widget
+
+proc isFrame*(w: Widget): bool = "frame" in w.pathname.split('.')[^1].split('.')[^1]
 
 proc newFrame*(parent: Widget, class: string = "", container: bool = false, visual: string = "default", colormap: string = "new"): Frame =
   new result

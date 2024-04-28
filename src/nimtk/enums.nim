@@ -282,4 +282,3 @@ type
     Arrow2 = "arrow2"
 
 include "./keysyms"
-
