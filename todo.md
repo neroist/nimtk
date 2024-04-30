@@ -4,7 +4,7 @@ These should be sorted by urgency/importance
 
 - [ ] Add documenation (<https://www.tcl.tk/man/tcl8.6/>)
 
-- [ ] Support not deciding for the dev, for `toArgs`, options with no value (`value.len == 0`), the option is ignored. this may be used to wrap functions such as `rowconfigure` and `columnconfigure` or other functions which are wraped via default values
+- [x] Support not deciding for the dev, for `toArgs`, options with no value (`value.len == 0`), the option is ignored. this may be used to wrap functions such as `rowconfigure` and `columnconfigure` or other functions which are wraped via default values
     
     In summary, dont use default values and instead use `""`
 
