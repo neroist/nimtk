@@ -1,10 +1,11 @@
 import std/strutils
 
-import ./private/toargs
 import ./private/escaping
+import ./private/toargs
 import ./private/tcllist
 import ./private/alias
 import ./widgets/widget
+import ./widgets/root
 import ../nimtk
 
 # font type is defined in widget.nim
@@ -121,8 +122,6 @@ proc actualSlant*(f: Font, w: Widget = nil, c: char): FontSlant   = parseEnum[Fo
 proc actualUnderline*(f: Font, w: Widget = nil, c: char): bool    = f.tk.call("font actual", f, {"displayof": $w}.toArgs, "-underline", "--", c)  == "1"
 proc actualOverstrike*(f: Font, w: Widget = nil, c: char): bool   = f.tk.call("font actual", f, {"displayof": $w}.toArgs, "-overstrike", "--", c) == "1"
 
-# TODO ?char?
-
 # widget methods
 proc font*(w: Widget): Font =
   new result
@@ -145,14 +144,26 @@ proc fontchooser*(w: Widget, title: string = "", font: Font = nil, command: TkFo
     {
       "title": tclEscape title,
       "font": $font,
-      "command": cmdname
+      "command": cmdname,
+      "parent": $w
     }.toArgs
   )
+proc fontchooser*(tk: Tk, title: string = "", font: Font = nil, command: TkFontCommand = nil) =
+  # this proc is preferred over the other one, for consistency reasons
+  fontchooser(tk.getRoot(), title, font, command)
 
-# TODO query?
+proc fontchooserVisible*(tk: Tk): bool = tk.call("tk fontchooser configure -visible") == "1"
+proc fontchooserTitle*(tk: Tk): string = tk.call("tk fontchooser configure -title")
+proc fontchooserFont*(tk: Tk): Font =
+  new result
+  
+  let fontname = tk.call("tk fontchooser configure -font")
+
+  result.tk = tk
+  result.fontname = fontname
+proc fontchooserCommand*(tk: Tk) {.alias: "fontchooserInvoke".} = tk.call("tk fontchooser configure -command")
+  ## Calls the command registered for the fontchoooser
 
 proc fontchooserShow*(tk: Tk) = tk.call("tk fontchooser show")
 proc fontchooserHide*(tk: Tk) = tk.call("tk fontchooser Hide")
-proc fontchooserShow*(w: Widget) = w.tk.call("tk fontchooser show")
-proc fontchooserHide*(w: Widget) = w.tk.call("tk fontchooser Hide")
 

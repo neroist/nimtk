@@ -26,13 +26,13 @@ button.pack(padx=50, pady=50)
 button2.pack(padx=50, pady=50)
 
 button.setCommand() do (_: Widget):
-  root.fontchooser(
+  tk.fontchooser(
     command = (
       proc (font: Font) = root.applyFont(font)    
     )
   )
 
-  root.fontchooserShow()
+  tk.fontchooserShow()
 
 button2.setCommand() do (_: Widget):
   let font = tk.newFont(family = root.families.sample(), 12)
