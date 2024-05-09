@@ -20,6 +20,10 @@ type
     pathname*: string
     tk*: Tk
   
+  Font* = ref object
+    fontname*: string
+    tk*: Tk
+  
   TkWidgetCommand* = proc (widget: Widget)
   TkSelectionHandleCommand* = proc (offset, maxChars: int): string
   TkGenericCommand* = proc ()
@@ -27,6 +31,7 @@ type
   TkScaleCommand* = proc (widget: Widget, newvalue: float)
   TkEntryCommand* = proc (widget: Widget, event: EntryEvent): bool
   TkSpinboxCommand* = proc (widget: Widget, button: string)
+  TkFontCommand* = proc (font: Font)
   
   TkCmdData[CMD] = ref object of RootObj
     fun*: CMD
@@ -128,9 +133,13 @@ type
                TkScaleCommand           or
                TkEntryCommand           or
                TkSpinboxCommand         or
+               TkFontCommand            or
                TkSelectionHandleCommand or
                TkGenericCommand         or
                TkEventCommand
+
+  Filetypes* = seq[tuple[typeName: string, extentions, macTypes: seq[string]]] or
+               seq[tuple[typeName: string, extentions: seq[string]]]
 
 # const
 #   Button* = ButtonPress
@@ -144,6 +153,7 @@ var
   genericCmdData: seq[TkCmdData[TkGenericCommand]]
   eventCmdData: seq[TkCmdData[TkEventCommand]]
   spinboxCmdData: seq[TkCmdData[TkSpinboxCommand]]
+  fontCmdData: seq[TkCmdData[TkFontCommand]]
 
 proc tkintwidgetcmd*(clientData: ClientData, _: ptr Interp, _: cint, _: cstringArray): cint {.cdecl.} =
   var data = cast[TkWidgetCmdData[TkWidgetCommand]](clientData)
@@ -171,11 +181,35 @@ proc tkintselhandlecmd*(clientData: ClientData, interp: ptr Interp, _: cint, arg
 
   return TCL_OK
 
-proc tkintgenericcmd*(clientData: ClientData, _: ptr Interp, _: cint, _: cstringArray): cint {.cdecl.} =
+proc tkintgenericcmd*(clientData: ClientData, _: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
   let data = cast[TkCmdData[TkGenericCommand]](clientData)
 
   if data.fun != nil:
     data.fun()
+
+  return TCL_OK
+
+proc tkintfontcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
+  let data = cast[TkCmdData[TkFontCommand]](clientData)
+  
+  let
+    args = argv.cstringArrayToSeq()
+    fontname = genName("THROWAWAY-intfontcmd_font")
+
+  var
+    tk = new Tk
+    font = new Font
+
+  tk.interp = interp
+
+  tk.call("font actual " & "{" & args[1] & "}")
+  tk.call("font create", fontname, tk.result)
+
+  font.tk = tk
+  font.fontname = fontname
+
+  if data.fun != nil:
+    data.fun(font)
 
   return TCL_OK
 
@@ -341,7 +375,10 @@ proc registerCmd*(tk: Tk, w: Widget, name: string, cmd: TkCmdType) =
 
   elif cmd is TkSpinboxCommand:
     registerCmdImpl(TkWidgetCmdData[TkSpinboxCommand], spinboxCmdData, tkintspinboxcmd)
-  
+
+  elif cmd is TkFontCommand:
+    registerCmdImpl(TkCmdData[TkFontCommand], fontCmdData, tkintfontcmd)
+ 
   else:
     registerCmdImpl(TkCmdData[TkEventCommand], eventCmdData, tkinteventcmd)
 
@@ -758,7 +795,7 @@ proc scaling*(w: Widget): float =
 
 # --- fontchooser 
 
-# TODO fontchooser 
+# * in font.nim
 
 # --- useinputmethods
 
@@ -772,7 +809,6 @@ proc useinputmethods*(w: Widget): bool =
 
 proc windowingsystem*(tk: Tk): string =
   tk.call("tk windowingsystem")
-  tk.result
 
 # --- tk_chooseDirectory
 
@@ -781,18 +817,18 @@ proc windowingsystem*(tk: Tk): string =
 # -message
 #
 # These options are only available on Mac OS X
+# Will return an error if used on other platforms
 
 proc chooseDirectory*(
   w: Widget = nil,
-  parent: Widget = w,
+  title: string = "",
   initialdir: string = "",
-  mustexist: bool = false,
-  title: string = ""
+  mustexist: bool = false
 ): string =
   w.tk.call(
     "tk_chooseDirectory",
     {
-      "parent": $parent,
+      "parent": $w,
       "initialdir": tclEscape initialdir,
       "mustexist": $mustexist,
       "title": tclEscape title,
@@ -803,14 +839,13 @@ proc chooseDirectory*(
 
 proc chooseColor*(
   w: Widget = nil,
-  parent: Widget = w,
-  initialColor: Color = 0.Color,
-  title: string = ""
+  title: string = "",
+  initialColor: Color or string = "",
 ): Color =
   w.tk.call(
     "tk_chooseColor",
     {
-      "parent": $parent,
+      "parent": $w,
       "initialcolor": $initialColor,
       "title": tclEscape title,
     }.toArgs()
@@ -844,7 +879,11 @@ proc focus*(tk: Tk): Widget =
   tk.newWidgetFromPathname(tk.result)
 
 proc focus*(w: Widget, force: bool = false) =
-  let forceArg = if force == false: "" else: " "
+  let forceArg = 
+    if force == false:
+      ""
+    else:
+      " "
 
   w.tk.call("focus", {"force": forceArg}.toArgs, w)
 
@@ -858,17 +897,35 @@ proc focusLastfor*(w: Widget): Widget =
 
 # --- tk_getOpenFile, tk_getSaveFile
 
-template getFileImpl(cmd: string): string {.dirty.} =
+template getFileImpl[T](cmd: string): T =
+  let parent = w
   var filetypesList: seq[string]
 
   for filetype in filetypes:
-    filetypesList.add "{{$1} {$2} {$3}}" % [filetype.typeName, filetype.extentions.join(" "), filetype.macTypes.join(" ")]
+    let macTypes =
+      when defined(filetype.macTypes):
+        filetype.macTypes.map(tclEscape).join(" ")
+      else:
+        ""
 
-  when cmd == "tk_getOpenFile":
-    let confirmoverwrite = ""
+    filetypesList.add:
+      "{$1 {$2} {$3}}" % [
+          tclEscape filetype[0],
+          filetype[1].map(tclEscape).join(" "),
+          macTypes
+        ]
 
-  when cmd == "tk_getSaveFile":
-    let multiple = ""
+  let confirmoverwrite =
+    when cmd == "tk_getOpenFile":
+      ""
+    else:
+      confirmoverwrite
+
+  let multiple =
+    when cmd == "tk_getSaveFile":
+      ""
+    else:
+      multiple
 
   w.tk.call(
     cmd,
@@ -885,31 +942,34 @@ template getFileImpl(cmd: string): string {.dirty.} =
     }.toArgs()
   )
 
+  when cmd == "tk_getOpenFile":
+    w.tk.fromTclList(w.tk.result)
+  else:
+    w.tk.result
+
 proc getOpenFile*(
   w: Widget,
   defaultextension: string = "",
-  filetypes: openArray[tuple[typeName: string, extentions, macTypes: seq[string]]] = @[], # seq because openArray is an "invalid type"
+  filetypes: Filetypes = @[],
   initialdir: string = "",
   initialfile: string = "",
   multiple: bool = false,
-  parent: Widget = w,
   title: string = "",
   typevariable: TkVar = nil
-): string {.discardable.} =
-  getFileImpl("tk_getOpenFile")
+): seq[string] =
+  getFileImpl[seq[string]]("tk_getOpenFile")
 
 proc getSaveFile*(
   w: Widget,
   confirmoverwrite: bool = true,
   defaultextension: string = "",
-  filetypes: openArray[tuple[typeName: string, extentions, macTypes: seq[string]]] = @[], # seq because openArray is an "invalid type"
+  filetypes: Filetypes = @[],
   initialdir: string = "",
   initialfile: string = "",
-  parent: Widget = w,
   title: string = "",
   typevariable: TkVar = nil
-): string {.discardable.} =
-  getFileImpl("tk_getSaveFile")
+): string =
+  getFileImpl[string]("tk_getSaveFile")
 
 # --- tk_messageBox
 
@@ -920,9 +980,8 @@ proc messageBox*(
   `type`: MessageBoxType = Ok,
   detail: string = "",
   default: ButtonName = Default,
-  icon: IconImage = Info, 
-  # parent: Widget = w,
-): ButtonName {.discardable.} =
+  icon: IconImage = Info
+): ButtonName =
   parseEnum[ButtonName] w.tk.call(
     "tk_messageBox",
     {
@@ -955,7 +1014,7 @@ proc setPalette*(tk: Tk, options: openArray[tuple[name: string, value: Color]]) 
 
   tk.call("tk_setPalette", opts.join(" "))
 
-proc setPalette*(tk: Tk, backgroundColor: Color) =
+proc setPalette*(tk: Tk, backgroundColor: Color) {.alias: "palette=".} =
   tk.call("tk_setPalette", backgroundColor)
 
 proc bisque*(tk: Tk) =
@@ -1215,7 +1274,7 @@ proc `compound=`*(w: Widget, compound: WidgetCompound)                          
 proc `disabledforeground=`*(w: Widget, disabledforeground: Color or string)           = w.configure({"disabledforeground": tclEscape $disabledforeground})
 proc `disabledbackground=`*(w: Widget, disabledbackground: Color or string)           = w.configure({"disabledbackground": tclEscape $disabledbackground})
 proc `exportselection=`*(w: Widget, exportselection: bool)                            = w.configure({"exportselection": $exportselection})
-#    proc `font=`*(w: Widget, font)                                                   = w.configure({"font": $font})
+# proc `font=`*(w: Widget, font: Font) is in font.nim
 proc `foreground=`*(w: Widget, foreground: Color) {.alias: "fg=".}                    = w.configure({"foreground": $foreground})
 # proc `height=`*(w: Widget, height: string or float or int)                            = w.configure({"height": $height})
 proc `highlightbackground=`*(w: Widget, highlightbackground: Color)                   = w.configure({"highlightbackground": $highlightbackground})
@@ -1260,7 +1319,7 @@ proc compound*(w: Widget): WidgetCompound            = parseEnum[WidgetCompound]
 proc disabledforeground*(w: Widget): Color           = fromTclColor w, w.cget("disabledforeground")
 proc disabledbackground*(w: Widget): Color           = fromTclColor w, w.cget("disabledbackground")
 proc exportselection*(w: Widget): bool               = w.cget("exportselection") == "1"
-#    proc font*(w: Widget)                           = w.cget("font")
+# proc font*(w: Widget) is in font.nim
 proc foreground*(w: Widget): Color {.alias: "fg".}   = fromTclColor w, w.cget("foreground")
 # proc height*(w: Widget): string                      = w.cget("height")
 proc highlightbackground*(w: Widget): Color          = fromTclColor w, w.cget("highlightbackground")

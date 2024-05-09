@@ -281,4 +281,12 @@ type
     Trough2 = "trough2"
     Arrow2 = "arrow2"
 
+  FontWeight* {.pure.} = enum
+    Normal = "normal"
+    Bold = "bold"
+
+  FontSlant* {.pure.} = enum
+    Roman = "roman"
+    Italic = "italic"
+
 include "./keysyms"
