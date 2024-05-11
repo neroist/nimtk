@@ -42,7 +42,7 @@ proc `offrelief=`*(r: RadioButton, offrelief: WidgetRelief) = r.configure({"offr
 proc `overrelief=`*(r: RadioButton, overrelief: WidgetRelief) = r.configure({"overrelief": $overrelief})
 proc `selectcolor=`*(r: RadioButton, selectcolor: Color) = r.configure({"selectcolor": $selectcolor})
 proc `variable=`*(r: RadioButton, variable: TkVar) = r.configure({"variable": variable.varname})
-proc `value=`*(r: RadioButton, value: int or string) = r.configure({"value": $value})
+proc `value=`*(r: RadioButton, value: bool or int or string) = tclEscape r.configure({"value": $value})
 proc `tristatevalue=`*(r: RadioButton, tristatevalue: string) = r.configure({"tristatevalue": tclEscape $tristatevalue})
 # proc `selectimage=`*(r: RadioButton, selectimage: Image) = r.configure({"selectimage": $selectimage})
 # proc `tristateimage=`*(r: RadioButton, tristateimage: Image) = r.configure({"tristateimage": $tristateimage})

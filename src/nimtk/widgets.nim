@@ -13,6 +13,7 @@ import
   ./widgets/listbox,
   ./widgets/spinbox,
   ./widgets/scrollbar,
+  ./widgets/menu,
   ./widgets/widget
 
 export
@@ -30,4 +31,5 @@ export
   listbox,
   spinbox,
   scrollbar,
+  menu,
   widget

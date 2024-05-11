@@ -289,4 +289,16 @@ type
     Roman = "roman"
     Italic = "italic"
 
+  MenuType* {.pure.} = enum
+    MenuBar = "menubar"
+    TearOff = "tearoff"
+    Normal = "normal"
+  
+  MenuEntryType* {.pure.} = enum
+    Cascade = "cascade"
+    Checkbutton = "checkbutton"
+    Command = "command"
+    Radiobutton = "radiobutton"
+    Separator = "separator"
+
 include "./keysyms"

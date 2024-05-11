@@ -1,10 +1,8 @@
 import std/strutils
-import std/sequtils
 
 import nimtcl
 
 import ../../nimtk
-import ./escaping
 
 proc toTclList*(padding: int or float or string): string =
   $padding

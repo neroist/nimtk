@@ -42,6 +42,7 @@ proc winfo_manager*(w: Widget): string {.alias: "manager".} = w.tk.call("winfo m
 proc winfo_name*(w: Widget): string {.alias: "name".} = w.tk.call("winfo name", w)
 proc winfo_parent*(w: Widget): Widget {.alias: "parent".} = w.tk.newWidgetFromPathname w.tk.call("winfo parent", w)
 proc winfo_pathname*(w: Widget, id: int): string {.alias: "pathname".} = w.tk.call("winfo pathname", "-displayof", w, id)
+proc winfo_pathname*(tk: Tk, id: int): string {.alias: "pathname".} = w.tk.call("winfo pathname", id)
 proc winfo_pixels*(w: Widget, number: int or float or string): int {.alias: "pixels".} = parseInt w.tk.call("winfo pixels", w)
 proc winfo_pointerx*(w: Widget): int {.alias: "pointerx".} = parseInt w.tk.call("winfo pointerx", w)
 proc winfo_pointerxy*(w: Widget): tuple[x, y: int] {.alias: "pointerxy".} =

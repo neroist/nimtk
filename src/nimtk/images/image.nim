@@ -1,6 +1,5 @@
 import std/strutils
 
-import ../private/escaping
 import ../../nimtk
 
 type

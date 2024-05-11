@@ -6,6 +6,8 @@ import std/times
 
 import nimtcl except Time
 
+import ../private/commands
+import ../private/tclcolor
 import ../private/escaping
 import ../private/tcllist
 import ../private/toargs
@@ -407,12 +409,6 @@ proc pathName*(names: varargs[string]): string =
   if names[0] == ".":
     result = result[1..^1] # discard leading extra '.'
 
-template configure*(w: Widget or typed, args: openArray[(string, string)]) =
-  discard w.tk.call($w, "configure", args.toArgs())
-
-template cget*(w: Widget or typed, option: string): string =
-  w.tk.call($w, "cget", {option: " "}.toArgs())
-
 proc destroy*(w: Widget) =
   ## Destroys a widget and its children
   
@@ -420,45 +416,21 @@ proc destroy*(w: Widget) =
 
 # --- helpers
 
-proc fromTclColor*[W](w: W, tclColor: string): Color =
-  ## Get `colors.Color` from color string returned from Tk
-  ## 
-  ## This is needed if Tk returns, for example, "systemDefault" from a command,
-  ## which cannot be parsed via just `parseColor`
-  ##
-  ## For all colors returned from Tk, please use this proc and not `parseColor`.
-
-  # if the color is already a normal HTML code color...
-  if tclColor[0] == '#':
-    return parseColor tclColor
-
-  # else, use winfo to get the exact 16-bit rgb values
-  let rgb = w.tk.call("winfo rgb", w, tclEscape tclColor)
-    .split(' ')
-    .map(parseInt)
-  
-  # the values returned are 16-bit, so we shift them right by 8 bits
-  # to get the 8 bit value we need for `colors.rgb`
-  return colors.rgb(
-    (rgb[0] shr 8).clamp(0, 255),
-    (rgb[1] shr 8).clamp(0, 255),
-    (rgb[2] shr 8).clamp(0, 255)
-  )
+export commands
+export tclcolor
 
 # --- --- Geometry Managers
 
 template bboxImpl(w: Widget) {.dirty.} =
-  let nums = w.tk.result.split()
+  let nums = w.tk.result.split().map(parseInt)
 
-  result.offsetX = nums[0].parseInt()
-  result.offsetY = nums[1].parseInt()
-  result.width = nums[2].parseInt()
-  result.height = nums[3].parseInt()
+  result.offsetX = nums[0]
+  result.offsetY = nums[1]
+  result.width = nums[2]
+  result.height = nums[3]
 
 template infoImpl(w: Widget) {.dirty.} =
   let res = w.tk.result.split()
-
-  echo res
 
   for idx in 0..<res.len:
     if idx mod 2 != 0: continue
@@ -1249,8 +1221,11 @@ const
   UserDefault* = 60
   Interactive* = 80
 
-proc optionAdd*(tk: Tk, pattern, value: string, priority: int) =
-  tk.call("option add", tclEscape pattern, tclEscape value, priority)
+# proc optionAdd*(tk: Tk, pattern, value: string, priority: 0..100 = Interactive) =
+#   tk.call("option add", pattern, tclEscape value, priority)
+
+proc optionAdd*[T](tk: Tk, pattern: string, value: T, priority: 0..100 = Interactive) {.alias: "[]=".} =
+  tk.call("option add", tclEscape pattern, tclEscape $value, priority)
 
 proc optionClear*(tk: Tk) =
   tk.call("option clear")
@@ -1261,6 +1236,16 @@ proc optionGet*(w: Widget, name, class: string): string =
 proc optionReadfile*(tk: Tk, filename: string, priority: int) =
   tk.call("option readfile", tclEscape filename, priority)
 
+# --- Converter...
+
+converter rootToTk*(w: Widget): Tk =
+  ## Lessen confusion with python using `root` for the main window and the
+  ## wrapper type for the Tcl interpreter
+  ##
+  ## .. note:: Please use the `.tk` attribute instead, or just pass `tk` in
+
+  w.tk
+
 # --- --- Common widget options
 
 proc `activebackground=`*(w: Widget, activebackground: Color)                         = w.configure({"activebackground": $activebackground})
@@ -1268,6 +1253,7 @@ proc `activeborderwidth=`*(w: Widget, activeborderwidth: string or float or int)
 proc `activeforeground=`*(w: Widget, activeforeground: Color)                         = w.configure({"activeforeground": $activeforeground})
 proc `anchor=`*(w: Widget, anchor: AnchorPosition)                                    = w.configure({"anchor": $anchor})
 proc `background=`*(w: Widget, background: Color) {.alias: "bg=".}                    = w.configure({"background": $background})
+proc `bitmap=`*(w: Widget, bitmap: string)                                            = w.configure({"bitmap": tclEscape $bitmap})
 proc `borderwidth=`*(w: Widget, borderwidth: string or float or int) {.alias: "bd=".} = w.configure({"borderwidth": $borderwidth})
 proc `cursor=`*(w: Widget, cursor: Cursor)                                            = w.configure({"cursor": $cursor})
 proc `compound=`*(w: Widget, compound: WidgetCompound)                                = w.configure({"compound": $compound})
@@ -1276,7 +1262,7 @@ proc `disabledbackground=`*(w: Widget, disabledbackground: Color or string)     
 proc `exportselection=`*(w: Widget, exportselection: bool)                            = w.configure({"exportselection": $exportselection})
 # proc `font=`*(w: Widget, font: Font) is in font.nim
 proc `foreground=`*(w: Widget, foreground: Color) {.alias: "fg=".}                    = w.configure({"foreground": $foreground})
-# proc `height=`*(w: Widget, height: string or float or int)                            = w.configure({"height": $height})
+# proc `height=`*(w: Widget, height: string or float or int)                          = w.configure({"height": $height})
 proc `highlightbackground=`*(w: Widget, highlightbackground: Color)                   = w.configure({"highlightbackground": $highlightbackground})
 proc `highlightcolor=`*(w: Widget, highlightcolor: Color)                             = w.configure({"highlightcolor": $highlightcolor})
 proc `highlightthickness=`*(w: Widget, highlightthickness: string or float or int)    = w.configure({"highlightthickness": $highlightthickness})
@@ -1313,6 +1299,7 @@ proc activeborderwidth*(w: Widget): string           = w.cget("activeborderwidth
 proc activeforeground*(w: Widget): Color             = fromTclColor w, w.cget("activeforeground")
 proc anchor*(w: Widget): AnchorPosition              = parseEnum[AnchorPosition] w.cget("anchor")
 proc background*(w: Widget): Color {.alias: "bg".}   = fromTclColor w, w.cget("background")
+proc bitmap*(w: Widget): string                      = w.cget("bitmap")
 proc borderwidth*(w: Widget): string {.alias: "bd".} = w.cget("borderwidth")
 proc cursor*(w: Widget): Cursor                      = parseEnum[Cursor] w.cget("cursor")
 proc compound*(w: Widget): WidgetCompound            = parseEnum[WidgetCompound] w.cget("compound")
@@ -1321,7 +1308,7 @@ proc disabledbackground*(w: Widget): Color           = fromTclColor w, w.cget("d
 proc exportselection*(w: Widget): bool               = w.cget("exportselection") == "1"
 # proc font*(w: Widget) is in font.nim
 proc foreground*(w: Widget): Color {.alias: "fg".}   = fromTclColor w, w.cget("foreground")
-# proc height*(w: Widget): string                      = w.cget("height")
+# proc height*(w: Widget): string                    = w.cget("height")
 proc highlightbackground*(w: Widget): Color          = fromTclColor w, w.cget("highlightbackground")
 proc highlightcolor*(w: Widget): Color               = fromTclColor w, w.cget("highlightcolor")
 proc highlightthickness*(w: Widget): string          = w.cget("highlightthickness")

@@ -13,16 +13,17 @@ const
   padx = 4
   pady = 4
 
-# TODO feat: menu item for copying password
-
 let
-  tk = newTK()
+  tk = newTk()
   root = tk.getRoot()
 
 root.title = "Password Generator"
 root.resizable = false
 
 let
+  menuBar = root.newMenu()
+  windowMenu = menuBar.newMenu("Window")
+
   mainframe = root.newFrame()
 
   lenLabel = mainframe.newLabel("How many characters should be in the password?")
@@ -38,6 +39,21 @@ let
   digitsCheckbutton = mainframe.newCheckbutton("Digits (0-9)")
   specialcharsCheckbutton = mainframe.newCheckbutton("Special characters")
   nodupesCheckButton = mainframe.newCheckbutton("No duplicate characters")
+
+# -- menu
+menuBar.tearoff = false
+windowMenu.tearoff = false
+
+root.menu = menuBar
+
+# window menu
+with menuBar.addCascade("Window"):
+  label = "Window"
+  menu = windowMenu
+
+with windowMenu.addCommand("Copy Password"):
+  setCommand() do ():
+    root.clipboardAdd passwordEntry.get()
 
 mainframe.pack(expand=true, padx=30, pady=30)
 

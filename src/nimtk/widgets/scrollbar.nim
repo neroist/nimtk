@@ -3,7 +3,6 @@ import std/strutils
 import std/colors
 
 import ../private/escaping
-import ../private/tcllist
 import ../private/alias
 import ../../nimtk
 import ./widget

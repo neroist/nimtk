@@ -1,14 +1,18 @@
 import std/colors
 
+import ../private/commands
+import ../private/tclcolor
 import ../private/escaping
+import ../private/toargs
+import ../private/alias
+import ../variables
 import ../../nimtk
-import ../widgets
 import ./image
 
 type
   Bitmap* = ref object of Image
 
-proc newBitmap*(tk: Tk, file: string, config: openArray[(string, string)] = {:}): Bitmap =
+proc newBitmap*(tk: Tk, file: string, config: openArray[(string, string)] = {:}): Bitmap {.alias: "newBitmapFromFile".} =
   new result
 
   result.name = genName("bitmap_")
@@ -21,7 +25,7 @@ proc newBitmap*(tk: Tk, file: string, config: openArray[(string, string)] = {:})
   if config.len > 0:
     result.configure(config)
 
-proc newBitmap*(tk: Tk, data: string, config: openArray[(string, string)] = {:}): Bitmap =
+proc newBitmap*(tk: Tk, data: string, config: openArray[(string, string)] = {:}): Bitmap {.alias: "newBitmapFromData".} =
   new result
 
   result.name = genName("bitmap_")
@@ -33,18 +37,6 @@ proc newBitmap*(tk: Tk, data: string, config: openArray[(string, string)] = {:})
 
   if config.len > 0:
     result.configure(config)
-
-proc `bitmap=`*(w: Widget, bitmap: Bitmap or string) =
-  when bitmap is string:
-    w.configure({"bitmap": $bitmap})
-  else:
-    w.configure({"image": $bitmap})
-
-proc bitmap*(w: Widget): Bitmap =
-  new result
-  
-  result.name = w.cget("bitmap")
-  result.tk = w.tk
 
 proc `background=`*(b: Bitmap, background: Color) = b.configure({"background": $background})
 proc `data=`*(b: Bitmap, data: string) = b.configure({"data": tclEscape $data})
