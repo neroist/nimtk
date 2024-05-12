@@ -1,5 +1,7 @@
-import std/strutils
+## Implements common/ & generic widget functions
+
 import std/sequtils
+import std/strutils
 import std/tables
 import std/colors
 import std/times
@@ -9,13 +11,12 @@ import nimtcl except Time
 import ../private/commands
 import ../private/tclcolor
 import ../private/escaping
+import ../private/genname
 import ../private/tcllist
 import ../private/toargs
 import ../private/alias
 import ../variables
 import ../../nimtk
-
-export variables
 
 type
   Widget* = ref object of RootObj
@@ -417,7 +418,6 @@ proc destroy*(w: Widget) =
 # --- helpers
 
 export commands
-export tclcolor
 
 # --- --- Geometry Managers
 
@@ -1235,16 +1235,6 @@ proc optionGet*(w: Widget, name, class: string): string =
 
 proc optionReadfile*(tk: Tk, filename: string, priority: int) =
   tk.call("option readfile", tclEscape filename, priority)
-
-# --- Converter...
-
-converter rootToTk*(w: Widget): Tk =
-  ## Lessen confusion with python using `root` for the main window and the
-  ## wrapper type for the Tcl interpreter
-  ##
-  ## .. note:: Please use the `.tk` attribute instead, or just pass `tk` in
-
-  w.tk
 
 # --- --- Common widget options
 

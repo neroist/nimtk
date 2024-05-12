@@ -1,6 +1,8 @@
 import std/strutils
 import std/colors
 
+import ../private/tclcolor
+import ../private/genname
 import ../private/toargs
 import ../../nimtk
 import ./widget
@@ -24,8 +26,6 @@ proc newToplevel*(parent: Widget, class: string = "", container: bool = false, v
     {"class": class, "container": $container, "visual": visual, "colormap": $colormap, "screen": screen, "use": use}.toArgs()
   )
 
-#! menu
-
 proc `background=`*(t: Toplevel or Root, background: Color or string) = t.configure({"background": $background & ' '})
 proc `height=`*(t: Toplevel or Root, height: string or float or int) = t.configure({"height": $height})
 proc `width=`*(t: Toplevel or Root, width: string or float or int) = t.configure({"width": $width})
@@ -46,11 +46,5 @@ proc use*(t: Toplevel or Root): Widget =
   else:
     t.tk.newWidgetFromPathname t.tk.pathName(res)
 proc visual*(t: Toplevel or Root): string = t.cget("visual")
-proc menu*(t: Toplevel or Root): Menu =
-  new result
-
-  let pathname = t.cget("menu")
-
-  result.tk = t.tk
-  result.pathname = pathname
+proc menu*(t: Toplevel or Root): Menu = newWidgetFromPathname t.tk, t.cget("menu")
 

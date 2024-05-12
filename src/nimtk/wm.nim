@@ -1,10 +1,12 @@
+import std/sequtils
 import std/strutils
 import std/macros
 
 import std/colors
 
-import ./private/toargs
 import ./private/escaping
+import ./private/genname
+import ./private/toargs
 import ./private/alias
 import ./widgets
 import ../nimtk
@@ -143,7 +145,7 @@ proc wm_geometry*(w: Window, x, y: int) {.alias: "geometry".} =
 
   w.tk.call("wm geometry", w, xstr & ystr)
 
-proc wm_geometry*(w: Window): tuple[width, height, x, y: int] = # {.alias: "geometry".}
+proc wm_geometry*(w: Window): tuple[width, height, x, y: int] {.alias: "geometry".} = 
   w.tk.call("wm geometry", w)
   
   let res = w.tk.result.split("x")
@@ -196,13 +198,8 @@ proc wm_iconname*(w: Window): string {.alias: "iconname".} =
 
 proc wm_iconphoto*(w: Window, image: string) {.alias: "iconphoto=".} = w.tk.call("wm iconphoto", w, tclEscape image)
 proc wm_iconphoto*(w: Window, images: varargs[string]) {.alias: "iconphoto".} =
-  var imgs_safe: seq[string]
-
-  for i in images:
-    imgs_safe.add tclEscape i
-
-  w.tk.call("wm iconphoto", w, imgs_safe.join(" "))
-proc wm_iconphoto*(w: Window, default: bool, images: varargs[string]) {.alias: "iconphoto".} = w.tk.call("wm iconphoto", w, "-default", images.join(" "))
+  w.tk.call("wm iconphoto", w, images.map(tclEscape).join(" "))
+proc wm_iconphoto*(w: Window, default: bool, images: varargs[string]) {.alias: "iconphoto".} = w.tk.call("wm iconphoto", w, "-default", images.map(tclEscape).join(" "))
 
 proc wm_iconposition*(w: Window, x, y: int or string) {.alias: "iconposition".} = w.tk.call("wm iconposition", $x, $y)
 proc wm_iconposition*(w: Window): tuple[x, y: int, nohints: bool] {.alias: "iconposition".} =

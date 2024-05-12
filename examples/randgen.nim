@@ -11,12 +11,12 @@ let
   tk = newTk()
   root = tk.getRoot()
 
-  frame = root.newFrame()
-
 root.title = "Random Number Generator"
 root.resizable = false
 
 let
+  frame = root.newFrame()
+
   beginVar = tk.newTkString("0")
   endVar = tk.newTkString("0")
 

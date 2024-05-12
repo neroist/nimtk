@@ -2,6 +2,8 @@ import std/strutils
 import std/colors
 
 import ../private/escaping
+import ../private/tclcolor
+import ../private/genname
 import ../private/toargs
 import ../../nimtk
 import ./widget
@@ -35,8 +37,8 @@ proc anchor*(l: LabelFrame): AnchorPosition = parseEnum[AnchorPosition] l.cget("
 proc background*(l: LabelFrame): Color = fromTclColor l, l.cget("background")
 proc height*(l: LabelFrame): string = l.cget("height")
 proc width*(l: LabelFrame): string = l.cget("width")
-proc labelwidget*(l: LabelFrame): Label =
+proc labelwidget*(l: LabelFrame): Label = 
   new result
 
-  result.pathname = l.cget("labelwidget")
   result.tk = l.tk
+  result.pathname = l.cget("labelwidget")

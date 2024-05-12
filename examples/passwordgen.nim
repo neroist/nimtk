@@ -22,7 +22,7 @@ root.resizable = false
 
 let
   menuBar = root.newMenu()
-  windowMenu = menuBar.newMenu("Window")
+  windowMenu = menuBar.newMenu()
 
   mainframe = root.newFrame()
 
@@ -53,6 +53,7 @@ with menuBar.addCascade("Window"):
 
 with windowMenu.addCommand("Copy Password"):
   setCommand() do ():
+    root.clipboardClear()
     root.clipboardAdd passwordEntry.get()
 
 mainframe.pack(expand=true, padx=30, pady=30)

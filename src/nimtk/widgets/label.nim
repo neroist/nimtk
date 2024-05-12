@@ -1,16 +1,12 @@
 import std/strutils
 
 import ../private/escaping
+import ../private/genname
 import ../../nimtk
 import ./widget
 
 type
   Label* = ref object of Widget
-
-  LabelState* {.pure.} = enum
-    Normal = "normal"
-    Active = "active"
-    Disabled = "disabled"
 
 proc isLabel*(w: Widget): bool = "label" in w.pathname.split('.')[^1]
 

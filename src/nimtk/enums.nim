@@ -301,4 +301,15 @@ type
     Radiobutton = "radiobutton"
     Separator = "separator"
 
+  MenuButtonDirection* {.pure.} = enum
+    Above = "above"
+    Below = "below"
+    Left = "left"
+    Right = "right"
+
+  LabelState* {.pure.} = enum
+    Normal = "normal"
+    Active = "active"
+    Disabled = "disabled"
+
 include "./keysyms"

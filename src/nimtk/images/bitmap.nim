@@ -3,9 +3,9 @@ import std/colors
 import ../private/commands
 import ../private/tclcolor
 import ../private/escaping
+import ../private/genname
 import ../private/toargs
 import ../private/alias
-import ../variables
 import ../../nimtk
 import ./image
 

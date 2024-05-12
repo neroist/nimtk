@@ -1,10 +1,13 @@
-import std/strutils
 import std/sequtils
+import std/strutils
 import std/colors
 
 import ../private/escaping
+import ../private/tclcolor
+import ../private/genname
 import ../private/toargs
 import ../private/alias
+import ../variables
 import ../../nimtk
 import ./widget
 
@@ -59,13 +62,7 @@ proc get*(l: Listbox, rng: Slice[int]): seq[string] {.alias: "[]".} = l.tk.call(
 proc get*[I1, I2: Index](l: Listbox, first: I1, last: I2): seq[string] = l.tk.call($l, "get", first, last).split(' ')
 proc get*(l: Listbox, first: Index): string {.alias: "[]".} = l.tk.call($l, "get", first)
 proc index*(l: Listbox, index: Index): int = parseInt l.tk.call($l, "index", $index)
-proc insert*(l: Listbox, index: Index, elements: varargs[string]) {.alias: "[]=".} =
-  var safeElements: seq[string]
-
-  for unsafeElement in elements:
-    safeElements.add tclEscape unsafeElement
-
-  l.tk.call($l, "insert", index, safeElements.join())
+proc insert*(l: Listbox, index: Index, elements: varargs[string]) {.alias: "[]=".} = l.tk.call($l, "insert", index, elements.map(tclEscape).join())
 proc add*(l: Listbox, elements: varargs[string]) = l.insert("end", elements)
 proc itemcget*(l: Listbox, index: Index, option: string): Color = fromTclColor l, l.tk.call($l, "itemcget", index, {option: " "}.toArgs())
 proc itemconfigure*(

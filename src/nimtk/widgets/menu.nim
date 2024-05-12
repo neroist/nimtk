@@ -3,10 +3,13 @@ import std/strutils
 import std/colors
 
 import ../private/escaping
+import ../private/tclcolor
+import ../private/genname
 import ../private/toargs
+import ../variables
 import ../../nimtk
-import ./widget
 import ../images
+import ./widget
 import ../font
 
 type

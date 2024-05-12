@@ -1,7 +1,7 @@
 import std/strutils
-import std/oids
 
 import ./private/escaping
+import ./private/genname
 import ../nimtk
 
 type
@@ -17,12 +17,6 @@ type
   TkVarType* = TkString or TkFloat or TkInt or TkBool
 
 proc `$`*(`var`: TkVar): string
-
-proc genName*(): string =
-  $genOid()
-
-proc genName*(start: string): string =
-  start & $genOid()
 
 template createTkVar*(tk1: Tk, name: string) {.dirty.} =
   if name.len == 0:
@@ -98,7 +92,7 @@ proc add*(`var`: TkString, val: string) =
   `var`.set(`var`.get() & val)
 
 proc `$`*(`var`: TkVar): string =
-  if `var` == nil or `var`.tk == nil: ""
+  if `var`.isNil() or `var`.tk.isNil(): ""
   else: $`var`.get()
 
 converter tkStringToStr*(`var`: TkString): string = `var`.get()

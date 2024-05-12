@@ -1,3 +1,10 @@
+## Keysyms recognized by Tk, included by `enums.nim`
+##
+## The names here are modified due to name collisions because of Nim's partial
+## case-insensitivity with identifiers. If you're working with keysyms please check
+## <https://www.tcl.tk/man/tcl8.6/TkCmd/keysyms.htm> along with this file.
+## (crosscheck the decimal values & enum name!)
+
 type
   Keysym* = enum
     ksSpace                               = 32

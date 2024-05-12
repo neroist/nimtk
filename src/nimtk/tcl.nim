@@ -1,8 +1,11 @@
+import std/sequtils
 import std/strutils
 
+import ./private/genname
 import ./private/tcllist
 import ./widgets/widget
 import ./private/alias
+import ./variables
 import ../nimtk
 
 type
@@ -44,10 +47,7 @@ proc afterCancel*(tk: Tk, id: int) =
   tk.call("after cancel", id)
 
 proc afterInfo*(tk: Tk): seq[int] =
-  tk.call("after info")
-
-  for id in tk.result.split(' '):
-    result.add id.parseInt()
+  tk.call("after info").split(' ').map(parseInt)
 
 proc afterInfo*(tk: Tk, id: int): AfterEventHandler =
   tk.call("after info", id)

@@ -1,6 +1,8 @@
 import std/strutils
 import std/colors
 
+import ../private/tclcolor
+import ../private/genname
 import ../private/toargs
 import ../../nimtk
 import ./widget

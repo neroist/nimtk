@@ -25,6 +25,8 @@ proc toTclList*[T](slice: Slice[T]): string =
 proc wrap(insa: string): string {.inline.} = '{' & insa & '}'
 
 proc fromTclList*(tk: Tk, list: string): seq[string] =
+  ## Convert Tcl list to Nim seq
+
   # we use tk.interp so its not logged in nimtk debug
   tk.interp.eval(cstring "llength " & wrap list)
 

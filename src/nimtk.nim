@@ -1,10 +1,13 @@
+from std/with import nil
+
 import std/strutils
 import std/macros
-import std/with
 
 import nimtk/exceptions
 import nimtcl/tk
 import nimtcl
+
+import nimtk/private/alias
 
 include nimtk/enums
 
@@ -15,7 +18,7 @@ type
 const
   nimtkDebug* {.booldefine: "nimtk.debug".} = false
   nimtkIgnoreTclErrors* {.booldefine: "nimtk.ignoreTclErrors".} = false
-  nimtkExitOnError* {.booldefine: "nimtk.ExitOnError".} = true
+  nimtkExitOnError* {.booldefine: "nimtk.exitOnError".} = true
 
 proc eval*(tk: Tk, cmd: string): int {.discardable.} =
   result = tk.interp.eval(cstring cmd)
@@ -87,8 +90,15 @@ proc newTk*(): Tk =
   result.init()
 
 export
-  exceptions,
-  with
+  exceptions
 
-macro config*(arg: typed; calls: varargs[untyped]) = quote do: with(`arg`, `calls`)
+macro config*(arg: typed; calls: varargs[untyped]) {.alias: "with".} =
+  ## Config macro which allows you to configure widgets with a single function call
+  ##
+  ## Same as the `with` macro from `std/with` but with no re-evaluation.
+
+  quote do:
+    var argvar = `arg`
+
+    with.with(argvar, `calls`)
   

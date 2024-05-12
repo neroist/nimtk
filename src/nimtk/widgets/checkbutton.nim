@@ -3,6 +3,9 @@ import std/colors
 import std/macros
 
 import ../private/escaping
+import ../private/tclcolor
+import ../private/genname
+import ../variables
 import ../../nimtk
 import ./widget
 

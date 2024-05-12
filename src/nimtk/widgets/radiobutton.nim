@@ -1,7 +1,10 @@
 import std/strutils
 import std/colors
 
+import ../private/tclcolor
 import ../private/escaping
+import ../private/genname
+import ../variables
 import ../../nimtk
 import ./widget
 

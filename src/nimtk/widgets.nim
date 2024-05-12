@@ -14,6 +14,7 @@ import
   ./widgets/spinbox,
   ./widgets/scrollbar,
   ./widgets/menu,
+  ./widgets/menubutton,
   ./widgets/widget
 
 export
@@ -32,4 +33,5 @@ export
   spinbox,
   scrollbar,
   menu,
+  menubutton,
   widget

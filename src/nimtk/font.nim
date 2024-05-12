@@ -1,16 +1,13 @@
 import std/strutils
 
 import ./private/escaping
-import ./private/toargs
+import ./private/genname
 import ./private/tcllist
-import ./private/alias
+import ./private/toargs
 import ./widgets/widget
+import ./private/alias
 import ./widgets/root
 import ../nimtk
-
-# font type is defined in widget.nim
-# i can smell it... a refactor is probably needed
-# flgmnfdjkgnfdjkff
 
 proc `$`*(f: Font): string =
   if f.isNil(): ""
