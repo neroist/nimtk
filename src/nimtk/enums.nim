@@ -313,6 +313,13 @@ type
     Normal = "normal"
     Active = "active"
     Disabled = "disabled"
+  
+  PaneStretch* {.pure.} = enum  
+    Always = "always"
+    First = "first"
+    Last = "last"
+    Middle = "middle"
+    Never = "never"
 
 import ./keysyms
 export keysyms
