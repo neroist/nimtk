@@ -10,7 +10,7 @@ let
   tk = newTk()
   root = tk.getRoot()
 
-root.title = "Password Generator"
+root.title = "3D Audio"
 root.resizable = false
 
 let
