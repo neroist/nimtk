@@ -15,6 +15,7 @@ import
   ./widgets/scrollbar,
   ./widgets/menu,
   ./widgets/menubutton,
+  ./widgets/panedwindow,
   ./widgets/widget
 
 export
@@ -34,4 +35,5 @@ export
   scrollbar,
   menu,
   menubutton,
+  panedwindow,
   widget
