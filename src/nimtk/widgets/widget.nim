@@ -198,7 +198,7 @@ proc tkintfontcmd(clientData: ClientData, interp: ptr Interp, _: cint, argv: cst
   
   let
     args = argv.cstringArrayToSeq()
-    fontname = genName("THROWAWAY-intfontcmd_font")
+    fontname = genName("THROWAWAY_intfontcmd_font")
 
   var
     tk = new Tk
@@ -559,18 +559,18 @@ proc placeInfo*(w: Widget): Table[string, string] =
 # --- grid
 
 # two seperate PX and PY generics do not force them to be the same type
-proc grid*[IPX, IPY, PX, PY: Padding](
+proc grid*[PX, PY: Padding or BlankOption](
   w: Widget,
   column: int or BlankOption = blankOption,
   row: int or BlankOption = blankOption,
   columnspan: int or BlankOption = blankOption,
   rowspan: int or BlankOption = blankOption,
   `in`: Widget = nil,
-  ipadx: IPX = "",
-  ipady: IPY = "",
-  padx: PX = "",
-  pady: PY = "",
-  sticky: FillStyle or AnchorPosition or BlankOption = blankOption
+  ipadx: int or BlankOption = blankOption,
+  ipady: int or BlankOption = blankOption,
+  padx: PX = blankOption,
+  pady: PY = blankOption,
+  sticky: FillStyle or AnchorPosition or seq[FillStyle] or seq[AnchorPosition] or Slice[FillStyle] or Slice[AnchorPosition] or BlankOption = blankOption
 ) =
   w.tk.call(
     "grid configure",
@@ -585,7 +585,7 @@ proc grid*[IPX, IPY, PX, PY: Padding](
       "pady": pady.toTclList(),
       "row": $row,
       "rowspan": $rowspan,
-      "sticky": $sticky
+      "sticky": sticky.toTclList()
     }.toArgs
   )
 
@@ -694,7 +694,7 @@ proc gridRowconfigure*(
   w.tk.call(
     "grid rowconfigure",
     w,
-    index,
+    index.toTclList(),
     {
       "minsize": $minsize,
       "weight": $weight,

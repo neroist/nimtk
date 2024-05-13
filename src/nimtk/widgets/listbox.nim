@@ -117,8 +117,9 @@ proc selectionAnchor*(l: Listbox, index: Index) = l.tk.call($l, "selection ancho
 proc selectionClear*(l: Listbox, rng: Slice[int]) = l.tk.call($l, "selection clear", rng.a, rng.b)
 proc selectionClear*[I1, I2: Index](l: Listbox, first: I1, last: I2 = "end") = l.tk.call($l, "selection clear", first, last)
 proc selectionIncludes*(l: Listbox, index: Index): bool = l.tk.call($l, "selection includes ", index) == "1"
-proc selectionSet*(l: Listbox, rng: Slice[int]) = l.tk.call($l, "selection set", rng.a, rng.b)
-proc selectionSet*[I1, I2: Index](l: Listbox, first: I1, last: I2 = "end") = l.tk.call($l, "selection set", first, last)
+proc selectionSet*(l: Listbox, index: Index) {.alias: "selection=".} = l.tk.call($l, "selection set", index)
+proc selectionSet*(l: Listbox, rng: Slice[int]) {.alias: "selection=".} = l.tk.call($l, "selection set", rng.a, rng.b)
+proc selectionSet*[I1, I2: Index](l: Listbox, first: I1, last: I2 = "end") {.alias: "selection=".} = l.tk.call($l, "selection set", first, last)
 proc selectionGet*(l: Listbox): seq[string] {.alias: "selection".} =
   let cursel = l.curselection
 
