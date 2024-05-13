@@ -1,9 +1,9 @@
 import
   ./images/bitmap,
-  ./images/image
-  # ./images/photo
+  ./images/image,
+  ./images/photo
 
 export
   bitmap,
-  image
-  # photo
+  image,
+  photo

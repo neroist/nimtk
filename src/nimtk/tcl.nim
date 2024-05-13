@@ -28,7 +28,7 @@ proc after*(tk: Tk, ms: int) {.alias: "sleep".} =
   tk.call("after", ms)
 
 proc after*(tk: Tk, ms: int, fn: TkGenericCommand): int =
-  let name = genName("after_generic_command_")
+  let name = genName("after_command_")
   
   tk.registerCmd(name, fn)
 
@@ -36,7 +36,7 @@ proc after*(tk: Tk, ms: int, fn: TkGenericCommand): int =
   tk.result.parseInt()
 
 proc afterIdle*(tk: Tk, fn: TkGenericCommand): int =
-  let name = genName("after_generic_command_")
+  let name = genName("after_command_")
   
   tk.registerCmd(name, fn)
 

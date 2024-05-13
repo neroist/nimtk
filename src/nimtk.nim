@@ -4,6 +4,7 @@ import std/strutils
 import std/macros
 
 import nimtk/exceptions
+import nimtcl/tk/img
 import nimtcl/tk
 import nimtcl
 
@@ -71,6 +72,17 @@ proc init*(tk: Tk) =
   if tkInit != TCL_OK:
     const errmsg = "Could not initialize Tk"
     
+    raise newException(
+      TkError,
+      errmsg & " -- " & repr $tk.interp.getStringResult()
+    )
+
+proc imgInit*(tk: Tk) =
+  let init = tk.interp.imgInit()
+
+  if init != TCL_OK:
+    const errmsg = "Could not initialize Img"
+
     raise newException(
       TkError,
       errmsg & " -- " & repr $tk.interp.getStringResult()

@@ -1,7 +1,6 @@
 import std/strutils
 import std/colors
 
-import ./private/escaping
 import ./widgets/widget
 import ./private/alias
 import ../nimtk
@@ -33,7 +32,7 @@ proc winfo_geometry*(w: Widget): tuple[width, height, x, y: int] {.alias: "geome
 
   result.width = res[0].parseInt()
 
-  lucky("+")
+  lucky("+", result)
 proc winfo_height*(w: Widget): int {.alias: "height".} = parseInt w.tk.call("winfo height", w)
 proc winfo_id*(w: Widget): int {.alias: "id".} = parseHexInt w.tk.call("winfo id", w)
 proc winfo_interps*(w: Widget): seq[string] {.alias: "interps".} = split w.tk.call("winfo interps", "-displayof", w), ' '
@@ -42,7 +41,7 @@ proc winfo_manager*(w: Widget): string {.alias: "manager".} = w.tk.call("winfo m
 proc winfo_name*(w: Widget): string {.alias: "name".} = w.tk.call("winfo name", w)
 proc winfo_parent*(w: Widget): Widget {.alias: "parent".} = w.tk.newWidgetFromPathname w.tk.call("winfo parent", w)
 proc winfo_pathname*(w: Widget, id: int): string {.alias: "pathname".} = w.tk.call("winfo pathname", "-displayof", w, id)
-proc winfo_pathname*(tk: Tk, id: int): string {.alias: "pathname".} = w.tk.call("winfo pathname", id)
+proc winfo_pathname*(tk: Tk, id: int): string {.alias: "pathname".} = tk.call("winfo pathname", id)
 proc winfo_pixels*(w: Widget, number: int or float or string): int {.alias: "pixels".} = parseInt w.tk.call("winfo pixels", w)
 proc winfo_pointerx*(w: Widget): int {.alias: "pointerx".} = parseInt w.tk.call("winfo pointerx", w)
 proc winfo_pointerxy*(w: Widget): tuple[x, y: int] {.alias: "pointerxy".} =

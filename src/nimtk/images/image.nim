@@ -9,6 +9,12 @@ type
 
 proc `$`*(i: Image): string = i.name
 
+proc createImage*(tk: Tk, name: string): Image =
+  new result
+
+  result.tk = tk
+  result.name = name
+
 proc delete*(i: Image) = i.tk.call("image delete", i)
 
 proc height*(i: Image): float =

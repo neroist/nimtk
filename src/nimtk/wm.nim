@@ -15,7 +15,7 @@ type
   Window* = Toplevel or Root
 
 # used in winfo
-template lucky*(op: string) {.dirty.} =
+template lucky*(op: string, result: var typed) =
   let rest = res[1].split(op)
 
   result.height = rest[0].parseInt
@@ -26,7 +26,7 @@ template lucky*(op: string) {.dirty.} =
     result.x = -result.x
     result.y = -result.y
 
-template unlucky(op, op2: string) {.dirty.} =
+template unlucky(op, op2: string, result: var typed) =
   let
     piece1 = res[1].split(op)
     piece2 = piece1[1].split(op2)
@@ -153,15 +153,15 @@ proc wm_geometry*(w: Window): tuple[width, height, x, y: int] {.alias: "geometry
   result.width = res[0].parseInt()
 
   if '+' in res[1] and '-' notin res[1]:
-    lucky("+")
+    lucky("+", result)
   elif '-' in res[1] and '+' notin res[1]:
-    lucky("-")
+    lucky("-", result)
   else:
     # ???-???+???
     if res[1].find('+') > res[1].find('-'):
-      unlucky("-", "+")
+      unlucky("-", "+", result)
     else: 
-      unlucky("+", "-")
+      unlucky("+", "-", result)
 
 proc wm_grid*(w: Window, baseWidth, baseHeight, widthInc, heightInc: int) {.alias: "grid".} = 
   w.tk.call("wm grid", w, $baseWidth, $baseHeight, $widthInc, $heightInc)

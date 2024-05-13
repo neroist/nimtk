@@ -68,10 +68,10 @@ proc itemcget*(l: Listbox, index: Index, option: string): Color = fromTclColor l
 proc itemconfigure*(
   l: Listbox,
   index: Index,
-  background: Color or string = "",
-  foreground: Color or string = "",
-  selectbackground: Color or string = "",
-  selectforeground: Color or string = ""
+  background: Color or BlankOption = blankOption,
+  foreground: Color or BlankOption = blankOption,
+  selectbackground: Color or BlankOption = blankOption,
+  selectforeground: Color or BlankOption = blankOption
 ) =
   l.tk.call(
     $l,
@@ -87,20 +87,20 @@ proc itemconfigure*(
 proc itemconfigure*(
   l: Listbox,
   indices: Slice[int],
-  background: Color or string = "",
-  foreground: Color or string = "",
-  selectbackground: Color or string = "",
-  selectforeground: Color or string = ""
+  background: Color or BlankOption = blankOption,
+  foreground: Color or BlankOption = blankOption,
+  selectbackground: Color or BlankOption = blankOption,
+  selectforeground: Color or BlankOption = blankOption
 ) =
   for idx in indices:
     l.itemconfigure(idx, background, foreground, selectbackground, selectforeground)
 proc itemconfigure*[I1, I2: Index](
   l: Listbox,
   first: I1, last: I2,
-  background: Color or string = "",
-  foreground: Color or string = "",
-  selectbackground: Color or string = "",
-  selectforeground: Color or string = ""
+  background: Color or BlankOption = blankOption,
+  foreground: Color or BlankOption = blankOption,
+  selectbackground: Color or BlankOption = blankOption,
+  selectforeground: Color or BlankOption = blankOption
 ) {.alias: "itemconfigureRange".} =
   var (firstIdx, lastIdx) = (l.index(first), l.index(last))
 

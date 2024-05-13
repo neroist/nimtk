@@ -2,6 +2,7 @@ import std/strutils
 import std/colors
 import std/os
 
+import ../src/nimtk/variables
 import ../src/nimtk/widgets
 import ../src/nimtk/images
 import ../src/nimtk/wm
@@ -43,7 +44,7 @@ frame.relief = Solid
 frame.borderwidth = 2
 
 button.grid(padx = 25, pady = 25) # add button to grid
-button.bitmap = bitmap # add image to button
+button.image = bitmap # add image to button
 button.compound = WidgetCompound.Left # set image to show left of text
 button.background = colSpringGreen # set background color
 button.cursor = Heart # set cursor
@@ -51,7 +52,7 @@ button.setCommand() do (w: Widget):
   let btn = cast[Button](w)
 
   btn.flash()
-  btn.messageBox("alert!", "I love you <3")
+  discard btn.messageBox("alert!", "I love you <3")
 
 checkbutton.grid(padx = 25, pady = 25) # add button2 to grid
 checkbutton.variable = checkvar

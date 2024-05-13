@@ -12,15 +12,21 @@ import ./image
 type
   Bitmap* = ref object of Image
 
+proc newBitmap*(tk: Tk): Bitmap {.alias: "newEmptyBitmap".} =
+  new result
+
+  result.name = genName("bitmap_")
+  result.tk = tk
+
+  discard tk.call("image create bitmap", result.name)
+
 proc newBitmap*(tk: Tk, file: string, config: openArray[(string, string)] = {:}): Bitmap {.alias: "newBitmapFromFile".} =
   new result
 
   result.name = genName("bitmap_")
   result.tk = tk
 
-  tk.call("image create bitmap", result.name)
-
-  result.configure({"file": tclEscape file})
+  tk.call("image create bitmap", result.name, {"file": tclEscape file}.toArgs)
 
   if config.len > 0:
     result.configure(config)
@@ -31,9 +37,7 @@ proc newBitmap*(tk: Tk, data: string, config: openArray[(string, string)] = {:})
   result.name = genName("bitmap_")
   result.tk = tk
 
-  tk.call("image create bitmap", result.name)
-
-  result.configure({"data": tclEscape data})
+  tk.call("image create bitmap", result.name, {"data": tclEscape data}.toArgs)
 
   if config.len > 0:
     result.configure(config)

@@ -1,6 +1,4 @@
-These should be sorted by urgency/importance
-
----
+# todo
 
 - [ ] Add documenation (<https://www.tcl.tk/man/tcl8.6/>)
 
@@ -12,9 +10,11 @@ These should be sorted by urgency/importance
 
 - [x] On creation of a new widget (that doesn't support `-text` but `-textvariable`), always create a default `textvariable` for the widget (and `variable` too, if applicable). This allows `set` and `get` procs for getting the value of the widget (varible) without needing to create a new TkVar
 
-- [ ] Should we use strings instead of Enums?
+- [x] ~~Should we use strings instead of Enums?~~ **no**
 
 - [ ] For all strings passed to Tcl, use `tclEscape`, or some kind of escaping function
+
+- [ ] Use `tclEscape` in `configure()`?
 
 - [x] Some color commands in Tcl return a colorname instead of being NORMAL and returning a hex code or something similar
 
@@ -41,8 +41,10 @@ button.foreground = colAliceBlue,
 button.relief = WidgetRelief.Groove
 ```
 
+(its called `config`)
+
 - [ ] All widget creation procs should accept a `configuration` argument which is of type `openArray[(string, string)]` and is passed to `result.configure`
 
-- [ ] Try to merge `Root` and `Tk`
+- [x] ~~Try to merge `Root` and `Tk`~~ 88no**
 
 - [ ] Learn from `tkinter` and other tk wrappers

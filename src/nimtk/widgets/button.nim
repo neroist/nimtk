@@ -2,6 +2,7 @@ import std/strutils
 
 import ../private/escaping
 import ../private/genname
+import ../private/toargs
 import ../../nimtk
 import ./widget
 
@@ -17,10 +18,7 @@ proc newButton*(parent: Widget, text: string = "", configuration: openArray[(str
   result.pathname = pathname(parent.pathname, genName("button_"))
   result.tk = parent.tk
 
-  result.tk.call("button", result.pathname)
-
-  if text.len > 0:
-    result.configure({"text": tclEscape text})
+  result.tk.call("button", result.pathname, {"text": tclEscape text}.toArgs())
   
   if configuration.len > 0:
     result.configure(configuration)

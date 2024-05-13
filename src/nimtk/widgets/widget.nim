@@ -15,6 +15,7 @@ import ../private/genname
 import ../private/tcllist
 import ../private/toargs
 import ../private/alias
+import ../images/image
 import ../variables
 import ../../nimtk
 
@@ -448,16 +449,16 @@ template slavesImpl(w: Widget) {.dirty.} =
 proc pack*[IPX, IPY, PX, PY: Padding](
   w: Widget,
   after: Widget = nil,
-  anchor: AnchorPosition or string = "",
+  anchor: AnchorPosition or BlankOption = blankOption,
   before: Widget = nil,
-  expand: bool or string = "",
-  fill: FillStyle or string = "",
+  expand: bool or BlankOption = blankOption,
+  fill: FillStyle or BlankOption = blankOption,
   `in`: Widget = nil,
   ipadx: IPX = "",
   ipady: IPY = "",
   padx: PX = "",
   pady: PY = "",
-  side: Side or string = ""
+  side: Side or BlankOption = blankOption
 ) =
 
   w.tk.call(
@@ -503,17 +504,17 @@ proc packInfo*(w: Widget): Table[string, string] =
 
 proc place*(
   w: Widget,
-  x: float or int or string = "",
-  y: float or int or string = "",
-  anchor: AnchorPosition or string = "",
-  bordermode: BorderMode or string = "",
-  height: int or float or string = "",
+  x: float or int or BlankOption = blankOption,
+  y: float or int or BlankOption = blankOption,
+  anchor: AnchorPosition or BlankOption = blankOption,
+  bordermode: BorderMode or BlankOption = blankOption,
+  height: int or float or BlankOption = blankOption,
   `in`: Widget = nil,
-  relheight: float or string = "",
-  relwidth: float or string = "",
-  relx: float or string = "",
-  rely: float or string = "",
-  width: int or float or string = ""
+  relheight: float or BlankOption = blankOption,
+  relwidth: float or BlankOption = blankOption,
+  relx: float or BlankOption = blankOption,
+  rely: float or BlankOption = blankOption,
+  width: int or float or BlankOption = blankOption
 ) =
 
   w.tk.call(
@@ -560,16 +561,16 @@ proc placeInfo*(w: Widget): Table[string, string] =
 # two seperate PX and PY generics do not force them to be the same type
 proc grid*[IPX, IPY, PX, PY: Padding](
   w: Widget,
-  column: string or int = "",
-  row: string or int = "",
-  columnspan: string or int = "",
-  rowspan: string or int = "",
+  column: int or BlankOption = blankOption,
+  row: int or BlankOption = blankOption,
+  columnspan: int or BlankOption = blankOption,
+  rowspan: int or BlankOption = blankOption,
   `in`: Widget = nil,
   ipadx: IPX = "",
   ipady: IPY = "",
   padx: PX = "",
   pady: PY = "",
-  sticky: FillStyle or AnchorPosition or string = ""
+  sticky: FillStyle or AnchorPosition or BlankOption = blankOption
 ) =
   w.tk.call(
     "grid configure",
@@ -664,10 +665,10 @@ proc gridColumnconfigure*(
   w: Widget,
   index: int or string or openArray[int] or Slice[int],
 
-  minsize: int or string = "",
-  weight: int or string = "",
-  uniform: bool or string = "",
-  pad: int or string = "" 
+  minsize: int or BlankOption = blankOption,
+  weight: int or BlankOption = blankOption,
+  uniform: bool or BlankOption = blankOption,
+  pad: int or BlankOption = blankOption 
 ) =
   w.tk.call(
     "grid columnconfigure",
@@ -685,10 +686,10 @@ proc gridRowconfigure*(
   w: Widget,
   index: int or string or openArray[int] or Slice[int],
 
-  minsize: int or string = "",
-  weight: int or string = "",
-  uniform: bool or string = "",
-  pad: int or string = "" 
+  minsize: int or BlankOption = blankOption,
+  weight: int or BlankOption = blankOption,
+  uniform: bool or BlankOption = blankOption,
+  pad: int or BlankOption = blankOption 
 ) =
   w.tk.call(
     "grid rowconfigure",
@@ -812,7 +813,7 @@ proc chooseDirectory*(
 proc chooseColor*(
   w: Widget = nil,
   title: string = "",
-  initialColor: Color or string = "",
+  initialColor: Color or BlankOption = blankOption,
 ): Color =
   w.tk.call(
     "tk_chooseColor",
@@ -1238,6 +1239,8 @@ proc optionReadfile*(tk: Tk, filename: string, priority: int) =
 
 # --- --- Common widget options
 
+# proc `font=`*(w: Widget, font: Font) is in font.nim
+
 proc `activebackground=`*(w: Widget, activebackground: Color)                         = w.configure({"activebackground": $activebackground})
 proc `activeborderwidth=`*(w: Widget, activeborderwidth: string or float or int)      = w.configure({"activeborderwidth": $activeborderwidth})
 proc `activeforeground=`*(w: Widget, activeforeground: Color)                         = w.configure({"activeforeground": $activeforeground})
@@ -1250,13 +1253,11 @@ proc `compound=`*(w: Widget, compound: WidgetCompound)                          
 proc `disabledforeground=`*(w: Widget, disabledforeground: Color or string)           = w.configure({"disabledforeground": tclEscape $disabledforeground})
 proc `disabledbackground=`*(w: Widget, disabledbackground: Color or string)           = w.configure({"disabledbackground": tclEscape $disabledbackground})
 proc `exportselection=`*(w: Widget, exportselection: bool)                            = w.configure({"exportselection": $exportselection})
-# proc `font=`*(w: Widget, font: Font) is in font.nim
 proc `foreground=`*(w: Widget, foreground: Color) {.alias: "fg=".}                    = w.configure({"foreground": $foreground})
-# proc `height=`*(w: Widget, height: string or float or int)                          = w.configure({"height": $height})
 proc `highlightbackground=`*(w: Widget, highlightbackground: Color)                   = w.configure({"highlightbackground": $highlightbackground})
 proc `highlightcolor=`*(w: Widget, highlightcolor: Color)                             = w.configure({"highlightcolor": $highlightcolor})
 proc `highlightthickness=`*(w: Widget, highlightthickness: string or float or int)    = w.configure({"highlightthickness": $highlightthickness})
-# proc `image=`*(w: Widget, image)                                                    = w.configure({"image": $image}) # TODO
+proc `image=`*(w: Widget, image: Image)                                               = w.configure({"image": $image}) # TODO
 proc `insertbackground=`*(w: Widget, insertbackground: Color)                         = w.configure({"insertbackground": $insertbackground})
 proc `insertborderwidth=`*(w: Widget, insertborderwidth: string or float or int)      = w.configure({"insertborderwidth": $insertborderwidth})
 proc `insertofftime=`*(w: Widget, insertofftime: int)                                 = w.configure({"insertofftime": $insertofftime})
@@ -1279,10 +1280,11 @@ proc `text=`*(w: Widget, text: string)                                          
 proc `textvariable=`*(w: Widget, textvariable: TkString)                              = w.configure({"textvariable": textvariable.varname})
 proc `troughcolor=`*(w: Widget, troughcolor: Color)                                   = w.configure({"troughcolor": $troughcolor})
 proc `underline=`*(w: Widget, underline: int)                                         = w.configure({"underline": $underline})
-# proc `width=`*(w: Widget, width: string or float or int)                              = w.configure({"width": $width})
 proc `wraplength=`*(w: Widget, wraplength: int)                                       = w.configure({"wraplength": $wraplength})
-proc `xscrollcommand=`*(w: Widget, xscrollcommand: string)                            = w.configure({"xscrollcommand": tclEscape $xscrollcommand})
-proc `yscrollcommand=`*(w: Widget, yscrollcommand: string)                            = w.configure({"yscrollcommand": tclEscape $yscrollcommand})
+proc `xscrollcommand=`*(w: Widget, xscrollcommand: string)                            = w.configure({"xscrollcommand": tclEscape xscrollcommand})
+proc `yscrollcommand=`*(w: Widget, yscrollcommand: string)                            = w.configure({"yscrollcommand": tclEscape yscrollcommand})
+
+# proc font*(w: Widget) is in font.nim
 
 proc activebackground*(w: Widget): Color             = fromTclColor w, w.cget("activebackground")
 proc activeborderwidth*(w: Widget): string           = w.cget("activeborderwidth")
@@ -1296,13 +1298,11 @@ proc compound*(w: Widget): WidgetCompound            = parseEnum[WidgetCompound]
 proc disabledforeground*(w: Widget): Color           = fromTclColor w, w.cget("disabledforeground")
 proc disabledbackground*(w: Widget): Color           = fromTclColor w, w.cget("disabledbackground")
 proc exportselection*(w: Widget): bool               = w.cget("exportselection") == "1"
-# proc font*(w: Widget) is in font.nim
 proc foreground*(w: Widget): Color {.alias: "fg".}   = fromTclColor w, w.cget("foreground")
-# proc height*(w: Widget): string                    = w.cget("height")
 proc highlightbackground*(w: Widget): Color          = fromTclColor w, w.cget("highlightbackground")
 proc highlightcolor*(w: Widget): Color               = fromTclColor w, w.cget("highlightcolor")
 proc highlightthickness*(w: Widget): string          = w.cget("highlightthickness")
-#    proc image*(w: Widget)                          = w.cget("image")
+proc image*(w: Widget): Image                        = createImage w.tk, w.cget("image")
 proc insertbackground*(w: Widget): Color             = fromTclColor w, w.cget("insertbackground")
 proc insertborderwidth*(w: Widget): string           = w.cget("insertborderwidth")
 proc insertofftime*(w: Widget): int                  = parseInt w.cget("insertofftime")
@@ -1325,8 +1325,6 @@ proc text*(w: Widget): string                        = w.cget("text")
 proc textvariable*(w: Widget): TkVar                 = createTkVar w.tk, w.cget("textvariable")
 proc troughcolor*(w: Widget): Color                  = fromTclColor w, w.cget("troughcolor")
 proc underline*(w: Widget): int                      = parseInt w.cget("underline")
-# proc width*(w: Widget): string                       = w.cget("width")
 proc wraplength*(w: Widget): int                     = parseInt w.cget("wraplength")
 proc xscrollcommand*(w: Widget): string              = w.cget("xscrollcommand")
 proc yscrollcommand*(w: Widget): string              = w.cget("yscrollcommand")
-

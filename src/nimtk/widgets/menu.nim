@@ -77,7 +77,7 @@ proc addCheckbutton*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m
 proc addCommand*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m.tk.call($m, "add", "command", {"label": tclEscape label}.toArgs); m[^1]
 proc addRadiobutton*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m.tk.call($m, "add", "radiobutton", {"label": tclEscape label}.toArgs); m[^1]
 proc addSeparator*(m: Menu): MenuEntry {.discardable.} = m.tk.call($m, "add", "separator"); m[^1]
-proc clone*(m: Menu, menu: var Menu, cloneType: MenuType or string = "") = m.tk.call($m, "clone", menu, tclEscape cloneType)
+proc clone*(m: Menu, menu: Menu, cloneType: MenuType or BlankOption = blankOption) = m.tk.call($m, "clone", menu, $cloneType)
 proc delete*(m: Menu, index1: Index) = m.tk.call($m, "delete", tclEscape $index1)
 proc delete*[I1, I2: Index](m: Menu, index1: I1, index2: I2) = m.tk.call($m, "delete", tclEscape $index1, tclEscape $index2)
 proc delete*(m: Menu, indexes: Slice[int]) {.inline.} = m.delete(indexes.a, indexes.b)
