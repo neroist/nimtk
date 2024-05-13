@@ -1,10 +1,27 @@
+import std/strutils
+
+import ../../utils/escaping
+import ../../utils/commands
+import ../../../nimtk
 import ../widget
 
 type
   TtkWidget = ref object of Widget
 
+
+# -- -- options
+
+proc `state=`*(w: TtkWidget, state: string) = w.configure({"state": state})
+proc `width=`*(w: TtkWidget, width: string or float or int) = w.configure({"width": $width})
+
+proc class*(w: TtkWidget): string = w.cget("class")
+proc width*(w: TtkWidget): string = w.cget("width")
+
+
+# -- -- commands
+
 # -- identify element
-proc identifyElement*(w: TtkWidget, x, y): string =
+proc identifyElement*(w: TtkWidget, x, y: int): string =
   w.call("identify element", x, y)
 
 #  -- instate
@@ -33,7 +50,7 @@ proc xview*(w: TtkWidget): array[2, float] =
   result[0] = parseFloat res[0]
   result[1] = parseFloat res[1]
 
-proc xview*(w: TtkWidget, index: Index) =
+proc xview*(w: TtkWidget, index: int) =
   w.call("xview", index)
 
 proc xviewMoveto*(w: TtkWidget, fraction: 0.0..1.0) =
@@ -51,7 +68,7 @@ proc yview*(w: TtkWidget): array[2, float] =
   result[0] = parseFloat res[0]
   result[1] = parseFloat res[1]
 
-proc yview*(w: TtkWidget, index: Index) =
+proc yview*(w: TtkWidget, index: int) =
   w.call("xview", index)
 
 proc yviewMoveto*(w: TtkWidget, fraction: 0.0..1.0) =
