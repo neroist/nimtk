@@ -399,6 +399,8 @@ proc `==`*(w1, w2: Widget): bool =
   
   return w1.pathname == w2.pathname
 
+template `as`*(w: Widget, asTyp: typedesc) = cast[asTyp](w)
+
 proc newWidgetFromPathname*(tk: Tk, pathname: string): Widget =
   new result
 
@@ -446,7 +448,7 @@ template slavesImpl(w: Widget) {.dirty.} =
 
 # --- pack
 
-proc pack*[IPX, IPY, PX, PY: Padding](
+proc pack*[IPX, IPY, PX, PY: Padding or BlankOption](
   w: Widget,
   after: Widget = nil,
   anchor: AnchorPosition or BlankOption = blankOption,
@@ -454,10 +456,10 @@ proc pack*[IPX, IPY, PX, PY: Padding](
   expand: bool or BlankOption = blankOption,
   fill: FillStyle or BlankOption = blankOption,
   `in`: Widget = nil,
-  ipadx: IPX = "",
-  ipady: IPY = "",
-  padx: PX = "",
-  pady: PY = "",
+  ipadx: IPX = blankOption,
+  ipady: IPY = blankOption,
+  padx: PX = blankOption,
+  pady: PY = blankOption,
   side: Side or BlankOption = blankOption
 ) =
 
