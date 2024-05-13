@@ -6,8 +6,8 @@ import ../private/commands
 import ../private/tclcolor
 import ../private/escaping
 import ../private/genname
+import ../private/tcllist
 import ../private/toargs
-import ../private/alias
 import ../../nimtk
 import ./image
 
@@ -21,7 +21,7 @@ proc toPalette(p: int or openArray[int]): string =
   else:
     p.join("/")
 
-proc flattened(coords: array[2, Point] or Point or array[4, int] or BlankOption): string =
+proc flattened(coords: array[2, Point] or Point or int or BlankOption): string =
   when coords is array[2, Point]:
     [coords[0][0], coords[0][1], coords[1][0], coords[1][1]].join(" ")
   
@@ -30,11 +30,14 @@ proc flattened(coords: array[2, Point] or Point or array[4, int] or BlankOption)
 
   elif coords is BlankOption:
     ""
+
+  elif coords is int:
+    $coords
   
   else:
     coords.join(" ")
 
-proc newPhoto*(tk: Tk): Photo {.alias: "newEmptyPhoto".} =
+proc newPhoto*(tk: Tk): Photo =
   new result
 
   result.name = genName("photo_")
@@ -44,10 +47,10 @@ proc newPhoto*(tk: Tk): Photo {.alias: "newEmptyPhoto".} =
 
 proc newPhoto*(
   tk: Tk,
-  file: string,
-  format: string = "",
+  file: string;
+  format: string = "", 
   config: openArray[(string, string)] = {:}
-): Photo {.alias: "newPhotoFromFile".} =
+): Photo =
   new result
 
   result.name = genName("photo_")
@@ -65,12 +68,12 @@ proc newPhoto*(
   if config.len > 0:
     result.configure(config)
 
-proc newPhoto*(
+proc newPhotoFromData*(
   tk: Tk,
-  data: string,
+  data: string;
   format: string = "",
   config: openArray[(string, string)] = {:}
-): Photo {.alias: "newPhotoFromData".} =
+): Photo =
   new result
 
   result.name = genName("photo_")
@@ -95,12 +98,13 @@ proc copy*(
   `from`: array[2, Point] or Point or BlankOption = blankOption,
   to: array[2, Point] or Point or BlankOption = blankOption,
   shrink: bool = false,
-  zoom: (int, int) or BlankOption = blankOption,
-  subsample: (int, int) or BlankOption = blankOption,
+  zoom: (int, int) or int or BlankOption = blankOption,
+  subsample: (int, int) or int or BlankOption = blankOption,
   compositingrule: string or BlankOption = blankOption
 ) =
   p.call(
-    "data",
+    "copy",
+    $sourceImage,
     {
       "from": `from`.flattened(),
       "to": to.flattened(),
@@ -110,10 +114,22 @@ proc copy*(
         else:
           "",
       "zoom": zoom.flattened(),
-      "subsample": zoom.flattened(),
+      "subsample": subsample.flattened(),
       "compositingrule": tclEscape compositingrule
     }.toArgs
   )
+proc zoom*(p: Photo, x: int; y: int = x): Photo =
+  result = p.tk.newPhoto()
+  
+  result.copy(p, zoom=(x, y))
+proc subsample*(p: Photo, x: int; y: int = x): Photo =
+  result = p.tk.newPhoto()
+  
+  result.copy(p, subsample=(x, y))
+proc compositingrule*(p: Photo, compositingrule: string): Photo =
+  result = p.tk.newPhoto()
+  
+  result.copy(p, compositingrule=compositingrule)
 proc data*(
   p: Photo,
   background: Color or BlankOption = blankOption,
@@ -200,17 +216,19 @@ proc write*(
     }.toArgs
   )
 
-proc `data=`*(p: Photo, data: string) = p.configure({"data": tclEscape $data})
-proc `format=`*(p: Photo, format: string) = p.configure({"format": tclEscape $format})
-proc `file=`*(p: Photo, file: string) = p.configure({"file": tclEscape $file})
+proc `data=`*(p: Photo, data: string) = p.configure({"data": tclEscape data})
+proc `format=`*(p: Photo, format: string) = p.configure({"format": tclEscape format})
+proc `file=`*(p: Photo, file: string) = p.configure({"file": tclEscape file})
 proc `gamma=`*(p: Photo, gamma: int or float) = p.configure({"gamma": $gamma})
 proc `height=`*(p: Photo, height: int) = p.configure({"height": $height})
 proc `palette=`*(p: Photo, palette: int or openArray[int]) = p.configure({"palette": palette.toPalette()})
-proc `width=`*(p: Photo, maskfile: int) = p.configure({"maskfile": tclEscape $maskfile})
+proc `width=`*(p: Photo, width: int) = p.configure({"width": $width})
 
-proc background*(p: Photo): Color = fromTclColor p, p.cget("background")
 proc cget_data*(p: Photo): string = p.cget("data")
+proc format*(p: Photo): string = p.cget("format")
 proc file*(p: Photo): string = p.cget("file")
-proc foreground*(p: Photo): Color = fromTclColor p, p.cget("foreground")
-proc maskdata*(p: Photo): string = p.cget("maskdata")
-proc maskfile*(p: Photo): string = p.cget("maskfile")
+proc gamma*(p: Photo): float = parseFloat p.cget("gamma")
+proc height*(p: Photo): int = parseInt p.cget("height")
+proc palette*(p: Photo): seq[int] = p.cget("palette").split('/').map(parseInt)
+proc width*(p: Photo): int = parseInt p.cget("width")
+

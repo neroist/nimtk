@@ -15,4 +15,3 @@ macro call*(w: typed, args: varargs[string, `$`]) =
 
   for arg in args:
     result.add arg
-

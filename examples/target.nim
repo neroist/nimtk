@@ -17,7 +17,7 @@ root.title = "Click!"
 root.geometry(width=800, 600)
 
 let
-  img = tk.newPhotoFromFile("./target.png")
+  photo = tk.newPhoto("./target.png").subsample(6) # 1/6 of the size iirc
 
   button = root.newButton("Click!")
 
@@ -30,13 +30,10 @@ proc placeButton(_: Widget = nil) =
     rand(0 .. root_geo.height - button_geo.height)
   )
 
-  echo img.data
-
   tk.update()
 
+button.image = photo
 button.command = placeButton
-
-button.image = img
 button.relief = WidgetRelief.Solid
 
 placeButton()
