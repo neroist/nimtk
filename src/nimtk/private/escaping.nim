@@ -15,11 +15,12 @@ const
     ## `BlankOption` string to use as default args in functions
 
 proc `$`*(_: BlankOption): string = ""
+  ## "Convert" a `BlankOption` into a string. Will always return an empty string.
 
 proc tclEscape*(str: string): string =
   ## Escape strings in a way that is acceptable to Tcl
   ##
-  ## Characters such as '[', ']', and '$' are integral parts of Tcl's syntax and may
+  ## Characters such as `'['`, `']'`, and `'$'` are integral parts of Tcl's syntax and may
   ## cause errors when unescaped.
   ##
   ## :str: The string to escape
@@ -31,7 +32,5 @@ proc tclEscape*(str: string): string =
   for escChar in escChars:
     result = result.replace($escChar, '\\' & escChar)
 
-proc tclEscape*(_: BlankOption): string =
-  ## Always returns an empty string.
-
-  ""
+proc tclEscape*(_: BlankOption): string = ""
+  ## "Escape" a `BlankOption`. Always returns an empty string.

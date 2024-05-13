@@ -3,10 +3,8 @@ import std/strutils
 import std/colors
 
 import ../private/commands
-import ../private/tclcolor
 import ../private/escaping
 import ../private/genname
-import ../private/tcllist
 import ../private/toargs
 import ../../nimtk
 import ./image

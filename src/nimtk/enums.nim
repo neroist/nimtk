@@ -1,3 +1,5 @@
+## Enums used by nimtk. All are pure enums, with the exception of keysyms.
+
 type
   Cursor* {.pure.} = enum
     XCursor = "X_cursor"
@@ -312,4 +314,5 @@ type
     Active = "active"
     Disabled = "disabled"
 
-include "./keysyms"
+import ./keysyms
+export keysyms

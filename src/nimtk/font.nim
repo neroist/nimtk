@@ -44,13 +44,20 @@ proc newFont*(
   tk: Tk,
   description: string
 ): Font =
-  # for the 3rd font description format
-  # family MUST not contain spaces
-  #
-  # if the family name contains spaces, simply
-  # remove them.
-  #
-  # EX: "Fira Code 16" -> "FiraCode 16"
+  ## Creates new font with font description `description`
+  ##
+  ## See https://www.tcl.tk/man/tcl8.6/TkCmd/font.htm#M13 for font descriptions
+  ## accepted by Tk
+  ##
+  ## .. note:: for the 3rd font description format
+  ##           family MUST not contain spaces
+  ##           
+  ##           if the family name contains spaces, simply
+  ##           remove them.
+  ##           
+  ##           EX: "Fira Code 16" -> "FiraCode 16"
+  ##
+  ## :description: Font description to create the font from.
 
   new result
 

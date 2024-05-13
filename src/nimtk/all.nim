@@ -1,6 +1,4 @@
 ## All submodules provided by nimtk.
-##
-## You probably want to import this.
 
 import
   ../nimtk,

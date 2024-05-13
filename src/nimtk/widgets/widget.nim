@@ -159,7 +159,7 @@ var
   spinboxCmdData: seq[TkCmdData[TkSpinboxCommand]]
   fontCmdData: seq[TkCmdData[TkFontCommand]]
 
-proc tkintwidgetcmd*(clientData: ClientData, _: ptr Interp, _: cint, _: cstringArray): cint {.cdecl.} =
+proc tkintwidgetcmd(clientData: ClientData, _: ptr Interp, _: cint, _: cstringArray): cint {.cdecl.} =
   var data = cast[TkWidgetCmdData[TkWidgetCommand]](clientData)
 
   if data != nil:
@@ -167,7 +167,7 @@ proc tkintwidgetcmd*(clientData: ClientData, _: ptr Interp, _: cint, _: cstringA
 
   return TCL_OK
 
-proc tkintscalecmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
+proc tkintscalecmd(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
   let data = cast[TkWidgetCmdData[TkScaleCommand]](clientData)
   let args = argv.cstringArrayToSeq()
 
@@ -176,7 +176,7 @@ proc tkintscalecmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
 
   return TCL_OK
 
-proc tkintselhandlecmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
+proc tkintselhandlecmd(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
   let data = cast[TkCmdData[TkSelectionHandleCommand]](clientData)
   let args = argv.cstringArrayToSeq()
 
@@ -185,7 +185,7 @@ proc tkintselhandlecmd*(clientData: ClientData, interp: ptr Interp, _: cint, arg
 
   return TCL_OK
 
-proc tkintgenericcmd*(clientData: ClientData, _: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
+proc tkintgenericcmd(clientData: ClientData, _: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
   let data = cast[TkCmdData[TkGenericCommand]](clientData)
 
   if data.fun != nil:
@@ -193,7 +193,7 @@ proc tkintgenericcmd*(clientData: ClientData, _: ptr Interp, _: cint, argv: cstr
 
   return TCL_OK
 
-proc tkintfontcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
+proc tkintfontcmd(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
   let data = cast[TkCmdData[TkFontCommand]](clientData)
   
   let
@@ -254,7 +254,7 @@ template newWidgetAttr(interp: ptr Interp, name: string): Widget =
 
 {.push warning[HoleEnumConv]: off.}
 
-proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
+proc tkinteventcmd(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
   let data = cast[TkCmdData[TkEventCommand]](clientData)
   let args = argv.cstringArrayToSeq() # all except %K
 
@@ -316,7 +316,7 @@ proc tkinteventcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
 
 {.pop.}
 
-proc tkintentrycmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
+proc tkintentrycmd(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
   let data = cast[TkWidgetCmdData[TkEntryCommand]](clientData)
   let args = argv.cstringArrayToSeq() # all except %K
 
@@ -338,7 +338,7 @@ proc tkintentrycmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: c
 
   return TCL_OK
 
-proc tkintspinboxcmd*(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
+proc tkintspinboxcmd(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
   let data = cast[TkWidgetCmdData[TkSpinboxCommand]](clientData)
   let args = argv.cstringArrayToSeq() # all except %K
 

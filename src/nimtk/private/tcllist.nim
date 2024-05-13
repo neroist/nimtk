@@ -1,8 +1,12 @@
+## Module to convert Nim types into Tcl lists. All exported functions do this.
+
 import std/strutils
 
 import nimtcl
 
 import ../../nimtk
+
+proc wrap(insa: string): string {.inline.} = '{' & insa & '}'
 
 proc toTclList*(padding: int or float or string): string =
   $padding
@@ -11,8 +15,7 @@ proc toTclList*(padding: tuple): string =
   "{$1 $2}" % [$padding[0], $padding[1]]
 
 proc toTclList*[T](arr: openArray[T]): string =
-  # '{' & arr.mapIt($(it).tclEscape()).join(" ") & '}'
-  '{' & arr.join(" ") & '}'
+  arr.join(" ").wrap()
 
 proc toTclList*[T](slice: Slice[T]): string =
   var arr: seq[T]
@@ -22,11 +25,7 @@ proc toTclList*[T](slice: Slice[T]): string =
 
   arr.toTclList()
 
-proc wrap(insa: string): string {.inline.} = '{' & insa & '}'
-
 proc fromTclList*(tk: Tk, list: string): seq[string] =
-  ## Convert Tcl list to Nim seq
-
   # we use tk.interp so its not logged in nimtk debug
   tk.interp.eval(cstring "llength " & wrap list)
 

@@ -13,7 +13,7 @@ proc fromTclColor*[W](w: W, tclColor: string): Color =
   ## This is needed if Tk returns, for example, "systemDefault" from a command,
   ## which cannot be parsed via just `parseColor`
   ##
-  ## For all colors returned from Tk, please use this proc and not `parseColor`.
+  ## For colors returned from Tk, please use this proc and not `parseColor`.
 
   # if the color is already a normal HTML code color...
   if tclColor[0] == '#' and tclColor.len == 7:

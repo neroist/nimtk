@@ -3,14 +3,13 @@ from std/with import nil
 import std/strutils
 import std/macros
 
+import nimtk/private/alias
 import nimtk/exceptions
 import nimtcl/tk/img
+import nimtk/enums
 import nimtcl/tk
 import nimtcl
 
-import nimtk/private/alias
-
-include nimtk/enums
 
 type
   Tk* = ref object
@@ -22,6 +21,34 @@ const
   nimtkExitOnError* {.booldefine: "nimtk.exitOnError".} = true
 
 proc eval*(tk: Tk, cmd: string): int {.discardable.} =
+  ## Evaluate Tcl command `cmd`.
+  ##
+  ## When `nimtk.debug` is defined, this routine will print out
+  ##   - the command being evaluated
+  ##   - the value returned by `tk.interp.eval` (usually either `0` (`TCL_OK`) or `1` (`TCL_ERROR`))
+  ##   - the result of the command
+  ## In that order.
+  ##
+  ## Example of such:
+  ##
+  ## ```
+  ## [TK EVAL]   wm geometry .
+  ## [TK RETURN] 0
+  ## [TK RESULT] 800x600+560+225
+  ## ```
+  ##
+  ## When `1` (`TCL_ERROR`) is retured by the Tcl interpreter, a `TkError` is raised,
+  ## containing the the command and the result.
+  ##
+  ## If `nimtk.exitOnError` is defined, then the program is terminated upon any
+  ## error raised by the interpreter. This flag is to avoid application freezing
+  ## upon errors.
+  ##
+  ## `nimtk.ignoreTclErrors` holds higher presedence than the aforementioned flag,
+  ## and will result in all Tcl errors being ignored. No exceptions will be raised.
+  ##
+  ## :cmd: Command to be evaluated
+
   result = tk.interp.eval(cstring cmd)
 
   when nimTkDebug:
@@ -41,13 +68,23 @@ proc eval*(tk: Tk, cmd: string): int {.discardable.} =
     )
 
 proc result*(tk: Tk): string =
+  ## Returns the current result of the Tcl interpreter in `tk`
+
   $tk.interp.getStringResult()
 
 proc call*(tk: Tk, cmd: string, args: varargs[string, `$`]): string {.discardable.} =
+  ## Evalutate `cmd` with arguments `args`, and return the result. This uses `eval`_.
+  ##
+  ## :tk: The Tk instance to evaluate the command with
+  ## :cmd: The base command to evaluate
+  ## :args: List of arguments to provide to `cmd`
+  
   tk.eval(cmd & " " & args.join(" ").strip())
   tk.result
 
 proc mainloop*(tk: Tk) =
+  ## Calls Tk mainloop
+
   tkMainloop()
 
 proc createCommand*(tk: Tk, name: string, clientData: pointer, fun: CmdProc) =
@@ -58,6 +95,8 @@ proc createCommand*(tk: Tk, name: string, clientData: pointer, fun: CmdProc) =
   )
 
 proc init*(tk: Tk) =
+  ## Initialise Tcl interpreter & Tk
+
   let tclInit = tk.interp.init()
   let tkInit = tk.interp.tkInit()
 
@@ -78,6 +117,8 @@ proc init*(tk: Tk) =
     )
 
 proc imgInit*(tk: Tk) =
+  ## Initialise tkImg library (allows for more image formats to be used with Tk)
+
   let init = tk.interp.imgInit()
 
   if init != TCL_OK:
@@ -89,6 +130,8 @@ proc imgInit*(tk: Tk) =
     )
 
 proc newTk*(): Tk =
+  ## Creates new `Tk` instance with a Tcl interpeter. Calls `init`_ for you.
+
   new result
 
   result.interp = createInterp()
@@ -102,7 +145,8 @@ proc newTk*(): Tk =
   result.init()
 
 export
-  exceptions
+  exceptions,
+  enums
 
 macro config*(arg: typed; calls: varargs[untyped]) {.alias: "with".} =
   ## Config macro which allows you to configure widgets with a single function call
