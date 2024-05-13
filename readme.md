@@ -40,4 +40,4 @@ though!**
 
 ## Wrapped widgets/commands/functionality
 
-See #1
+See https://github.com/neroist/nimtk/issues/1
