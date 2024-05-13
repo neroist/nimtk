@@ -19,6 +19,8 @@ proc toTclList*[T](arr: openArray[T]): string =
 proc toTclList*[T](slice: Slice[T]): string =
   slice.toSeq().join(" ").wrap()
 
+proc toTclList*(_: BlankOption): string = ""
+
 proc toTclList*[T](padding: T and not openArray and not tuple and not Slice): string =
   result = $padding
 

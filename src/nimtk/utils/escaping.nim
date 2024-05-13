@@ -34,3 +34,6 @@ proc tclEscape*(str: string): string =
 
 proc tclEscape*(_: BlankOption): string = ""
   ## "Escape" a `BlankOption`. Always returns an empty string.
+
+proc tclEscape*[T](val: T and not BlankOption and not string): string = tclEscape $val
+  ## Escape values without needing to stringify them beforehand
