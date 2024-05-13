@@ -1,8 +1,8 @@
 import std/strutils
 
-import ../private/escaping
-import ../private/genname
-import ../private/toargs
+import ../utils/escaping
+import ../utils/genname
+import ../utils/toargs
 import ../../nimtk
 import ./widget
 

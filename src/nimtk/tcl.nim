@@ -1,10 +1,10 @@
 import std/sequtils
 import std/strutils
 
-import ./private/genname
-import ./private/tcllist
+import ./utils/genname
+import ./utils/tcllist
 import ./widgets/widget
-import ./private/alias
+import ./utils/alias
 import ./variables
 import ../nimtk
 

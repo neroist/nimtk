@@ -1,7 +1,7 @@
 import std/strutils
 
-import ../private/escaping
-import ../private/genname
+import ../utils/escaping
+import ../utils/genname
 import ../../nimtk
 import ./widget
 

@@ -1,7 +1,10 @@
+import std/sequtils
 import std/strutils
 
-import ../private/escaping
-import ../private/genname
+import ../utils/escaping
+import ../utils/genname
+import ../utils/toargs
+import ../variables
 import ../../nimtk
 import ./widget
 import ./menu
@@ -17,10 +20,18 @@ proc newMenuButton*(parent: Widget, text: string = "", configuration: openArray[
   result.pathname = pathname(parent.pathname, genName("menubutton_"))
   result.tk = parent.tk
 
-  result.tk.call("menubutton", result.pathname)
+  result.tk.call("menubutton", result.pathname, {"text": tclEscape text}.toArgs)
+  
+  if configuration.len > 0:
+    result.configure(configuration)
 
-  if text.len > 0:
-    result.configure({"text": tclEscape text})
+proc newOptionMenu*(parent: Widget, variable: TkVar, values: varargs[string, `$`], configuration: openArray[(string, string)] = {:}): MenuButton =
+  new result
+
+  result.pathname = pathname(parent.pathname, genName("menubutton_"))
+  result.tk = parent.tk
+
+  result.tk.call("tk_optionMenu", result.pathname, variable.varname, values.map(tclEscape).join(" "))
   
   if configuration.len > 0:
     result.configure(configuration)

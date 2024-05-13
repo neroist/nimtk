@@ -3,7 +3,7 @@ from std/with import nil
 import std/strutils
 import std/macros
 
-import nimtk/private/alias
+import nimtk/utils/alias
 import nimtk/exceptions
 import nimtcl/tk/img
 import nimtk/enums

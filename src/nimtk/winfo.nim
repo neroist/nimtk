@@ -2,7 +2,7 @@ import std/strutils
 import std/colors
 
 import ./widgets/widget
-import ./private/alias
+import ./utils/alias
 import ../nimtk
 import ./wm
 

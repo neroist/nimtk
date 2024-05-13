@@ -1,11 +1,7 @@
 import std/strutils
 import std/random
 
-import ../src/nimtk/widgets/entry
-import ../src/nimtk/widgets
-import ../src/nimtk/tcl
-import ../src/nimtk/wm
-import ../src/nimtk
+import ../src/nimtk/all
 
 randomize()
 
@@ -23,11 +19,12 @@ root.resizable = false
 let
   menuBar = root.newMenu()
   windowMenu = menuBar.newMenu()
+  presetsMenu = menuBar.newMenu()
 
   mainframe = root.newFrame()
 
   lenLabel = mainframe.newLabel("How many characters should be in the password?")
-  lenEntry = mainframe.newEntry($rand(16..64))
+  lenEntry = mainframe.newEntry($rand(16..32))
 
   passwordLabel = mainframe.newLabel("Password:")
   passwordEntry = mainframe.newEntry()
@@ -43,18 +40,42 @@ let
 # -- menu
 menuBar.tearoff = false
 windowMenu.tearoff = false
+presetsMenu.tearoff = false
 
 root.menu = menuBar
 
 # window menu
 with menuBar.addCascade("Window"):
-  label = "Window"
   menu = windowMenu
 
 with windowMenu.addCommand("Copy Password"):
+  accelerator = "Alt + C"
+  underline = 0
+
   setCommand() do ():
     root.clipboardClear()
     root.clipboardAdd passwordEntry.get()
+
+# presets menu
+with menuBar.addCascade("Presets"):
+  menu = presetsMenu
+
+with presetsMenu.addCommand("Pin preset"):
+  accelerator = "Alt + P"
+  underline = 0
+
+  setCommand() do ():
+    for checkbutton in [uppercharsCheckbutton,
+                        lowercharsCheckbutton,
+                        digitsCheckbutton,
+                        specialcharsCheckbutton,
+                        nodupesCheckButton]:
+      checkbutton.deselect()
+
+    digitsCheckbutton.select()
+    nodupesCheckButton.select()
+
+    lenEntry.set $rand(4..12)
 
 mainframe.pack(expand=true, padx=30, pady=30)
 
@@ -157,5 +178,11 @@ generateButton.setCommand() do (_: Widget):
 
 lenEntry.bind("<Return>") do (_: Event):
   generateButton.invoke()
+
+root.bind("<Alt-p>") do (_: Event): presetsMenu[0].invoke()
+root.bind("<Alt-P>") do (_: Event): presetsMenu[0].invoke()
+
+root.bind("<Alt-c>") do (_: Event): windowMenu[0].invoke()
+root.bind("<Alt-C>") do (_: Event): windowMenu[0].invoke()
 
 tk.mainloop()

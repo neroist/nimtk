@@ -1,11 +1,11 @@
 import std/colors
 
-import ../private/commands
-import ../private/tclcolor
-import ../private/escaping
-import ../private/genname
-import ../private/toargs
-import ../private/alias
+import ../utils/commands
+import ../utils/tclcolor
+import ../utils/escaping
+import ../utils/genname
+import ../utils/toargs
+import ../utils/alias
 import ../../nimtk
 import ./image
 

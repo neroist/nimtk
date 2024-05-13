@@ -2,10 +2,10 @@ import std/sequtils
 import std/strutils
 import std/colors
 
-import ../private/escaping
-import ../private/tclcolor
-import ../private/genname
-import ../private/toargs
+import ../utils/escaping
+import ../utils/tclcolor
+import ../utils/genname
+import ../utils/toargs
 import ../variables
 import ../../nimtk
 import ../images
@@ -38,6 +38,22 @@ proc newMenu*(parent: Widget, title: string = "", configuration: openArray[(stri
   if configuration.len > 0:
     result.configure(configuration)
 
+proc newAppleMenu*(parent: Widget, title: string = "", configuration: openArray[(string, string)] = {:}): Menu =
+  result = newMenu(parent, title, configuration)
+  result.pathname = pathName(parent.pathname, "apple")
+
+proc newWindowMenu*(parent: Widget, title: string = "", configuration: openArray[(string, string)] = {:}): Menu =
+  result = newMenu(parent, title, configuration)
+  result.pathname = pathName(parent.pathname, "window")
+
+proc newHelpMenu*(parent: Widget, title: string = "", configuration: openArray[(string, string)] = {:}): Menu =
+  result = newMenu(parent, title, configuration)
+  result.pathname = pathName(parent.pathname, "help")
+
+proc newSystemMenu*(parent: Widget, title: string = "", configuration: openArray[(string, string)] = {:}): Menu =
+  result = newMenu(parent, title, configuration)
+  result.pathname = pathName(parent.pathname, "system")
+
 proc setPostCommand*(m: Menu, command: TkGenericCommand) =
   let name = genName("menu_postcommand_")
   
@@ -45,7 +61,7 @@ proc setPostCommand*(m: Menu, command: TkGenericCommand) =
 
   m.configure({"command": name})
 proc `postcommand=`*(m: Menu, command: TkGenericCommand) = m.setPostCommand(command)
-proc setTearOffCommand*(m: Menu, command: TkWidgetCommand) =
+proc setTearOffCommand*(m: Menu, command: TkWidgetCommand) = # TODO
   let name = genName("menu_tearoffcommand_")
   
   m.tk.registerCmd(m, name, command)
@@ -66,10 +82,15 @@ proc `type`*(m: Menu): MenuType = parseEnum[MenuType] m.cget("type")
 
 proc `[]`*(m: Menu, index: Index): MenuEntry =
   result.menu = m
-  result.index = m.index(index)
+  result.index = 
+    when index is string:
+      m.index(index)
+    else:
+      index
+
 proc `[]`*(m: Menu, index: BackwardsIndex): MenuEntry =
   result.menu = m
-  result.index = m.index(int(index) - 1)
+  result.index = m.index("end") - (int(index) - 1)
 
 proc add*(m: Menu, `type`: MenuEntryType or string): MenuEntry {.discardable.} = m.tk.call($m, "add", tclEscape $`type`); m[^1]
 proc addCascade*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m.tk.call($m, "add", "cascade", {"label": tclEscape label}.toArgs); m[^1]
@@ -84,7 +105,7 @@ proc delete*(m: Menu, indexes: Slice[int]) {.inline.} = m.delete(indexes.a, inde
 proc entrycget*(m: Menu, index: int, option: string): string = m.tk.call($m, "entrycget", tclEscape $index, tclEscape option)
 proc entryconfigure*(m: Menu, index: Index, options: openArray[(string, string)] = []): string {.discardable.} = m.tk.call($m, "entryconfigure", tclEscape $index, options.mapIt((it[0], tclEscape it[1])).toArgs())
 proc index*(m: Menu, index: Index): int =
-  # if index is "none", return -1
+  ## if index is "none", return -1
   m.tk.call($m, "index", tclEscape $index)
 
   if m.tk.result == "none":
@@ -105,6 +126,9 @@ proc type*(m: Menu, index: Index): MenuEntryType = parseEnum[MenuEntryType] m.tk
 proc unpost*(m: Menu) = m.tk.call($m, "unpost")
 proc xposition*(m: Menu, index: Index): int = parseInt m.tk.call($m, "xposition", tclEscape $index)
 proc yposition*(m: Menu, index: Index): int = parseInt m.tk.call($m, "yposition", tclEscape $index)
+
+proc setFocus*(m: Menu) = m.tk.call("tk_menuSetFocus", m)
+proc popup*(m: Menu, x, y: int, entry: Index = "") = m.tk.call("tk_popup", m, x, y, tclEscape entry)
 
 # --- menuentry procs
 proc cget*(m: MenuEntry, option: string): string = m.menu.tk.call($m.menu, "entrycget", m.index, tclEscape option)
@@ -135,14 +159,14 @@ proc `compound=`*(m: MenuEntry, compound: WidgetCompound) = m.configure({"compou
 proc `font=`*(m: MenuEntry, font: Font) = m.configure({"font": $font})
 proc `foreground=`*(m: MenuEntry, foreground: Color) = m.configure({"foreground": $foreground})
 proc `hidemargin=`*(m: MenuEntry, hidemargin: bool) = m.configure({"hidemargin": $hidemargin})
-# image
+proc `image=`*(m: MenuEntry, image: Image) = m.configure({"image": $image})
 proc `indicatoron=`*(m: MenuEntry, indicatoron: bool) = m.configure({"indicatoron": $indicatoron})
 proc `label=`*(m: MenuEntry, label: string) =  m.configure({"label": tclEscape label})
 proc `menu=`*(m: MenuEntry, menu: Menu) = m.configure({"menu": $menu})
 proc `offvalue=`*(m: MenuEntry, offvalue: bool or int or string) = m.configure({"offvalue": tclEscape $offvalue})
 proc `onvalue=`*(m: MenuEntry, onvalue: bool or int or string) = m.configure({"onvalue": tclEscape $onvalue})
 proc `selectcolor=`*(m: MenuEntry, selectcolor: Color) = m.configure({"selectcolor": $selectcolor})
-# selectimage
+proc `selectimage=`*(m: MenuEntry, selectimage: Image) = m.configure({"selectimage": $selectimage})
 proc `state=`*(m: MenuEntry, state: WidgetState) = m.configure({"state": $state})
 proc `underline=`*(m: MenuEntry, underline: int) = m.configure({"underline": $underline})
 proc `value=`*(m: MenuEntry, value: bool or int or string) = m.configure({"value": tclEscape $value})

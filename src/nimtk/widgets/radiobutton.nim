@@ -1,11 +1,12 @@
 import std/strutils
 import std/colors
 
-import ../private/tclcolor
-import ../private/escaping
-import ../private/genname
+import ../utils/tclcolor
+import ../utils/escaping
+import ../utils/genname
 import ../variables
 import ../../nimtk
+import ../images
 import ./widget
 
 type
@@ -47,8 +48,8 @@ proc `selectcolor=`*(r: RadioButton, selectcolor: Color) = r.configure({"selectc
 proc `variable=`*(r: RadioButton, variable: TkVar) = r.configure({"variable": variable.varname})
 proc `value=`*(r: RadioButton, value: bool or int or string) = tclEscape r.configure({"value": $value})
 proc `tristatevalue=`*(r: RadioButton, tristatevalue: string) = r.configure({"tristatevalue": tclEscape $tristatevalue})
-# proc `selectimage=`*(r: RadioButton, selectimage: Image) = r.configure({"selectimage": $selectimage})
-# proc `tristateimage=`*(r: RadioButton, tristateimage: Image) = r.configure({"tristateimage": $tristateimage})
+proc `selectimage=`*(r: RadioButton, selectimage: Image) = r.configure({"selectimage": $selectimage})
+proc `tristateimage=`*(r: RadioButton, tristateimage: Image) = r.configure({"tristateimage": $tristateimage})
 proc `state=`*(r: RadioButton, state: WidgetState) = r.configure({"state": $state})
 proc `width=`*(r: RadioButton, width: string or float or int) = r.configure({"width": $width})
 

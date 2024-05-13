@@ -8,13 +8,13 @@ import std/times
 
 import nimtcl except Time
 
-import ../private/commands
-import ../private/tclcolor
-import ../private/escaping
-import ../private/genname
-import ../private/tcllist
-import ../private/toargs
-import ../private/alias
+import ../utils/commands
+import ../utils/tclcolor
+import ../utils/escaping
+import ../utils/genname
+import ../utils/tcllist
+import ../utils/toargs
+import ../utils/alias
 import ../images/image
 import ../variables
 import ../../nimtk
@@ -742,13 +742,16 @@ proc appname*(tk: Tk): string =
   tk.call("tk appname")
   tk.result
 
-# --- tk_version & tk_patchLevel
+# --- tk_version & tk_patchLevel & tk_library
 
-proc version*(tk: Tk): string =
-  tk.call("set tk_version")
+proc library*(tk: Tk): string =
+  tk.call("set tk_library")
 
 proc patchLevel*(tk: Tk): string =
   tk.call("set tk_patchLevel")
+
+proc version*(tk: Tk): string =
+  tk.call("set tk_version")
 
 # --- inactive
 
@@ -1044,7 +1047,7 @@ proc send*(w: Widget, async: bool, cmd: string, args: varargs[string]) =
 
 # --- bind
 
-proc `bind`*(w: Widget, sequence: string = nil, command: TkEventCommand) =
+proc `bind`*(w: Widget, sequence: string, command: TkEventCommand) =
   let name = genName("event_command_")
 
   w.tk.registerCmd(name, command)
@@ -1056,7 +1059,7 @@ proc `bind`*(w: Widget, sequence: string = nil, command: TkEventCommand) =
     "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
   )
 
-proc `bind`*(tk: Tk, className: string, sequence: string = nil, command: TkEventCommand) =
+proc `bind`*(tk: Tk, className: string, sequence: string, command: TkEventCommand) =
   let name = genName("event_command_" & className & "_")
 
   tk.registerCmd(name, command)
@@ -1068,7 +1071,7 @@ proc `bind`*(tk: Tk, className: string, sequence: string = nil, command: TkEvent
     "{$1 %# %a %b %c %d %f %h %i %k %m %o %p %s %t %w %x %y %A %B %D %E %M %N %P %R %S %T %W %X %Y}" % name
   )
 
-proc bindAll*(tk: Tk, sequence: string = nil, command: TkEventCommand) =
+proc bindAll*(tk: Tk, sequence: string, command: TkEventCommand) =
   let name = genName("event_command_ALL_")
 
   tk.registerCmd(name, command)

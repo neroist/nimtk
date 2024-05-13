@@ -2,11 +2,11 @@ import std/sequtils
 import std/strutils
 import std/colors
 
-import ../private/tclcolor
-import ../private/escaping
-import ../private/genname
-import ../private/tcllist
-import ../private/alias
+import ../utils/tclcolor
+import ../utils/escaping
+import ../utils/genname
+import ../utils/tcllist
+import ../utils/alias
 import ../../nimtk
 import ./widget
 

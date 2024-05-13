@@ -4,10 +4,10 @@ import std/macros
 
 import std/colors
 
-import ./private/escaping
-import ./private/genname
-import ./private/toargs
-import ./private/alias
+import ./utils/escaping
+import ./utils/genname
+import ./utils/toargs
+import ./utils/alias
 import ./widgets
 import ../nimtk
 
