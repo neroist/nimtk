@@ -24,11 +24,11 @@ proc newScrollbar*(parent: Widget, values: openArray[string] = [], configuration
   if configuration.len > 0:
     result.configure(configuration)
 
-template linkX*(w: Widget, s: Scrollbar) {.alias: "xscrollbar=".} =
+proc linkX*(w: Widget, s: Scrollbar) {.inline, alias: "xscrollbar=".} =
   w.yscrollcommand = $s & " set"
   s.command = $w & " xview"
 
-template linkY*(w: Widget, s: Scrollbar) {.alias: "yscrollbar=".} =
+proc linkY*(w: Widget, s: Scrollbar) {.inline, alias: "yscrollbar=".} =
   w.yscrollcommand = $s & " set"
   s.command = $w & " yview"
 
