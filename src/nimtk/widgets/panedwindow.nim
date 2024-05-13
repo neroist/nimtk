@@ -34,6 +34,16 @@ proc identify*(p: PanedWindow, x, y: int): tuple[index: int, kind: string] =
   result.index = res[0].parseInt()
   result.kind = res[1]
 proc panecget*(p: PanedWindow, window: Widget, option: string): string = p.tk.call($p, "panecget", window, option)
+proc paneafter*(p: PanedWindow, window: Widget): Widget {.inline.} = p.tk.newWidgetFromPathname p.panecget("after")
+proc panebefore*(p: PanedWindow, window: Widget): Widget {.inline.} = p.tk.newWidgetFromPathname p.panecget("before")
+proc paneheight*(p: PanedWindow, window: Widget): string {.inline.} = p.panecget("height")
+proc panehide*(p: PanedWindow, window: Widget): bool {.inline.} = parseBool p.panecget("hide")
+proc paneminsize*(p: PanedWindow, window: Widget): string {.inline.} = p.panecget("minsize")
+proc panepadx*(p: PanedWindow, window: Widget): string {.inline.} = p.panecget("padx")
+proc panepady*(p: PanedWindow, window: Widget): string {.inline.} = p.panecget("pady")
+proc panesticky*(p: PanedWindow, window: Widget): string {.inline.} = p.panecget("sticky")
+proc panestretch*(p: PanedWindow, window: Widget): PaneStretch {.inline.} = parseEnum[PaneStretch] p.panecget("stretch")
+proc panewidth*(p: PanedWindow, window: Widget): string {.inline.} = p.panecget("width")
 proc paneconfigure*(
   p: PanedWindow,
   window: Widget,
