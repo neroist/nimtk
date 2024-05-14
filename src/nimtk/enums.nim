@@ -228,7 +228,7 @@ type
     Active = "active"
     Passive = "passive"
 
-  GeometryFrom* {.pure.} = enum # TODO change name
+  GeometryFrom* {.pure.} = enum
     User = "user"
     Program = "program"
 
