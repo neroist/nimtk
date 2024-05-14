@@ -6,7 +6,7 @@ import ../../../nimtk
 import ../widget
 
 type
-  TtkWidget = ref object of Widget
+  TtkWidget* = ref object of Widget
 
 
 # -- -- options
