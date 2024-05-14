@@ -1,8 +1,9 @@
 import std/strutils
 
-import ../utils/escaping
-import ../utils/genname
-import ../../nimtk
+import ../../utils/escaping
+import ../../utils/genname
+import ../../../nimtk
+import ../widget
 import ./widget
 
 type
