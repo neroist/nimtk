@@ -38,6 +38,6 @@ If you want to emulate tkinter's behavior with nimtk (for whatever reason?),
 `nimtk/tkinter` contains some converters which may be of use. **Still discouraged
 though!**
 
-## Wrapped widgets/commands/functionality
+## Wrapped functionality from Tk
 
 See https://github.com/neroist/nimtk/issues/1
