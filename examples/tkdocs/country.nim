@@ -54,13 +54,6 @@ const
 
   altListboxBg = Color 0xf0f0ff
 
-  (N, W, E, S) = (
-    AnchorPosition.North,
-    AnchorPosition.West,
-    AnchorPosition.East,
-    AnchorPosition.South
-  )
-
 let
   tk = newTk()
   root = tk.getRoot()
@@ -127,18 +120,18 @@ proc sendGift(_: Event = Event()) =
   ]
 
 # grid all widgets & frames
-mainframe.grid(0, 0, pady=5, padx=(12, 0), sticky = @[N, S, W, E])
+mainframe.grid(0, 0, pady=5, padx=(12, 0), sticky="nswe")
 root.grid_columnconfigure(0, weight=1)
 root.grid_rowconfigure(0, weight=1)
 
-countriesListbox.grid(0, 0, rowspan=6, sticky = @[N, S, W, E])
+countriesListbox.grid(0, 0, rowspan=6, sticky="nswe")
 sendToLabel.grid(1, 0, padx=10, pady=5)
-cardRadiobutton.grid(1, 1, sticky=AnchorPosition.West, padx=20)
-flowersRadiobutton.grid(1, 2, sticky=AnchorPosition.West, padx=20)
-nastyGramRadiobutton.grid(1, 3, sticky=AnchorPosition.West, padx=20)
-sendButton.grid(2, 4, sticky=AnchorPosition.East, padx=5)
-sentLabel.grid(1, 5, sticky=AnchorPosition.North, pady=5, padx=5)
-populationLabel.grid(0, 6, columnspan=2, sticky = @[AnchorPosition.West, AnchorPosition.East])
+cardRadiobutton.grid(1, 1, sticky="w", padx=20)
+flowersRadiobutton.grid(1, 2, sticky="w", padx=20)
+nastyGramRadiobutton.grid(1, 3, sticky="w", padx=20)
+sendButton.grid(2, 4, sticky="e", padx=5)
+sentLabel.grid(1, 5, sticky="n", pady=5, padx=5)
+populationLabel.grid(0, 6, columnspan=2, sticky="we")
 
 mainframe.grid_columnconfigure(0..1, weight=1)
 mainframe.grid_rowconfigure(0..6, weight=1)
