@@ -90,7 +90,7 @@ proc `alpha=`*(w: Window, alpha: float) = w.wm_attributes("alpha", $alpha)
 proc `fullscreen=`*(w: Window, fullscreen: bool) = w.wm_attributes("fullscreen", $fullscreen)
 proc `topmost=`*(w: Window, topmost: bool) = w.wm_attributes("topmost", $topmost)
 
-when defined(macos):
+when defined(windows):
   proc `disabled=`*(w: Window, disabled: bool) = w.wm_attributes("disabled", $disabled)
   proc `toolwindow=`*(w: Window, toolwindow: bool) = w.wm_attributes("toolwindow", $toolwindow)
   proc `transparentcolor=`*(w: Window, transparentcolor: string) = w.wm_attributes("transparentcolor", transparentcolor)
