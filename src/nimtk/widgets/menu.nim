@@ -61,13 +61,13 @@ proc setPostCommand*(m: Menu, command: TkGenericCommand) =
 
   m.configure({"command": name})
 proc `postcommand=`*(m: Menu, command: TkGenericCommand) = m.setPostCommand(command)
-proc setTearOffCommand*(m: Menu, command: TkWidgetCommand) = # TODO
+proc setTearOffCommand*(m: Menu, command: TkMenuTearoffCommand) =
   let name = genName("menu_tearoffcommand_")
   
   m.tk.registerCmd(m, name, command)
 
-  m.configure({"command": name})
-proc `tearoffcommand=`*(m: Menu, tearoffcommand: TkWidgetCommand) = m.setTearOffCommand(tearoffcommand)
+  m.configure({"tearoffcommand": name})
+proc `tearoffcommand=`*(m: Menu, tearoffcommand: TkMenuTearoffCommand) = m.setTearOffCommand(tearoffcommand)
 proc `selectcolor=`*(m: Menu, selectcolor: Color) = m.configure({"selectcolor": $selectcolor})
 proc `tearoff=`*(m: Menu, tearoff: bool) = m.configure({"tearoff": $tearoff})
 proc `title=`*(m: Menu, title: string) = m.configure({"title": title})

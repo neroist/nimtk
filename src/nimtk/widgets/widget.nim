@@ -36,6 +36,7 @@ type
   TkEntryCommand* = proc (widget: Widget, event: EntryEvent): bool
   TkSpinboxCommand* = proc (widget: Widget, button: string)
   TkFontCommand* = proc (font: Font)
+  TkMenuTearoffCommand* = proc (ogMenu, newMenu: Widget)
   
   TkCmdData[CMD] = ref object of RootObj
     fun*: CMD
@@ -138,6 +139,7 @@ type
                TkEntryCommand           or
                TkSpinboxCommand         or
                TkFontCommand            or
+               TkMenuTearoffCommand     or
                TkSelectionHandleCommand or
                TkGenericCommand         or
                TkEventCommand
@@ -158,6 +160,7 @@ var
   eventCmdData: seq[TkCmdData[TkEventCommand]]
   spinboxCmdData: seq[TkCmdData[TkSpinboxCommand]]
   fontCmdData: seq[TkCmdData[TkFontCommand]]
+  menutearoffCmdData: seq[TkCmdData[TkMenuTearoffCommand]]
 
 proc tkintwidgetcmd(clientData: ClientData, _: ptr Interp, _: cint, _: cstringArray): cint {.cdecl.} =
   var data = cast[TkWidgetCmdData[TkWidgetCommand]](clientData)
@@ -347,6 +350,17 @@ proc tkintspinboxcmd(clientData: ClientData, interp: ptr Interp, _: cint, argv: 
 
   return TCL_OK
 
+proc tkintmenutearoffcmd(clientData: ClientData, interp: ptr Interp, _: cint, argv: cstringArray): cint {.cdecl.} =
+  let data = cast[TkCmdData[TkMenuTearoffCommand]](clientData)
+  let args = argv.cstringArrayToSeq()
+
+  let (w1, w2) = (newWidgetAttr(interp, args[1]), newWidgetAttr(interp, args[2]))
+
+  if data.fun != nil:
+    data.fun(w1, w2)
+
+  return TCL_OK
+
 template registerCmdImpl(datatype: typedesc, dataseq: typed, intcmd: proc) {.dirty.} =
   let data = new datatype
 
@@ -383,6 +397,9 @@ proc registerCmd*(tk: Tk, w: Widget, name: string, cmd: TkCmdType) =
   elif cmd is TkFontCommand:
     registerCmdImpl(TkCmdData[TkFontCommand], fontCmdData, tkintfontcmd)
  
+  elif cmd is TkMenuTearoffCommand:
+    registerCmdImpl(TkCmdData[TkMenuTearoffCommand], menutearoffCmdData, tkintmenutearoffcmd)
+
   else:
     registerCmdImpl(TkCmdData[TkEventCommand], eventCmdData, tkinteventcmd)
 
@@ -1266,7 +1283,7 @@ proc `foreground=`*(w: Widget, foreground: Color) {.alias: "fg=".}              
 proc `highlightbackground=`*(w: Widget, highlightbackground: Color)                   = w.configure({"highlightbackground": $highlightbackground})
 proc `highlightcolor=`*(w: Widget, highlightcolor: Color)                             = w.configure({"highlightcolor": $highlightcolor})
 proc `highlightthickness=`*(w: Widget, highlightthickness: string or float or int)    = w.configure({"highlightthickness": $highlightthickness})
-proc `image=`*(w: Widget, image: Image)                                               = w.configure({"image": $image}) # TODO
+proc `image=`*(w: Widget, image: Image)                                               = w.configure({"image": $image})
 proc `insertbackground=`*(w: Widget, insertbackground: Color)                         = w.configure({"insertbackground": $insertbackground})
 proc `insertborderwidth=`*(w: Widget, insertborderwidth: string or float or int)      = w.configure({"insertborderwidth": $insertborderwidth})
 proc `insertofftime=`*(w: Widget, insertofftime: int)                                 = w.configure({"insertofftime": $insertofftime})
