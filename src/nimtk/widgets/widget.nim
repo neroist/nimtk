@@ -44,11 +44,11 @@ type
   TkWidgetCmdData*[CMD] = ref object of TkCmdData[CMD]
     widget*: Widget
 
-  Padding* = (SomeNumber, SomeNumber) or # these two have to be the same type
-             (string, string)         or
-             (string, SomeNumber)     or
-             (SomeNumber, string)     or
-             SomeNumber               or
+  Padding* = (float|int, float|int) or # these two have to be the same type
+             (string, string)        or
+             (string, float|int)     or
+             (float|int, string)     or
+             float|int               or
              string
   
   EntryEvent* = object
@@ -465,7 +465,7 @@ template slavesImpl(w: Widget) {.dirty.} =
 
 # --- pack
 
-proc pack*[IPX, IPY, PX, PY: Padding or BlankOption](
+proc pack*[IPX, IPY: float or int or string or BlankOption; PX, PY: Padding or BlankOption](
   w: Widget,
   after: Widget = nil,
   anchor: AnchorPosition or string or BlankOption = blankOption,
