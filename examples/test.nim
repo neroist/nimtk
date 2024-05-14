@@ -1,12 +1,10 @@
+## Test file i made when first starting the library
+
 import std/strutils
 import std/colors
 import std/os
 
-import ../src/nimtk/variables
-import ../src/nimtk/widgets
-import ../src/nimtk/images
-import ../src/nimtk/wm
-import ../src/nimtk
+import nimtk/all
 
 # lets set the cwd to the app dir
 setCurrentDir(getAppDir())
@@ -27,11 +25,12 @@ root.title = "test.nim"
 root.maxsize = (800, 800)
 
 # create two buttons
-let frame = root.newFrame()
-let msg = frame.newMessage()
-let button = frame.newButton("this")
-let checkbutton = frame.newCheckButton("meow")
-let scale = frame.newScale(1.5..150.0)
+let 
+  frame = root.newFrame()
+  msg = frame.newMessage()
+  button = frame.newButton("this")
+  checkbutton = frame.newCheckButton("meow")
+  scale = frame.newScale(1.5..150.0)
 
 # create bool var for checkbutton
 let checkvar = tk.newTkBool()
@@ -44,36 +43,44 @@ frame.relief = Solid
 frame.borderwidth = 2
 
 button.grid(padx = 25, pady = 25) # add button to grid
-button.image = bitmap # add image to button
-button.compound = WidgetCompound.Left # set image to show left of text
-button.background = colSpringGreen # set background color
-button.cursor = Heart # set cursor
-button.setCommand() do (w: Widget):
-  let btn = cast[Button](w)
 
-  btn.flash()
-  discard btn.messageBox("alert!", "I love you <3")
+config button:
+  image = bitmap # add image to button
+  compound = WidgetCompound.Left # set image to show left of text
+  background = colSpringGreen # set background color
+  cursor = Heart # set cursor
+  
+  setCommand() do (w: Widget):
+    let btn = cast[Button](w)
+
+    btn.flash()
+    discard btn.messageBox("alert!", "I love you <3")
 
 checkbutton.grid(padx = 25, pady = 25) # add button2 to grid
-checkbutton.variable = checkvar
-checkbutton.background = colSkyBlue # set button2 color
-checkbutton.foreground = colRebeccaPurple
-checkbutton.overrelief = WidgetRelief.Raised
-checkbutton.relief = WidgetRelief.Sunken
-checkbutton.cursor = Gobbler # set button2 cursor
-checkbutton.padx = "3c" # set button2 horizontal padding
-checkbutton.setCommand() do (w: Widget):
-  echo checkvar.get, '\n'
+
+config checkbutton:
+  variable = checkvar
+  background = colSkyBlue # set button2 color
+  foreground = colRebeccaPurple
+  overrelief = WidgetRelief.Raised
+  relief = WidgetRelief.Sunken
+  cursor = Gobbler # set button2 cursor
+  padx = "3c" # set button2 horizontal padding
+  
+  setCommand() do (w: Widget):
+    echo checkvar.get, '\n'
 
 msg.grid(padx = 25, pady = 25)
 msg.text = "This is a message! o sitelen a!"
 msg.cursor = Gumby
 
 scale.grid(padx = 25, pady = 25)
-scale.label = "nanpa!"
-scale.resolution = 0.01
-scale.orient = Horizontal
-scale.cursor = Exchange
+
+config scale:
+  label = "nanpa!"
+  resolution = 0.01
+  orient = Horizontal
+  cursor = Exchange
 
 root.selectionHandle("SECONDARY", command=handle)
 root.selectionOwn("SECONDARY") do (): echo "lost!"

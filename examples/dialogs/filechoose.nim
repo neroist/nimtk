@@ -1,9 +1,6 @@
 import std/os
 
-import ../../src/nimtk/widgets
-import ../../src/nimtk/winfo
-import ../../src/nimtk/wm
-import ../../src/nimtk
+import nimtk/all
 
 let
   tk = newTk()

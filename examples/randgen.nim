@@ -1,7 +1,7 @@
 import std/strutils
 import std/random
 
-import ../src/nimtk/all
+import nimtk/all
 
 randomize()
 

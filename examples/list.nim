@@ -1,7 +1,7 @@
 import std/strutils
 import std/colors
 
-import ../src/nimtk/all
+import nimtk/all
 
 let
   tk = newTk()

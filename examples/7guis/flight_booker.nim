@@ -2,10 +2,7 @@ import std/strutils
 import std/colors
 import std/times
 
-import ../../src/nimtk/widgets
-import ../../src/nimtk/tcl
-import ../../src/nimtk/wm
-import ../../src/nimtk
+import nimtk/all
 
 const dateFmt = "dd-MM-yyyy"
 

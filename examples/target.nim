@@ -1,11 +1,6 @@
 import std/random
 
-import ../src/nimtk/widgets
-import ../src/nimtk/images
-import ../src/nimtk/winfo
-import ../src/nimtk/tcl
-import ../src/nimtk/wm
-import ../src/nimtk
+import nimtk/all
 
 randomize()
 

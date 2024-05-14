@@ -1,10 +1,6 @@
 import std/strutils
-import std/math
 
-import ../../src/nimtk/widgets
-import ../../src/nimtk/tcl
-import ../../src/nimtk/wm
-import ../../src/nimtk
+import nimtk/all
 
 let
   tk = newTk()

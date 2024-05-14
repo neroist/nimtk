@@ -3,7 +3,7 @@ import std/strutils
 import std/tables
 import std/colors
 
-import ../src/nimtk/all
+import nimtk/all
 
 const
   countryNames = [

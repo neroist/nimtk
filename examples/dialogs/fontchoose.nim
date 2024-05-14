@@ -1,10 +1,6 @@
 import std/random
 
-import ../../src/nimtk/widgets
-import ../../src/nimtk/font as _
-import ../../src/nimtk/winfo
-import ../../src/nimtk/wm
-import ../../src/nimtk
+import nimtk/all
 
 randomize()
 

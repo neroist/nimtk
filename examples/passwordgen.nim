@@ -1,7 +1,7 @@
 import std/strutils
 import std/random
 
-import ../src/nimtk/all
+import nimtk/all
 
 randomize()
 
@@ -37,6 +37,14 @@ let
   specialcharsCheckbutton = mainframe.newCheckbutton("Special characters")
   nodupesCheckButton = mainframe.newCheckbutton("No duplicate characters")
 
+  allCheckbuttons = [
+    uppercharsCheckbutton,
+    lowercharsCheckbutton,
+    digitsCheckbutton,
+    specialcharsCheckbutton,
+    nodupesCheckButton
+  ]
+
 # -- menu
 menuBar.tearoff = false
 windowMenu.tearoff = false
@@ -45,10 +53,10 @@ presetsMenu.tearoff = false
 root.menu = menuBar
 
 # window menu
-with menuBar.addCascade("Window"):
+config menuBar.addCascade("Window"):
   menu = windowMenu
 
-with windowMenu.addCommand("Copy Password"):
+config windowMenu.addCommand("Copy Password"):
   accelerator = "Alt + C"
   underline = 0
 
@@ -57,20 +65,18 @@ with windowMenu.addCommand("Copy Password"):
     root.clipboardAdd passwordEntry.get()
 
 # presets menu
-with menuBar.addCascade("Presets"):
+config menuBar.addCascade("Presets"):
   menu = presetsMenu
 
-with presetsMenu.addCommand("Pin preset"):
+config presetsMenu.addCommand("Pin preset"):
   accelerator = "Alt + P"
   underline = 0
 
   setCommand() do ():
-    for checkbutton in [uppercharsCheckbutton,
-                        lowercharsCheckbutton,
-                        digitsCheckbutton,
-                        specialcharsCheckbutton,
-                        nodupesCheckButton]:
+    for checkbutton in allCheckbuttons:
       checkbutton.deselect()
+
+    tk.update()
 
     digitsCheckbutton.select()
 
@@ -99,7 +105,7 @@ nodupesCheckButton.grid(1, 4)
 
 # --- widget config
 
-for checkbutton in [uppercharsCheckbutton, lowercharsCheckbutton, digitsCheckbutton, specialcharsCheckbutton]:
+for checkbutton in allCheckbuttons:
   checkbutton.select()
 
 proc generatePassword(
