@@ -11,6 +11,8 @@ type
 
 # -- -- options
 
+#! style
+
 proc `state=`*(w: TtkWidget, state: string) = w.configure({"state": state})
 proc `width=`*(w: TtkWidget, width: string or float or int) = w.configure({"width": $width})
 
