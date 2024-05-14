@@ -3,7 +3,6 @@ from std/with import nil
 import std/strutils
 import std/macros
 
-import nimtk/utils/alias
 import nimtk/exceptions
 import nimtcl/tk/img
 import nimtk/enums
@@ -148,7 +147,7 @@ export
   exceptions,
   enums
 
-macro config*(arg: typed; calls: varargs[untyped]) {.alias: "with".} =
+macro config*(arg: typed; calls: varargs[untyped]) =
   ## Config macro which allows you to configure widgets with a single function call
   ##
   ## Same as the `with` macro from `std/with` but with no re-evaluation.
