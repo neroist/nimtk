@@ -130,7 +130,6 @@ type
     macZoomIn = "zoom-in"
     macZoomOut = "zoom-out"
 
-
   AnchorPosition* {.pure.} = enum
     Center = "center"
     North = "n"
@@ -308,6 +307,7 @@ type
     Below = "below"
     Left = "left"
     Right = "right"
+    Flush = "flush" # ttk
 
   LabelState* {.pure.} = enum
     Normal = "normal"
