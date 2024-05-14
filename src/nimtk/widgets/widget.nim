@@ -451,16 +451,16 @@ template slavesImpl(w: Widget) {.dirty.} =
 proc pack*[IPX, IPY, PX, PY: Padding or BlankOption](
   w: Widget,
   after: Widget = nil,
-  anchor: AnchorPosition or BlankOption = blankOption,
+  anchor: AnchorPosition or string or BlankOption = blankOption,
   before: Widget = nil,
   expand: bool or BlankOption = blankOption,
-  fill: FillStyle or BlankOption = blankOption,
+  fill: FillStyle or string or BlankOption = blankOption,
   `in`: Widget = nil,
   ipadx: IPX = blankOption,
   ipady: IPY = blankOption,
   padx: PX = blankOption,
   pady: PY = blankOption,
-  side: Side or BlankOption = blankOption
+  side: Side or string or BlankOption = blankOption
 ) =
 
   w.tk.call(
@@ -468,16 +468,16 @@ proc pack*[IPX, IPY, PX, PY: Padding or BlankOption](
     $w,
     {
       "after": $after,
-      "anchor": $anchor,
+      "anchor": tclEscape anchor,
       "before": $before,
       "expand": $expand,
-      "fill": $fill,
+      "fill": tclEscape fill,
       "in": $`in`,
       "ipadx": $ipadx,
       "ipady": $ipady,
       "padx": padx.toTclList(),
       "pady": pady.toTclList(),
-      "side": $side
+      "side": tclEscape side
     }.toArgs()
   )
 
@@ -508,8 +508,8 @@ proc place*(
   w: Widget,
   x: float or int or BlankOption = blankOption,
   y: float or int or BlankOption = blankOption,
-  anchor: AnchorPosition or BlankOption = blankOption,
-  bordermode: BorderMode or BlankOption = blankOption,
+  anchor: AnchorPosition or string or BlankOption = blankOption,
+  bordermode: BorderMode or string or BlankOption = blankOption,
   height: int or float or BlankOption = blankOption,
   `in`: Widget = nil,
   relheight: float or BlankOption = blankOption,
@@ -523,8 +523,8 @@ proc place*(
     "place configure",
     w,
     {
-      "anchor": $anchor,
-      "bordermode": $bordermode,
+      "anchor": tclEscape anchor,
+      "bordermode": tclEscape bordermode,
       "height": $height,
       "in": $`in`,
       "relheight": $relheight,
@@ -572,7 +572,7 @@ proc grid*[PX, PY: Padding or BlankOption](
   ipady: int or BlankOption = blankOption,
   padx: PX = blankOption,
   pady: PY = blankOption,
-  sticky: FillStyle or AnchorPosition or seq[FillStyle] or seq[AnchorPosition] or Slice[FillStyle] or Slice[AnchorPosition] or BlankOption = blankOption
+  sticky: AnchorPosition or seq[AnchorPosition] or BlankOption or string = blankOption
 ) =
   w.tk.call(
     "grid configure",
@@ -587,11 +587,15 @@ proc grid*[PX, PY: Padding or BlankOption](
       "pady": pady.toTclList(),
       "row": $row,
       "rowspan": $rowspan,
-      "sticky": sticky.toTclList()
+      "sticky": 
+        when sticky is string:
+          tclEscape sticky
+        else: 
+          sticky.toTclList()
     }.toArgs
   )
 
-proc gridAnchor*(w: Widget, anchor: AnchorPosition = Northwest) =
+proc gridAnchor*(w: Widget, anchor: AnchorPosition or char = Northwest) =
   w.tk.call("grid anchor", w, anchor)
 
 proc gridBbox*(w: Widget): tuple[offsetX, offsetY, width, height: int] =
@@ -1231,7 +1235,7 @@ const
 #   tk.call("option add", pattern, tclEscape value, priority)
 
 proc optionAdd*[T](tk: Tk, pattern: string, value: T, priority: 0..100 = Interactive) {.alias: "[]=".} =
-  tk.call("option add", tclEscape pattern, tclEscape $value, priority)
+  tk.call("option add", tclEscape pattern, tclEscape value, priority)
 
 proc optionClear*(tk: Tk) =
   tk.call("option clear")

@@ -1,9 +1,7 @@
 import std/strutils
 import std/random
 
-import ../src/nimtk/widgets
-import ../src/nimtk/wm
-import ../src/nimtk
+import ../src/nimtk/all
 
 randomize()
 
@@ -56,10 +54,9 @@ endEntry.textvariable = endVar
 proc validate(_: Widget, event: EntryEvent): bool =
   try:
     discard parseInt(event.editedValue)
+    return true
   except ValueError:
     return false
-
-  return true
 
 proc invalid(w: Widget, _: EntryEvent): bool =
   w.bell()
@@ -79,6 +76,7 @@ genButton.setCommand() do (w: Widget):
   if num1 > num2:
     w.bell()
     return
+  
 
   numberLabel.text = $rand num1..num2
 

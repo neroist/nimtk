@@ -78,7 +78,7 @@ flightSpinbox.setCommand() do (_: Widget, _: string):
     returnDateEntry.state = WidgetState.Readonly
 
 bookButton.setCommand() do (_: Widget):
-  root.messageBox(
+  discard root.messageBox(
     "Flight Booked",
     "You have booked a $1 flight on $2" % [flightSpinbox.get(), startDateEntry.get()]
   )

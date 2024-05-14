@@ -73,7 +73,6 @@ with presetsMenu.addCommand("Pin preset"):
       checkbutton.deselect()
 
     digitsCheckbutton.select()
-    nodupesCheckButton.select()
 
     lenEntry.set $rand(4..12)
 

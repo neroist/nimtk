@@ -4,6 +4,7 @@ import std/colors
 
 import ../utils/escaping
 import ../utils/tclcolor
+import ../utils/tcllist
 import ../utils/genname
 import ../utils/toargs
 import ../utils/alias
@@ -58,8 +59,8 @@ proc curselection*(l: Listbox): seq[int] =
 proc delete*(l: Listbox, rng: Slice[int]) = l.tk.call($l, "delete", rng.a, rng.b)
 proc delete*[I1, I2: Index](l: Listbox, first: I1, last: I2) = l.tk.call($l, "delete", first, last)
 proc delete*(l: Listbox, first: Index) = l.tk.call($l, "delete", first)
-proc get*(l: Listbox, rng: Slice[int]): seq[string] {.alias: "[]".} = l.tk.call($l, "get", rng.a, rng.b).split(' ')
-proc get*[I1, I2: Index](l: Listbox, first: I1, last: I2): seq[string] = l.tk.call($l, "get", first, last).split(' ')
+proc get*(l: Listbox, rng: Slice[int]): seq[string] {.alias: "[]".} = l.tk.fromTclList l.tk.call($l, "get", rng.a, rng.b)
+proc get*[I1, I2: Index](l: Listbox, first: I1, last: I2): seq[string] = l.tk.fromTclList l.tk.call($l, "get", first, last)
 proc get*(l: Listbox, first: Index): string {.alias: "[]".} = l.tk.call($l, "get", first)
 proc index*(l: Listbox, index: Index): int = parseInt l.tk.call($l, "index", $index)
 proc insert*(l: Listbox, index: Index, elements: varargs[string]) {.alias: "[]=".} = l.tk.call($l, "insert", index, elements.map(tclEscape).join())

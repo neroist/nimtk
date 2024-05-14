@@ -35,6 +35,7 @@ proc placeButton(_: Widget = nil) =
 button.image = photo
 button.command = placeButton
 button.relief = WidgetRelief.Solid
+button.borderwidth = 0
 
 placeButton()
 
