@@ -53,7 +53,7 @@ proc `variable=`*(c: CheckButton, variable: TkBool) = c.configure({"variable": v
 proc `selectimage=`*(c: CheckButton, selectimage: Image) = c.configure({"selectimage": $selectimage})
 proc `tristateimage=`*(c: CheckButton, tristateimage: Image) = c.configure({"tristateimage": $tristateimage})
 proc `state=`*(c: CheckButton, state: WidgetState) = c.configure({"state": $state})
-proc `tristatevalue=`*(c: CheckButton, tristatevalue: string) = c.configure({"tristatevalue": tclEscape $tristatevalue})
+proc `tristatevalue=`*(c: CheckButton, tristatevalue: string) = c.configure({"tristatevalue":  tclEscape tristatevalue})
 proc `width=`*(c: CheckButton, width: string or float or int) = c.configure({"width": $width})
 
 proc indicatoron*(c: CheckButton): bool = c.cget("indicatoron") == "1"

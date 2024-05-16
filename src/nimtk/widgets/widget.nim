@@ -740,7 +740,7 @@ proc busyCget*(w: Widget): string =
   w.tk.result
 
 proc busyConfigure*(w: Widget, cursorName: string or Cursor) =
-  w.tk.call("tk busy configure", w, {"cursor": tclEscape $cursorName}.toArgs())
+  w.tk.call("tk busy configure", w, {"cursor": tclEscape cursorName}.toArgs())
 
 proc busyConfigure*(w: Widget): seq[string] =
   w.tk.call("tk busy configure", w)[1..^2].split()[3..^1]
@@ -1009,7 +1009,7 @@ proc setPalette*(tk: Tk, options: openArray[tuple[name: string, value: Color]]) 
 
   for option in options:
     opts.add option[0]
-    opts.add tclEscape $option[1]
+    opts.add tclEscape option[1]
 
   tk.call("tk_setPalette", opts.join(" "))
 
@@ -1131,35 +1131,35 @@ proc eventGenerate*(
 ) =
   tk.call(
     "event generate",
-    tclEscape $w,
+    tclEscape w,
     event,
     {
-      "above": tclEscape $eventObj.above,
-      "borderwidth": tclEscape $eventObj.borderwidth,
-      "button": tclEscape $eventObj.button,
-      "count": tclEscape $eventObj.count,
-      "data": tclEscape $eventObj.userData, # userdata
-      "delta": tclEscape $eventObj.delta,
-      "detail": tclEscape $eventObj.userData, # detail
-      "focus": tclEscape $eventObj.focus,
-      "height": tclEscape $eventObj.height,
-      "keycode": tclEscape $eventObj.keycode,
-      "keysym": tclEscape $eventObj.keysym,
-      "mode": tclEscape $eventObj.mode,
-      "override": tclEscape $eventObj.override,
-      "place": tclEscape $eventObj.place,
-      "root": tclEscape $eventObj.root,
-      "rootx": tclEscape $eventObj.xRoot,
-      "rooty": tclEscape $eventObj.yRoot,
-      "sendevent": tclEscape $eventObj.sendevent,
-      "serial": tclEscape $eventObj.serial,
-      "state": tclEscape $eventObj.state,
-      "subwindow": tclEscape $eventObj.subwindow,
-      "time": tclEscape $eventObj.time,
+      "above": tclEscape eventObj.above,
+      "borderwidth": tclEscape eventObj.borderwidth,
+      "button": tclEscape eventObj.button,
+      "count": tclEscape eventObj.count,
+      "data": tclEscape eventObj.userData, # userdata
+      "delta": tclEscape eventObj.delta,
+      "detail": tclEscape eventObj.userData, # detail
+      "focus": tclEscape eventObj.focus,
+      "height": tclEscape eventObj.height,
+      "keycode": tclEscape eventObj.keycode,
+      "keysym": tclEscape eventObj.keysym,
+      "mode": tclEscape eventObj.mode,
+      "override": tclEscape eventObj.override,
+      "place": tclEscape eventObj.place,
+      "root": tclEscape eventObj.root,
+      "rootx": tclEscape eventObj.xRoot,
+      "rooty": tclEscape eventObj.yRoot,
+      "sendevent": tclEscape eventObj.sendevent,
+      "serial": tclEscape eventObj.serial,
+      "state": tclEscape eventObj.state,
+      "subwindow": tclEscape eventObj.subwindow,
+      "time": tclEscape eventObj.time,
       "warp": $warp,
-      "width": tclEscape $eventObj.width,
-      "when": tclEscape $eventObj.time,
-      "x": tclEscape $eventObj.x
+      "width": tclEscape eventObj.width,
+      "when": tclEscape eventObj.time,
+      "x": tclEscape eventObj.x
     }.toArgs()
   )
 
@@ -1272,12 +1272,12 @@ proc `activeborderwidth=`*(w: Widget, activeborderwidth: string or float or int)
 proc `activeforeground=`*(w: Widget, activeforeground: Color)                         = w.configure({"activeforeground": $activeforeground})
 proc `anchor=`*(w: Widget, anchor: AnchorPosition)                                    = w.configure({"anchor": $anchor})
 proc `background=`*(w: Widget, background: Color) {.alias: "bg=".}                    = w.configure({"background": $background})
-proc `bitmap=`*(w: Widget, bitmap: string)                                            = w.configure({"bitmap": tclEscape $bitmap})
+proc `bitmap=`*(w: Widget, bitmap: string)                                            = w.configure({"bitmap": tclEscape bitmap})
 proc `borderwidth=`*(w: Widget, borderwidth: string or float or int) {.alias: "bd=".} = w.configure({"borderwidth": $borderwidth})
 proc `cursor=`*(w: Widget, cursor: Cursor)                                            = w.configure({"cursor": $cursor})
 proc `compound=`*(w: Widget, compound: WidgetCompound)                                = w.configure({"compound": $compound})
-proc `disabledforeground=`*(w: Widget, disabledforeground: Color or string)           = w.configure({"disabledforeground": tclEscape $disabledforeground})
-proc `disabledbackground=`*(w: Widget, disabledbackground: Color or string)           = w.configure({"disabledbackground": tclEscape $disabledbackground})
+proc `disabledforeground=`*(w: Widget, disabledforeground: Color or string)           = w.configure({"disabledforeground": tclEscape disabledforeground})
+proc `disabledbackground=`*(w: Widget, disabledbackground: Color or string)           = w.configure({"disabledbackground": tclEscape disabledbackground})
 proc `exportselection=`*(w: Widget, exportselection: bool)                            = w.configure({"exportselection": $exportselection})
 proc `foreground=`*(w: Widget, foreground: Color) {.alias: "fg=".}                    = w.configure({"foreground": $foreground})
 proc `highlightbackground=`*(w: Widget, highlightbackground: Color)                   = w.configure({"highlightbackground": $highlightbackground})
