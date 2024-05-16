@@ -116,7 +116,7 @@ proc init*(tk: Tk) =
     )
 
 proc imgInit*(tk: Tk) =
-  ## Initialise tkImg library (allows for more image formats to be used with Tk)
+  ## Initialise Img library (allows for more image formats to be used with Tk)
 
   let init = tk.interp.imgInit()
 
