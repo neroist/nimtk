@@ -27,26 +27,26 @@ type
 proc after*(tk: Tk, ms: int) {.alias: "sleep".} =
   tk.call("after", ms)
 
-proc after*(tk: Tk, ms: int, fn: TkGenericCommand): int =
+proc after*(tk: Tk, ms: int, fn: TkGenericCommand): int {.discardable.} =
   let name = genName("after_command_")
   
   tk.registerCmd(name, fn)
 
-  tk.call("after", ms, name)
-  tk.result.parseInt()
+  parseInt tk.call("after", ms, name)
 
-proc afterIdle*(tk: Tk, fn: TkGenericCommand): int =
+proc afterIdle*(tk: Tk, fn: TkGenericCommand): int {.discardable.} =
   let name = genName("after_command_")
   
   tk.registerCmd(name, fn)
 
-  tk.call("after idle", name)
-  tk.result.parseInt()
+  parseInt tk.call("after idle", name)
 
 proc afterCancel*(tk: Tk, id: int) =
   tk.call("after cancel", id)
 
 proc afterInfo*(tk: Tk): seq[int] =
+  # returns a list of numerical ids
+  # i see no reason why this may fail with `split`
   tk.call("after info").split(' ').map(parseInt)
 
 proc afterInfo*(tk: Tk, id: int): AfterEventHandler =
