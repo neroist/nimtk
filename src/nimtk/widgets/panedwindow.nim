@@ -72,7 +72,7 @@ proc paneconfigure*(
       "sticky": tclEscape sticky,
       "stretch": $stretch,
       "width": tclEscape width
-    }
+    }.toArgs
   )
 proc panes*(p: PanedWindow): seq[Widget] =
   let res = p.tk.call($p, "panes").split(' ')
