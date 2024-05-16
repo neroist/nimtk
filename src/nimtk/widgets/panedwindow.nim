@@ -88,13 +88,13 @@ proc proxyCoord*(p: PanedWindow): tuple[x, y: int] =
 proc proxyForget*(p: PanedWindow) = p.tk.call($p, "proxy forget")
 proc proxyPlace*(p: PanedWindow, x, y: int) = p.tk.call($p, "proxy place", x, y)
 proc sashCoord*(p: PanedWindow, index: int): tuple[x, y: int] =
-  let res = p.tk.call($p, "proxy coord",  tclEscape index).split(' ').map(parseInt)
+  let res = p.tk.call($p, "sash coord",  tclEscape index).split(' ').map(parseInt)
 
   result.x = res[0]
   result.y = res[1]
-proc shashDragto*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "proxy dragto",  tclEscape index, x, y)
-proc shashMark*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "proxy mark",  tclEscape index, x, y)
-proc shashPlace*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "proxy place",  tclEscape index, x, y)
+proc sashDragto*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "sash dragto",  tclEscape index, x, y)
+proc sashMark*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "sash mark",  tclEscape index, x, y)
+proc sashPlace*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "sash place",  tclEscape index, x, y)
 
 proc `handlepad=`*(p: PanedWindow, handlepad: int or string or float) = p.configure({"handlepad":  tclEscape handlepad})
 proc `handlesize=`*(p: PanedWindow, handlesize: int or string or float) = p.configure({"handlesize":  tclEscape handlesize})
