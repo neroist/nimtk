@@ -10,7 +10,7 @@ import ../../../nimtk
 import ../widget
 
 type
-  TtkEntry* = ref object of Widget
+  TtkEntry* = ref object of TtkWidget
 
   Index = string or int
 

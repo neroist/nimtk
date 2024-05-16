@@ -11,7 +11,7 @@ import ../widget
 import ./widget
 
 type
-  TtkPanedWindow* = ref object of Widget
+  TtkPanedWindow* = ref object of TtkWidget
 
 proc isTtkPanedWindow*(w: Widget): bool = "ttkpanedwindow" in w.pathname.split('.')[^1]
 
