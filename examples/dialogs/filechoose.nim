@@ -6,6 +6,7 @@ let
   tk = newTk()
   root = tk.getRoot()
 
+root.geometry("300x400")
 root.title = "File & Directory Dialogs"
 
 let
@@ -31,8 +32,8 @@ openButton.setCommand() do (_: Widget):
   )
 
   # when using `initialfile` the initial file will
-  # always be the first element (unless the dialog)
-  # was closed
+  # always be the first element (unless the dialog
+  # was closed)
   if files.len < 2:
     return
 
@@ -55,6 +56,9 @@ saveButton.setCommand() do (_: Widget):
     confirmoverwrite = true
   )
 
+  if file.len < 1:
+    return
+
   discard root.messageBox(
     title = "You saved a file!",
     message = "You opened " & file.splitPath().tail,
@@ -62,15 +66,18 @@ saveButton.setCommand() do (_: Widget):
   )
 
 dirButton.setCommand() do (_: Widget):
-  let file = root.chooseDirectory(
+  let dir = root.chooseDirectory(
     title = "Open a file",
     initialdir = currentSourcePath().parentDir(),
     mustexist = true
   )
 
+  if dir.len < 1:
+    return
+
   discard root.messageBox(
     title = "You chose a directory!",
-    message = "Directory: " & file.parentDir().splitPath().tail
+    message = "Directory: " & dir.parentDir().splitPath().tail
   )
 
 tk.mainloop()
