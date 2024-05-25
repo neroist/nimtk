@@ -13,7 +13,7 @@ type
 
 proc isPanedWindow*(w: Widget): bool = "panedwindow" in w.pathname.split('.')[^1]
 
-proc newPanedWindow*(parent: Widget, orient: WidgetOrientation = WidgetOrientation.Horizontal, configuration: openArray[(string, string)] = {:}): PanedWindow =
+proc newPanedWindow*(parent: Widget, orient: WidgetOrientation = woHorizontal, configuration: openArray[(string, string)] = {:}): PanedWindow =
   new result
 
   result.pathname = pathname(parent.pathname, genName("panedwindow_"))

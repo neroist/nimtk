@@ -17,8 +17,8 @@ proc newFont*(
   tk: Tk,
   family: string,
   size: int,
-  weight: FontWeight = FontWeight.Normal,
-  slant: FontSlant = FontSlant.Roman,
+  weight: FontWeight = fwNormal,
+  slant: FontSlant = fsRoman,
   underline: bool = false,
   overstrike: bool = false
 ): Font =

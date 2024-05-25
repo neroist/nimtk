@@ -612,7 +612,7 @@ proc grid*[PX, PY: Padding or BlankOption](
     }.toArgs
   )
 
-proc gridAnchor*(w: Widget, anchor: AnchorPosition or char = Northwest) =
+proc gridAnchor*(w: Widget, anchor: AnchorPosition or char = apNorthwest) =
   w.tk.call("grid anchor", w, anchor)
 
 proc gridBbox*(w: Widget): tuple[offsetX, offsetY, width, height: int] =
@@ -976,10 +976,10 @@ proc messageBox*(
   w: Widget,
   title: string = "",
   message: string = "",
-  `type`: MessageBoxType = Ok,
+  `type`: MessageBoxType = mbtOk,
   detail: string = "",
-  default: ButtonName = Default,
-  icon: IconImage = Info
+  default: ButtonName = bnDefault,
+  icon: IconImage = iiInfo
 ): ButtonName =
   parseEnum[ButtonName] w.tk.call(
     "tk_messageBox",
