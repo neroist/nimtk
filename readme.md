@@ -7,7 +7,7 @@ High level wrapper for Tk
 You may install using nimble
 
 ```sh
-nimble install https://github.com/neroist/nimtk
+nimble install nimtk
 ```
 
 This library only depends upon [`nimtcl`](https://github.com/neroist/nimtcl).
