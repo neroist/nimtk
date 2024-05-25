@@ -72,7 +72,7 @@ proc paneconfigure*(
       "sticky": tclEscape sticky,
       "stretch": $stretch,
       "width": tclEscape width
-    }
+    }.toArgs
   )
 proc panes*(p: PanedWindow): seq[Widget] =
   let res = p.tk.call($p, "panes").split(' ')
@@ -88,27 +88,27 @@ proc proxyCoord*(p: PanedWindow): tuple[x, y: int] =
 proc proxyForget*(p: PanedWindow) = p.tk.call($p, "proxy forget")
 proc proxyPlace*(p: PanedWindow, x, y: int) = p.tk.call($p, "proxy place", x, y)
 proc sashCoord*(p: PanedWindow, index: int): tuple[x, y: int] =
-  let res = p.tk.call($p, "proxy coord", tclEscape $index).split(' ').map(parseInt)
+  let res = p.tk.call($p, "sash coord",  tclEscape index).split(' ').map(parseInt)
 
   result.x = res[0]
   result.y = res[1]
-proc shashDragto*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "proxy dragto", tclEscape $index, x, y)
-proc shashMark*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "proxy mark", tclEscape $index, x, y)
-proc shashPlace*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "proxy place", tclEscape $index, x, y)
+proc sashDragto*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "sash dragto",  tclEscape index, x, y)
+proc sashMark*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "sash mark",  tclEscape index, x, y)
+proc sashPlace*(p: PanedWindow, index: int, x, y: int) = p.tk.call($p, "sash place",  tclEscape index, x, y)
 
-proc `handlepad=`*(p: PanedWindow, handlepad: int or string or float) = p.configure({"handlepad": tclEscape $handlepad})
-proc `handlesize=`*(p: PanedWindow, handlesize: int or string or float) = p.configure({"handlesize": tclEscape $handlesize})
-proc `height=`*(p: PanedWindow, height: int or string or float) = p.configure({"height": tclEscape $height})
+proc `handlepad=`*(p: PanedWindow, handlepad: int or string or float) = p.configure({"handlepad":  tclEscape handlepad})
+proc `handlesize=`*(p: PanedWindow, handlesize: int or string or float) = p.configure({"handlesize":  tclEscape handlesize})
+proc `height=`*(p: PanedWindow, height: int or string or float) = p.configure({"height":  tclEscape height})
 proc `opaqueresize=`*(p: PanedWindow, opaqueresize: bool) = p.configure({"opaqueresize": $opaqueresize})
 proc `proxybackground=`*(p: PanedWindow, proxybackground: Color) = p.configure({"proxybackground": $proxybackground})
-proc `proxyborderwidth=`*(p: PanedWindow, proxyborderwidth: int or string or float) = p.configure({"proxyborderwidth": tclEscape $proxyborderwidth})
+proc `proxyborderwidth=`*(p: PanedWindow, proxyborderwidth: int or string or float) = p.configure({"proxyborderwidth":  tclEscape proxyborderwidth})
 proc `proxyrelief=`*(p: PanedWindow, proxyrelief: WidgetRelief) = p.configure({"proxyrelief": $proxyrelief})
-proc `sashcursor=`*(p: PanedWindow, sashcursor: Cursor or string) = p.configure({"sashcursor": tclEscape $sashcursor})
-proc `sashpad=`*(p: PanedWindow, sashpad: int or string or float) = p.configure({"sashpad": tclEscape $sashpad})
+proc `sashcursor=`*(p: PanedWindow, sashcursor: Cursor or string) = p.configure({"sashcursor":  tclEscape sashcursor})
+proc `sashpad=`*(p: PanedWindow, sashpad: int or string or float) = p.configure({"sashpad":  tclEscape sashpad})
 proc `sashrelief=`*(p: PanedWindow, sashrelief: WidgetRelief) = p.configure({"sashrelief": $sashrelief})
-proc `sashwidth=`*(p: PanedWindow, sashwidth: int or string or float) = p.configure({"sashwidth": tclEscape $sashwidth})
+proc `sashwidth=`*(p: PanedWindow, sashwidth: int or string or float) = p.configure({"sashwidth":  tclEscape sashwidth})
 proc `showhandle=`*(p: PanedWindow, showhandle: bool) = p.configure({"showhandle": $showhandle})
-proc `width=`*(p: PanedWindow, width: int or string or float) = p.configure({"width": tclEscape $width})
+proc `width=`*(p: PanedWindow, width: int or string or float) = p.configure({"width":  tclEscape width})
 
 proc handlepad*(p: PanedWindow): string = p.cget("handlepad")
 proc handlesize*(p: PanedWindow): string = p.cget("handlesize")

@@ -163,7 +163,7 @@ proc put*(
     tclEscape data,
     {
       "to": to.flattened(),
-      "format": tclEscape $format,
+      "format":  tclEscape format,
     }.toArgs
   )
 proc read*(
@@ -179,7 +179,7 @@ proc read*(
     tclEscape filename,
     {
       "to": to.flattened(),
-      "format": tclEscape $format,
+      "format":  tclEscape format,
       "from": `from`.flattened(),
       "shrink":
         if shrink:
@@ -203,8 +203,8 @@ proc write*(
     "write",
     tclEscape filename,
     {
-      "background": tclEscape $background,
-      "format": tclEscape $format,
+      "background":  tclEscape background,
+      "format":  tclEscape format,
       "from": `from`.flattened(),
       "greyscale":
         if grayscale:

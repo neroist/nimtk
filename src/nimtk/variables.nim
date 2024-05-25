@@ -88,8 +88,15 @@ proc set*(`var`: TkVar, val: string | float | bool | int) =
   else:
     `var`.tk.call("set", `var`.varname, $val)
 
+# convinience procs
 proc add*(`var`: TkString, val: string) =
   `var`.set(`var`.get() & val)
+
+proc inc*(v: TkFloat or TkInt, val: int or float = 1'f) =
+  when v is TkInt:
+    v.set(v.get() + int val)
+  else:
+    v.set(v.get() + val)
 
 proc `$`*(`var`: TkVar): string =
   if `var`.isNil() or `var`.tk.isNil(): ""

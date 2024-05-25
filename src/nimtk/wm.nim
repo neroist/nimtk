@@ -97,8 +97,8 @@ when defined(windows):
 
 elif defined(macos):
   proc `modified=`*(w: Window, modified: bool) = w.wm_attributes("modified", $modified)
-  proc `notify=`*(w: Window, notify: string) = w.wm_attributes("notify", tclEscape $notify)
-  proc `titlepath=`*(w: Window, titlepath: string) = w.wm_attributes("titlepath", tclEscape $titlepath)
+  proc `notify=`*(w: Window, notify: string) = w.wm_attributes("notify",  tclEscape notify)
+  proc `titlepath=`*(w: Window, titlepath: string) = w.wm_attributes("titlepath",  tclEscape titlepath)
   proc `transparent=`*(w: Window, transparent: bool) = w.wm_attributes("transparent", $transparent)
 
 else:

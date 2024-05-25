@@ -321,5 +321,9 @@ type
     psMiddle = "middle"
     psNever = "never"
 
+  ProgressBarMode* {.pure.} = enum
+    Determinate = "derminate"
+    Indeterminate = "inderminate"
+
 import ./keysyms
 export keysyms
