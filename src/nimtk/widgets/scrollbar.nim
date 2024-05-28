@@ -32,14 +32,14 @@ template linkY*(w: Widget, s: Scrollbar) {.alias: "yscrollbar=".} =
   w.yscrollcommand = $s & " set"
   s.command = $w & " yview"
 
-proc activate*(s: Scrollbar, element: ScrollbarElement) = s.tk.call($s, "activate", element)
-proc activate*(s: Scrollbar): ScrollbarElement = parseEnum[ScrollbarElement] s.tk.call($s, "activate")
-proc delta*(s: Scrollbar, deltaX, deltaY: int or float) = s.tk.call($s, "delta", deltaX, deltaY)
-proc fraction*(s: Scrollbar, x, y: int): float = parseFloat s.tk.call($s, "fraction", x, y)
-proc identify*(s: Scrollbar, x, y: int): string = s.tk.call($s, "identify", x, y)
-proc set*(s: Scrollbar, first, last: float) = s.tk.call($s, "set", first, last)
+proc activate*(s: Scrollbar, element: ScrollbarElement) = s.call("activate", element)
+proc activate*(s: Scrollbar): ScrollbarElement = parseEnum[ScrollbarElement] s.call("activate")
+proc delta*(s: Scrollbar, deltaX, deltaY: int or float) = s.call("delta", deltaX, deltaY)
+proc fraction*(s: Scrollbar, x, y: int): float = parseFloat s.call("fraction", x, y)
+proc identify*(s: Scrollbar, x, y: int): string = s.call("identify", x, y)
+proc set*(s: Scrollbar, first, last: float) = s.call("set", first, last)
 proc get*(s: Scrollbar): array[2, float] {.alias: "text".} =
-  s.tk.call($s, "get")
+  s.call("get")
 
   let res = s.tk.result.split(' ').map(parseFloat)
 

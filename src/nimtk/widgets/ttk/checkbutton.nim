@@ -27,7 +27,7 @@ proc newTtkCheckButton*(parent: Widget, text: string = "", configuration: openAr
   if configuration.len > 0:
     result.configure(configuration)
 
-proc invoke*(c: TtkCheckButton) = c.tk.call($c, "invoke")
+proc invoke*(c: TtkCheckButton) = c.call("invoke")
 
 proc setCommand*(c: TtkCheckButton, command: TkWidgetCommand) =
   let name = genName("ttkcheckbutton_command_")

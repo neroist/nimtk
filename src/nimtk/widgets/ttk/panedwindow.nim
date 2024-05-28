@@ -26,18 +26,18 @@ proc newTtkPanedWindow*(parent: Widget, orient: WidgetOrientation = WidgetOrient
   if configuration.len > 0:
     result.configure(configuration)
 
-proc add*(p: TtkPanedWindow, window: Widget, weight: int = 0) = p.tk.call($p, "add", window, {"weight": $weight}.toArgs)
-proc insert*(p: TtkPanedWindow, pos: string or int or Widget, window: Widget, weight: int = 0) = p.tk.call($p, "insert", tclEscape pos, window, {"weight": $weight}.toArgs)
-proc forget*(p: TtkPanedWindow, window: Widget) = p.tk.call($p, "forget", window)
+proc add*(p: TtkPanedWindow, window: Widget, weight: int = 0) = p.call("add", window, {"weight": $weight}.toArgs)
+proc insert*(p: TtkPanedWindow, pos: string or int or Widget, window: Widget, weight: int = 0) = p.call("insert", tclEscape pos, window, {"weight": $weight}.toArgs)
+proc forget*(p: TtkPanedWindow, window: Widget) = p.call("forget", window)
 proc identifySash*(p: TtkPanedWindow, x, y: int): int =
   ## Returns -1 if no component is present at location (x, y)
 
   try:
-    parseInt p.tk.call($p, "identify sash", x, y)
+    parseInt p.call("identify sash", x, y)
   except ValueError:
     -1
 # identifyElement from ./widget.nim
-proc paneweight*(p: TtkPanedWindow, pane: int or Widget): int = parseInt p.tk.call($p, "pane", pane, {"weight": " "}.toArgs)
+proc paneweight*(p: TtkPanedWindow, pane: int or Widget): int = parseInt p.call("pane", pane, {"weight": " "}.toArgs)
 proc pane*(
   p: TtkPanedWindow,
   pane: int or Widget,
@@ -49,13 +49,13 @@ proc pane*(
     {"weight": $weight}.toArgs
   )
 proc panes*(p: TtkPanedWindow): seq[Widget] =
-  let res = p.tk.call($p, "panes").split(' ')
+  let res = p.call("panes").split(' ')
 
   for i in res:
     result.add(p.tk.newWidgetFromPathname i)
 proc `[]`*(p: TtkPanedWindow, idx: int): Widget {.inline.} = p.panes[idx]
-proc sashPos*(p: TtkPanedWindow, index: int): int = parseInt p.tk.call($p, "sashpos", index)
-proc sashPos*(p: TtkPanedWindow, index: int, newPos: int): int {.alias: "sashPos=".} = parseInt p.tk.call($p, "sashpos", index, newPos)
+proc sashPos*(p: TtkPanedWindow, index: int): int = parseInt p.call("sashpos", index)
+proc sashPos*(p: TtkPanedWindow, index: int, newPos: int): int {.alias: "sashPos=".} = parseInt p.call("sashpos", index, newPos)
 
 proc `height=`*(p: TtkPanedWindow, height: int or string or float) = p.configure({"height":  tclEscape height})
 proc `width=`*(p: TtkPanedWindow, width: int or string or float) = p.configure({"width":  tclEscape width})

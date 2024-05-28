@@ -23,7 +23,7 @@ proc newTtkButton*(parent: Widget, text: string = "", configuration: openArray[(
   if configuration.len > 0:
     result.configure(configuration)
 
-proc invoke*(b: TtkButton) = b.tk.call($b, "invoke")
+proc invoke*(b: TtkButton) = b.call("invoke")
 
 proc setCommand*(b: TtkButton, command: TkWidgetCommand) =
   let name = genName("ttkbutton_command_")

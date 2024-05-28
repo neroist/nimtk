@@ -27,7 +27,7 @@ proc newTtkRadioButton*(parent: Widget, text: string = "", configuration: openAr
   if configuration.len > 0:
     result.configure(configuration)
 
-proc invoke*(r: TtkRadioButton) = r.tk.call($r, "invoke")
+proc invoke*(r: TtkRadioButton) = r.call("invoke")
 
 proc setCommand*(r: TtkRadioButton, command: TkWidgetCommand) =
   let name = genName("ttkradiobutton_command_")

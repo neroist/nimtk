@@ -26,7 +26,7 @@ proc newScale*(parent: Widget, fromto: Slice[int or float], configuration: openA
     result.configure(configuration)
 
 proc coords*(s: Scale, value: int or float): tuple[x, y: int] = 
-  s.tk.call($s, "coords", value)
+  s.call("coords", value)
 
   let res = s.tk.result.split(' ')
 
@@ -34,7 +34,7 @@ proc coords*(s: Scale, value: int or float): tuple[x, y: int] =
   result.y = res[1].parseInt()
 
 proc coords*(s: Scale): tuple[x, y: int] = 
-  s.tk.call($s, "coords")
+  s.call("coords")
 
   let res = s.tk.result.split(' ')
 
@@ -42,16 +42,16 @@ proc coords*(s: Scale): tuple[x, y: int] =
   result.y = res[1].parseInt()
 
 proc get*(s: Scale, x, y: int): float =
-  s.tk.call($s, "get", x, y).parseFloat()
+  s.call("get", x, y).parseFloat()
 
 proc get*(s: Scale): float =
-  s.tk.call($s, "get").parseFloat()
+  s.call("get").parseFloat()
 
 proc identify*(s: Scale, x, y: int): string =
-  s.tk.call($s, "idenify", x, y)
+  s.call("idenify", x, y)
 
 proc set*(s: Scale, value: int or float) {.alias: "value=".} =
-  s.tk.call($s, "set", value)
+  s.call("set", value)
 
 proc setCommand*(s: Scale, command: TkScaleCommand) =
   let name = genName("scale_command_")

@@ -27,8 +27,8 @@ proc newTtkSpinbox*(parent: Widget, values: openArray[string] = [], configuratio
   if configuration.len > 0:
     result.configure(configuration)
 
-proc get*(s: TtkSpinbox): string = s.tk.call($s, "get")
-proc set*(s: TtkSpinbox, text: string) = s.tk.call($s, "set", tclEscape text)
+proc get*(s: TtkSpinbox): string = s.call("get")
+proc set*(s: TtkSpinbox, text: string) = s.call("set", tclEscape text)
 
 proc setValidateCommand*(s: TtkSpinbox, command: TkEntryCommand) =
   let name = genName("ttkspinbox_validate_command_")

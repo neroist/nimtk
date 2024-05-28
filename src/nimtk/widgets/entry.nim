@@ -32,7 +32,7 @@ proc newEntry*(parent: Widget, text: string = "", configuration: openArray[(stri
     result.configure(configuration)
 
 proc bbox*(e: Entry, index: Index): tuple[offsetX, offsetY, width, height: int] =
-  e.tk.call($e, "bbox", index)
+  e.call("bbox", index)
 
   if e.tk.result.len == 0:
     return
@@ -44,31 +44,31 @@ proc bbox*(e: Entry, index: Index): tuple[offsetX, offsetY, width, height: int] 
   result.width = nums[2].parseInt()
   result.height = nums[3].parseInt()
 proc clear*(e: Entry) = e.tk.call("set", e.cget("textvariable"), "\"\"")
-proc delete*[I1, I2: Index](e: Entry, first: I1; last: I2 = "") = e.tk.call($e, "delete", first, last)
-proc get*(e: Entry): string {.alias: "text".} = e.tk.call($e, "get")
+proc delete*[I1, I2: Index](e: Entry, first: I1; last: I2 = "") = e.call("delete", first, last)
+proc get*(e: Entry): string {.alias: "text".} = e.call("get")
 proc set*(e: Entry, text: string) {.alias: "text".} = e.tk.call("set", e.cget("textvariable"), tclEscape text)
-proc icursor*(e: Entry, index: Index) = e.tk.call($e, "icursor", index)
-proc index*(e: Entry, index: string): int = parseInt e.tk.call($e, "index", index)
-proc insert*(e: Entry, index: string, str: string) = e.tk.call($e, "insert", index, tclEscape str)
-proc scanMark*(e: Entry, x: int) = e.tk.call($e, "scan mark", x)
-proc scanDragTo*(e: Entry, x: int) = e.tk.call($e, "scan dragto", x)
-proc selectionAdjust*(e: Entry, index: Index) = e.tk.call($e, "selection adjust", index)
-proc selectionClear*(e: Entry) = e.tk.call($e, "selection clear")
-proc selectionFrom*(e: Entry, index: Index) = e.tk.call($e, "selection from", index)
-proc selectionPresent*(e: Entry): bool = e.tk.call($e, "selection present") == "1"
-proc selectionRange*[I1, I2: Index](e: Entry, start: I1, `end`: I2) = e.tk.call($e, "selection range", start, `end`)
-proc selectionTo*(e: Entry, index: Index) = e.tk.call($e, "selection to", index)
-proc validate*(e: Entry): bool = e.tk.call($e, "validate") == "1"
+proc icursor*(e: Entry, index: Index) = e.call("icursor", index)
+proc index*(e: Entry, index: string): int = parseInt e.call("index", index)
+proc insert*(e: Entry, index: string, str: string) = e.call("insert", index, tclEscape str)
+proc scanMark*(e: Entry, x: int) = e.call("scan mark", x)
+proc scanDragTo*(e: Entry, x: int) = e.call("scan dragto", x)
+proc selectionAdjust*(e: Entry, index: Index) = e.call("selection adjust", index)
+proc selectionClear*(e: Entry) = e.call("selection clear")
+proc selectionFrom*(e: Entry, index: Index) = e.call("selection from", index)
+proc selectionPresent*(e: Entry): bool = e.call("selection present") == "1"
+proc selectionRange*[I1, I2: Index](e: Entry, start: I1, `end`: I2) = e.call("selection range", start, `end`)
+proc selectionTo*(e: Entry, index: Index) = e.call("selection to", index)
+proc validate*(e: Entry): bool = e.call("validate") == "1"
 proc xview*(e: Entry): array[2, float] =
-  e.tk.call($e, "xview")
+  e.call("xview")
 
   let res = e.tk.result.split(' ')
 
   result[0] = parseFloat res[0]
   result[1] = parseFloat res[1]
-proc xview*(e: Entry, index: Index) = e.tk.call($e, "xview", index)
-proc xviewMoveto*(e: Entry, fraction: 0.0..1.0) = e.tk.call($e, "xview moveto", fraction)
-proc xviewScroll*(e: Entry, number: int, what: string) = e.tk.call($e, "xview scroll", number, tclEscape what)
+proc xview*(e: Entry, index: Index) = e.call("xview", index)
+proc xviewMoveto*(e: Entry, fraction: 0.0..1.0) = e.call("xview moveto", fraction)
+proc xviewScroll*(e: Entry, number: int, what: string) = e.call("xview scroll", number, tclEscape what)
 
 proc setValidateCommand*(e: Entry, command: TkEntryCommand) =
   let name = genName("entry_validate_command_")

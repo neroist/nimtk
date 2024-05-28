@@ -27,11 +27,11 @@ proc newRadioButton*(parent: Widget, text: string = "", configuration: openArray
   if configuration.len > 0:
     result.configure(configuration)
 
-proc invoke*(r: RadioButton) = r.tk.call($r, "invoke")
-proc flash*(r: RadioButton) = r.tk.call($r, "flash")
-proc select*(r: RadioButton) = r.tk.call($r, "select")
-proc toggle*(r: RadioButton) = r.tk.call($r, "toggle")
-proc deselect*(r: RadioButton) = r.tk.call($r, "deselect")
+proc invoke*(r: RadioButton) = r.call("invoke")
+proc flash*(r: RadioButton) = r.call("flash")
+proc select*(r: RadioButton) = r.call("select")
+proc toggle*(r: RadioButton) = r.call("toggle")
+proc deselect*(r: RadioButton) = r.call("deselect")
 
 proc setCommand*(r: RadioButton, command: TkWidgetCommand) =
   let name = genName("checkbutton_command_")

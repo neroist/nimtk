@@ -34,9 +34,9 @@ proc newListbox*(parent: Widget, texts: openArray[string] = [], configuration: o
   if configuration.len > 0:
     result.configure(configuration)
 
-proc activate*(l: Listbox, index: Index) = l.tk.call($l, "activate", index)
+proc activate*(l: Listbox, index: Index) = l.call("activate", index)
 proc bbox*(l: Listbox, index: Index): tuple[offsetX, offsetY, width, height: int] =
-  l.tk.call($l, "bbox", index)
+  l.call("bbox", index)
 
   if l.tk.result.len == 0:
     return
@@ -48,7 +48,7 @@ proc bbox*(l: Listbox, index: Index): tuple[offsetX, offsetY, width, height: int
   result.width = nums[2].parseInt()
   result.height = nums[3].parseInt()
 proc curselection*(l: Listbox): seq[int] =
-  l.tk.call($l, "curselection")
+  l.call("curselection")
 
   # this relies on the implicit return of an empty seq
   # if this turns out to be false
@@ -56,16 +56,16 @@ proc curselection*(l: Listbox): seq[int] =
     return l.tk.result
       .split(' ')
       .map(parseInt)
-proc delete*(l: Listbox, rng: Slice[int]) = l.tk.call($l, "delete", rng.a, rng.b)
-proc delete*[I1, I2: Index](l: Listbox, first: I1, last: I2) = l.tk.call($l, "delete", first, last)
-proc delete*(l: Listbox, first: Index) = l.tk.call($l, "delete", first)
-proc get*(l: Listbox, rng: Slice[int]): seq[string] {.alias: "[]".} = l.tk.fromTclList l.tk.call($l, "get", rng.a, rng.b)
-proc get*[I1, I2: Index](l: Listbox, first: I1, last: I2): seq[string] = l.tk.fromTclList l.tk.call($l, "get", first, last)
-proc get*(l: Listbox, first: Index): string {.alias: "[]".} = l.tk.call($l, "get", first)
-proc index*(l: Listbox, index: Index): int = parseInt l.tk.call($l, "index", $index)
-proc insert*(l: Listbox, index: Index, elements: varargs[string]) {.alias: "[]=".} = l.tk.call($l, "insert", index, elements.map(tclEscape).join())
+proc delete*(l: Listbox, rng: Slice[int]) = l.call("delete", rng.a, rng.b)
+proc delete*[I1, I2: Index](l: Listbox, first: I1, last: I2) = l.call("delete", first, last)
+proc delete*(l: Listbox, first: Index) = l.call("delete", first)
+proc get*(l: Listbox, rng: Slice[int]): seq[string] {.alias: "[]".} = l.tk.fromTclList l.call("get", rng.a, rng.b)
+proc get*[I1, I2: Index](l: Listbox, first: I1, last: I2): seq[string] = l.tk.fromTclList l.call("get", first, last)
+proc get*(l: Listbox, first: Index): string {.alias: "[]".} = l.call("get", first)
+proc index*(l: Listbox, index: Index): int = parseInt l.call("index", $index)
+proc insert*(l: Listbox, index: Index, elements: varargs[string]) {.alias: "[]=".} = l.call("insert", index, elements.map(tclEscape).join())
 proc add*(l: Listbox, elements: varargs[string]) = l.insert("end", elements)
-proc itemcget*(l: Listbox, index: Index, option: string): Color = fromTclColor l, l.tk.call($l, "itemcget", index, {option: " "}.toArgs())
+proc itemcget*(l: Listbox, index: Index, option: string): Color = fromTclColor l, l.call("itemcget", index, {option: " "}.toArgs())
 proc itemconfigure*(
   l: Listbox,
   index: Index,
@@ -110,17 +110,17 @@ proc itemconfigure*[I1, I2: Index](
 
   for idx in firstIdx..lastIdx:
     l.itemconfigure(idx, background, foreground, selectbackground, selectforeground)
-proc nearest*(l: Listbox, y: int): int = parseInt l.tk.call($l, "nearest", y)
-proc scanMark*(l: Listbox, x: int) = l.tk.call($l, "scan mark", x)
-proc scanDragTo*(l: Listbox, x: int) = l.tk.call($l, "scan dragto", x)
-proc see*(l: Listbox, index: Index) = l.tk.call($l, "see", index)
-proc selectionAnchor*(l: Listbox, index: Index) = l.tk.call($l, "selection anchor", index)
-proc selectionClear*(l: Listbox, rng: Slice[int]) = l.tk.call($l, "selection clear", rng.a, rng.b)
-proc selectionClear*[I1, I2: Index](l: Listbox, first: I1, last: I2 = "end") = l.tk.call($l, "selection clear", first, last)
-proc selectionIncludes*(l: Listbox, index: Index): bool = l.tk.call($l, "selection includes ", index) == "1"
-proc selectionSet*(l: Listbox, index: Index) {.alias: "selection=".} = l.tk.call($l, "selection set", index)
-proc selectionSet*(l: Listbox, rng: Slice[int]) {.alias: "selection=".} = l.tk.call($l, "selection set", rng.a, rng.b)
-proc selectionSet*[I1, I2: Index](l: Listbox, first: I1, last: I2 = "end") {.alias: "selection=".} = l.tk.call($l, "selection set", first, last)
+proc nearest*(l: Listbox, y: int): int = parseInt l.call("nearest", y)
+proc scanMark*(l: Listbox, x: int) = l.call("scan mark", x)
+proc scanDragTo*(l: Listbox, x: int) = l.call("scan dragto", x)
+proc see*(l: Listbox, index: Index) = l.call("see", index)
+proc selectionAnchor*(l: Listbox, index: Index) = l.call("selection anchor", index)
+proc selectionClear*(l: Listbox, rng: Slice[int]) = l.call("selection clear", rng.a, rng.b)
+proc selectionClear*[I1, I2: Index](l: Listbox, first: I1, last: I2 = "end") = l.call("selection clear", first, last)
+proc selectionIncludes*(l: Listbox, index: Index): bool = l.call("selection includes ", index) == "1"
+proc selectionSet*(l: Listbox, index: Index) {.alias: "selection=".} = l.call("selection set", index)
+proc selectionSet*(l: Listbox, rng: Slice[int]) {.alias: "selection=".} = l.call("selection set", rng.a, rng.b)
+proc selectionSet*[I1, I2: Index](l: Listbox, first: I1, last: I2 = "end") {.alias: "selection=".} = l.call("selection set", first, last)
 proc selectionGet*(l: Listbox): seq[string] {.alias: "selection".} =
   let cursel = l.curselection
 
@@ -129,27 +129,27 @@ proc selectionGet*(l: Listbox): seq[string] {.alias: "selection".} =
 
   for selectionIndex in cursel:
     result.add l.get(selectionIndex)
-proc size*(l: Listbox): int {.alias: "len".} = parseInt l.tk.call($l, "size")
+proc size*(l: Listbox): int {.alias: "len".} = parseInt l.call("size")
 proc xview*(l: Listbox): array[2, float] =
-  l.tk.call($l, "xview")
+  l.call("xview")
 
   let res = l.tk.result.split(' ')
 
   result[0] = parseFloat res[0]
   result[1] = parseFloat res[1]
-proc xview*(l: Listbox, index: Index) = l.tk.call($l, "xview", index)
-proc xviewMoveto*(l: Listbox, fraction: 0.0..1.0) = l.tk.call($l, "xview moveto", fraction)
-proc xviewScroll*(l: Listbox, number: int, what: string) = l.tk.call($l, "xview scroll", number, tclEscape what)
+proc xview*(l: Listbox, index: Index) = l.call("xview", index)
+proc xviewMoveto*(l: Listbox, fraction: 0.0..1.0) = l.call("xview moveto", fraction)
+proc xviewScroll*(l: Listbox, number: int, what: string) = l.call("xview scroll", number, tclEscape what)
 proc yview*(l: Listbox): array[2, float] =
-  l.tk.call($l, "xview")
+  l.call("xview")
 
   let res = l.tk.result.split(' ')
 
   result[0] = parseFloat res[0]
   result[1] = parseFloat res[1]
-proc yview*(l: Listbox, index: Index) = l.tk.call($l, "xview", index)
-proc yviewMoveto*(l: Listbox, fraction: 0.0..1.0) = l.tk.call($l, "xview moveto", fraction)
-proc yviewScroll*(l: Listbox, number: int, what: string) = l.tk.call($l, "xview scroll", number, tclEscape what)
+proc yview*(l: Listbox, index: Index) = l.call("xview", index)
+proc yviewMoveto*(l: Listbox, fraction: 0.0..1.0) = l.call("xview moveto", fraction)
+proc yviewScroll*(l: Listbox, number: int, what: string) = l.call("xview scroll", number, tclEscape what)
 
 proc `activestyle=`*(w: Widget, activestyle: ActiveStyle) = w.configure({"activestyle": $activestyle})
 proc `height=`*(l: Listbox, height: int) = l.configure({"height": $height})

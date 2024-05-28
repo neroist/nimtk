@@ -92,40 +92,40 @@ proc `[]`*(m: Menu, index: BackwardsIndex): MenuEntry =
   result.menu = m
   result.index = m.index("end") - (int(index) - 1)
 
-proc add*(m: Menu, `type`: MenuEntryType or string): MenuEntry {.discardable.} = m.tk.call($m, "add",  tclEscape `type`); m[^1]
-proc addCascade*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m.tk.call($m, "add", "cascade", {"label": tclEscape label}.toArgs); m[^1]
-proc addCheckbutton*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m.tk.call($m, "add", "checkbutton", {"label": tclEscape label}.toArgs); m[^1]
-proc addCommand*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m.tk.call($m, "add", "command", {"label": tclEscape label}.toArgs); m[^1]
-proc addRadiobutton*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m.tk.call($m, "add", "radiobutton", {"label": tclEscape label}.toArgs); m[^1]
-proc addSeparator*(m: Menu): MenuEntry {.discardable.} = m.tk.call($m, "add", "separator"); m[^1]
-proc clone*(m: Menu, menu: Menu, cloneType: MenuType or BlankOption = blankOption) = m.tk.call($m, "clone", menu, $cloneType)
-proc delete*(m: Menu, index1: Index) = m.tk.call($m, "delete",  tclEscape index1)
-proc delete*[I1, I2: Index](m: Menu, index1: I1, index2: I2) = m.tk.call($m, "delete",  tclEscape index1,  tclEscape index2)
+proc add*(m: Menu, `type`: MenuEntryType or string): MenuEntry {.discardable.} = m.call("add",  tclEscape `type`); m[^1]
+proc addCascade*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m.call("add", "cascade", {"label": tclEscape label}.toArgs); m[^1]
+proc addCheckbutton*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m.call("add", "checkbutton", {"label": tclEscape label}.toArgs); m[^1]
+proc addCommand*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m.call("add", "command", {"label": tclEscape label}.toArgs); m[^1]
+proc addRadiobutton*(m: Menu, label: string = ""): MenuEntry {.discardable.} = m.call("add", "radiobutton", {"label": tclEscape label}.toArgs); m[^1]
+proc addSeparator*(m: Menu): MenuEntry {.discardable.} = m.call("add", "separator"); m[^1]
+proc clone*(m: Menu, menu: Menu, cloneType: MenuType or BlankOption = blankOption) = m.call("clone", menu, $cloneType)
+proc delete*(m: Menu, index1: Index) = m.call("delete",  tclEscape index1)
+proc delete*[I1, I2: Index](m: Menu, index1: I1, index2: I2) = m.call("delete",  tclEscape index1,  tclEscape index2)
 proc delete*(m: Menu, indexes: Slice[int]) {.inline.} = m.delete(indexes.a, indexes.b)
-proc entrycget*(m: Menu, index: int, option: string): string = m.tk.call($m, "entrycget",  tclEscape index, tclEscape option)
-proc entryconfigure*(m: Menu, index: Index, options: openArray[(string, string)] = []): string {.discardable.} = m.tk.call($m, "entryconfigure",  tclEscape index, options.mapIt((it[0], tclEscape it[1])).toArgs())
+proc entrycget*(m: Menu, index: int, option: string): string = m.call("entrycget",  tclEscape index, tclEscape option)
+proc entryconfigure*(m: Menu, index: Index, options: openArray[(string, string)] = []): string {.discardable.} = m.call("entryconfigure",  tclEscape index, options.mapIt((it[0], tclEscape it[1])).toArgs())
 proc index*(m: Menu, index: Index): int =
   ## if index is "none", return -1
-  m.tk.call($m, "index",  tclEscape index)
+  m.call("index",  tclEscape index)
 
   if m.tk.result == "none":
     return -1
   else:
     return parseInt(m.tk.result)
-proc insert*(m: Menu, index: Index, `type`: MenuEntryType or string): MenuEntry = m.tk.call($m, "insert",  tclEscape index,  tclEscape `type`); m[^1]
-proc insertCascade*(m: Menu, index: Index, label: string = ""): MenuEntry {.discardable.} = m.tk.call($m, "insert",  tclEscape index, "cascade", {"label": tclEscape label}.toArgs); m[^1]
-proc insertCheckbutton*(m: Menu, index: Index, label: string = ""): MenuEntry {.discardable.} = m.tk.call($m, "insert",  tclEscape index, "checkbutton", {"label": tclEscape label}.toArgs); m[^1]
-proc insertCommand*(m: Menu, index: Index, label: string = ""): MenuEntry {.discardable.} = m.tk.call($m, "insert",  tclEscape index, "command", {"label": tclEscape label}.toArgs); m[^1]
-proc insertRadiobutton*(m: Menu, index: Index, label: string = ""): MenuEntry {.discardable.} = m.tk.call($m, "insert",  tclEscape index, "radiobutton", {"label": tclEscape label}.toArgs); m[^1]
-proc insertSeparator*(m: Menu, index: Index): MenuEntry {.discardable.} = m.tk.call($m, "insert",  tclEscape index, "separator"); m[^1]
-proc invoke*(m: Menu, index: Index) = m.tk.call($m, "invoke",  tclEscape index)
-proc post*(m: Menu, x, y: int, index: Index) = m.tk.call($m, "post", x, y,  tclEscape index)
-proc post*(m: Menu, x, y: int) = m.tk.call($m, "post", x, y)
-proc postcascade*(m: Menu, index: Index) = m.tk.call($m, "postcascade",  tclEscape index)
-proc type*(m: Menu, index: Index): MenuEntryType = parseEnum[MenuEntryType] m.tk.call($m, "type",  tclEscape index)
-proc unpost*(m: Menu) = m.tk.call($m, "unpost")
-proc xposition*(m: Menu, index: Index): int = parseInt m.tk.call($m, "xposition",  tclEscape index)
-proc yposition*(m: Menu, index: Index): int = parseInt m.tk.call($m, "yposition",  tclEscape index)
+proc insert*(m: Menu, index: Index, `type`: MenuEntryType or string): MenuEntry = m.call("insert",  tclEscape index,  tclEscape `type`); m[^1]
+proc insertCascade*(m: Menu, index: Index, label: string = ""): MenuEntry {.discardable.} = m.call("insert",  tclEscape index, "cascade", {"label": tclEscape label}.toArgs); m[^1]
+proc insertCheckbutton*(m: Menu, index: Index, label: string = ""): MenuEntry {.discardable.} = m.call("insert",  tclEscape index, "checkbutton", {"label": tclEscape label}.toArgs); m[^1]
+proc insertCommand*(m: Menu, index: Index, label: string = ""): MenuEntry {.discardable.} = m.call("insert",  tclEscape index, "command", {"label": tclEscape label}.toArgs); m[^1]
+proc insertRadiobutton*(m: Menu, index: Index, label: string = ""): MenuEntry {.discardable.} = m.call("insert",  tclEscape index, "radiobutton", {"label": tclEscape label}.toArgs); m[^1]
+proc insertSeparator*(m: Menu, index: Index): MenuEntry {.discardable.} = m.call("insert",  tclEscape index, "separator"); m[^1]
+proc invoke*(m: Menu, index: Index) = m.call("invoke",  tclEscape index)
+proc post*(m: Menu, x, y: int, index: Index) = m.call("post", x, y,  tclEscape index)
+proc post*(m: Menu, x, y: int) = m.call("post", x, y)
+proc postcascade*(m: Menu, index: Index) = m.call("postcascade",  tclEscape index)
+proc type*(m: Menu, index: Index): MenuEntryType = parseEnum[MenuEntryType] m.call("type",  tclEscape index)
+proc unpost*(m: Menu) = m.call("unpost")
+proc xposition*(m: Menu, index: Index): int = parseInt m.call("xposition",  tclEscape index)
+proc yposition*(m: Menu, index: Index): int = parseInt m.call("yposition",  tclEscape index)
 
 proc setFocus*(m: Menu) = m.tk.call("tk_menuSetFocus", m)
 proc popup*(m: Menu, x, y: int, entry: Index = "") = m.tk.call("tk_popup", m, x, y, tclEscape entry)

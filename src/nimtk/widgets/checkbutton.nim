@@ -29,11 +29,11 @@ proc newCheckButton*(parent: Widget, text: string = "", configuration: openArray
   if configuration.len > 0:
     result.configure(configuration)
 
-proc invoke*(c: CheckButton) = c.tk.call($c, "invoke")
-proc flash*(c: CheckButton) = c.tk.call($c, "flash")
-proc select*(c: CheckButton) = c.tk.call($c, "select")
-proc toggle*(c: CheckButton) = c.tk.call($c, "toggle")
-proc deselect*(c: CheckButton) = c.tk.call($c, "deselect")
+proc invoke*(c: CheckButton) = c.call("invoke")
+proc flash*(c: CheckButton) = c.call("flash")
+proc select*(c: CheckButton) = c.call("select")
+proc toggle*(c: CheckButton) = c.call("toggle")
+proc deselect*(c: CheckButton) = c.call("deselect")
 proc get*(c: CheckButton): bool = c.tk.call("set", c.cget("variable")) == "1"
 proc set*(c: CheckButton, state: bool) = c.tk.call("set", c.cget("variable"), $int(state))
 
