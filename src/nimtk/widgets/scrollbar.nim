@@ -13,7 +13,7 @@ type
 
 proc isScrollbar*(w: Widget): bool = "scrollbar" in w.pathname.split('.')[^1]
 
-proc newScrollbar*(parent: Widget, values: openArray[string] = [], configuration: openArray[(string, string)] = {:}): Scrollbar =
+proc newScrollbar*(parent: Widget, configuration: openArray[(string, string)] = {:}): Scrollbar =
   new result
 
   result.pathname = pathname(parent.pathname, genName("scrollbar_"))
