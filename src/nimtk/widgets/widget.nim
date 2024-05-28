@@ -457,11 +457,10 @@ template infoImpl(w: Widget) {.dirty.} =
 
     result[res[idx][1..^1]] = res[idx + 1]
 
-template slavesImpl(w: Widget) {.dirty.} =
-  let res = w.tk.result
-
-  for pathname in res.split():
-    result.add newWidgetFromPathname(w.tk, pathname)
+template slavesImpl(w: Widget): seq[Widget] =
+  w.tk.result
+    .split()
+    .mapIt(newWidgetFromPathname(w.tk, it))
 
 # --- pack
 
@@ -499,10 +498,10 @@ proc pack*[IPX, IPY: float or int or string or BlankOption; PX, PY: Padding or B
   )
 
 proc packForget*(w: Widget) =
-  w.tk.call("pack forget", $w)
+  w.tk.call("pack forget", w)
 
 proc packSlaves*(w: Widget): seq[Widget] =
-  w.tk.call("pack slaves", $w)
+  w.tk.call("pack slaves", w)
 
   w.slavesImpl()
 
@@ -684,7 +683,7 @@ proc gridSize*(w: Widget): tuple[cols, rows: int] =
   result.cols = nums[0].parseInt()
   result.rows = nums[1].parseInt()
 
-proc gridColumnconfigure*(
+proc gridColumnConfigure*(
   w: Widget,
   index: int or string or openArray[int] or Slice[int],
 
@@ -692,7 +691,7 @@ proc gridColumnconfigure*(
   weight: int or BlankOption = blankOption,
   uniform: bool or BlankOption = blankOption,
   pad: int or BlankOption = blankOption 
-) =
+) {.alias: "columnConfigure".} =
   w.tk.call(
     "grid columnconfigure",
     w,
@@ -713,7 +712,7 @@ proc gridRowconfigure*(
   weight: int or BlankOption = blankOption,
   uniform: bool or BlankOption = blankOption,
   pad: int or BlankOption = blankOption 
-) =
+) {.alias: "rowConfigure".} =
   w.tk.call(
     "grid rowconfigure",
     w,
