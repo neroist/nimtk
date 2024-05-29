@@ -6,12 +6,15 @@ import
   ./widgets/ttk/labelframe,
   ./widgets/ttk/menubutton,
   ./widgets/ttk/separator,
+  ./widgets/ttk/scrollbar,
   ./widgets/ttk/sizegrip,
+  ./widgets/ttk/combobox,
   ./widgets/ttk/spinbox,
   ./widgets/ttk/button,
   ./widgets/ttk/widget,
   ./widgets/ttk/entry,
   ./widgets/ttk/frame,
+  ./widgets/ttk/scale,
   ./widgets/ttk/label
 
 export
@@ -22,10 +25,13 @@ export
   labelframe,
   menubutton,
   separator,
+  scrollbar,
   sizegrip,
+  combobox,
   spinbox,
   button,
   widget,
   entry,
   frame,
+  scale,
   label
