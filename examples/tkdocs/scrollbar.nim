@@ -11,7 +11,7 @@ root.title = "Scrolling"
 
 let
   listbox = root.newListbox()
-  scrollbar = root.newScrollbar() # TODO should be ttk scrollbar
+  scrollbar = root.newTtkScrollbar()
   label = root.newTtkLabel("Status message here")
 
 # widget configuration
