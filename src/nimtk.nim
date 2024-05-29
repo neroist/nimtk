@@ -158,5 +158,4 @@ macro config*(arg: typed; calls: varargs[untyped]) =
     with.with(argvar, `calls`)
 
     # needed to avoid segmentation faults on *arc and orc, see #3
-    GC_ref `arg`
-    GC_unref `arg`
+    discard `arg`
