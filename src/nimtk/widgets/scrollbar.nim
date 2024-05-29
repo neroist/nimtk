@@ -4,6 +4,7 @@ import std/colors
 
 import ../utils/escaping
 import ../utils/genname
+import ../utils/toargs
 import ../utils/alias
 import ../../nimtk
 import ./widget
@@ -13,16 +14,22 @@ type
 
 proc isScrollbar*(w: Widget): bool = "scrollbar" in w.pathname.split('.')[^1]
 
-proc newScrollbar*(parent: Widget, configuration: openArray[(string, string)] = {:}): Scrollbar =
+proc newScrollbar*(parent: Widget, orient: WidgetOrientation = woVertical, configuration: openArray[(string, string)] = {:}): Scrollbar =
   new result
 
   result.pathname = pathname(parent.pathname, genName("scrollbar_"))
   result.tk = parent.tk
 
-  result.tk.call("scrollbar", result.pathname)
+  result.tk.call("scrollbar", result.pathname, {"orient": $orient}.toArgs)
   
   if configuration.len > 0:
     result.configure(configuration)
+
+proc newHorizontalScrollbar*(parent: Widget, configuration: openArray[(string, string)] = {:}): Scrollbar =
+  newScrollbar(parent, woHorizontal, configuration)
+
+proc newVerticalScrollbar*(parent: Widget, configuration: openArray[(string, string)] = {:}): Scrollbar =
+  newScrollbar(parent, woVertical, configuration)
 
 template linkX*(w: Widget, s: Scrollbar) {.alias: "xscrollbar=".} =
   w.yscrollcommand = $s & " set"

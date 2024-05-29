@@ -13,16 +13,22 @@ type
 
 proc isProgressBar*(w: Widget): bool = "progressbar" in w.pathname.split('.')[^1]
 
-proc newProgressBar*(parent: Widget, maximum: int or float = 100, configuration: openArray[(string, string)] = {:}): ProgressBar =
+proc newProgressBar*(parent: Widget, maximum: int or float = 100, orient: WidgetOrientation = woHorizontal, configuration: openArray[(string, string)] = {:}): ProgressBar =
   new result
 
   result.pathname = pathname(parent.pathname, genName("progressbar_"))
   result.tk = parent.tk
 
-  result.tk.call("ttk::progressbar", result.pathname, {"maximum": $maximum}.toArgs())
+  result.tk.call("ttk::progressbar", result.pathname, {"maximum": $maximum, "orient": $orient}.toArgs())
   
   if configuration.len > 0:
     result.configure(configuration)
+
+proc newHorizontalProgressBar*(parent: Widget, maximum: int or float = 100, configuration: openArray[(string, string)] = {:}): ProgressBar =
+  newProgressBar(parent, maximum, woHorizontal, configuration)
+
+proc newVerticalProgressBar*(parent: Widget, maximum: int or float = 100, configuration: openArray[(string, string)] = {:}): ProgressBar =
+  newProgressBar(parent, maximum, woVertical, configuration)
 
 proc identify*(p: ProgressBar, x, y: int): string = p.call("identify", x, y)
 #? Use instate by ./widget.nim?
