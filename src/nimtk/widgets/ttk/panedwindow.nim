@@ -1,4 +1,3 @@
-import std/sequtils
 import std/strutils
 import std/colors
 
@@ -15,7 +14,7 @@ type
 
 proc isTtkPanedWindow*(w: Widget): bool = "ttkpanedwindow" in w.pathname.split('.')[^1]
 
-proc newTtkPanedWindow*(parent: Widget, orient: WidgetOrientation = WidgetOrientation.Horizontal, configuration: openArray[(string, string)] = {:}): TtkPanedWindow =
+proc newTtkPanedWindow*(parent: Widget, orient: WidgetOrientation = woHorizontal, configuration: openArray[(string, string)] = {:}): TtkPanedWindow =
   new result
 
   result.pathname = pathname(parent.pathname, genName("ttkpanedwindow_"))
