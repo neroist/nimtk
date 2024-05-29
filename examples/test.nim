@@ -36,7 +36,7 @@ let
 let checkvar = tk.newTkBool()
 
 # create image from file
-let bitmap = tk.newBitmap(file="./meow.bitmap")
+let bitmap = tk.newBitmap(file="./assets/meow.bitmap")
 
 frame.pack(padx = 25, pady = 25)
 frame.relief = wrSolid

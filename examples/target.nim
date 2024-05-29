@@ -12,7 +12,7 @@ root.title = "Click!"
 root.geometry(width=800, 600)
 
 let
-  photo = tk.newPhoto("./target.png").subsample(6) # 1/6 of the size
+  photo = tk.newPhoto("./assets/target.png").subsample(6) # 1/6 of the size
 
   button = root.newButton()
 
