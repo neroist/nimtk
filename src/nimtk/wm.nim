@@ -93,7 +93,7 @@ proc `topmost=`*(w: Window, topmost: bool) = w.wm_attributes("topmost", $topmost
 when defined(windows):
   proc `disabled=`*(w: Window, disabled: bool) = w.wm_attributes("disabled", $disabled)
   proc `toolwindow=`*(w: Window, toolwindow: bool) = w.wm_attributes("toolwindow", $toolwindow)
-  proc `transparentcolor=`*(w: Window, transparentcolor: string) = w.wm_attributes("transparentcolor", transparentcolor)
+  proc `transparentcolor=`*(w: Window, transparentcolor: string) = w.wm_attributes("transparentcolor", tclEscape transparentcolor)
 
 elif defined(macos):
   proc `modified=`*(w: Window, modified: bool) = w.wm_attributes("modified", $modified)
