@@ -7,14 +7,16 @@ let
   root = tk.getRoot()
 
 root.title = "Color Dialogs"
+root.geometry("300x200")
 
 let
   colorButton = root.newButton("color")
 
-colorButton.pack(padx=50, pady=50)
+colorButton.pack(expand=true)
 
 colorButton.setCommand() do (_: Widget):
   let color = root.chooseColor()
+
   tk.setPalette(color)
 
 tk.mainloop()
