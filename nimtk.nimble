@@ -9,6 +9,7 @@ srcDir        = "src"
 
 # Dependencies
 
+# TODO test older nim versions
 requires "nim >= 2.0.0"
 
 requires "nimtcl >= 0.1.0"
