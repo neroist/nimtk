@@ -1,7 +1,9 @@
+import std/sequtils
 import std/strutils
 
 import ../../utils/escaping
 import ../../utils/commands
+import ../../utils/tcllist
 import ../../../nimtk
 import ../widget
 
@@ -13,9 +15,12 @@ type
 
 #! style
 
-proc `state=`*(w: TtkWidget, state: string) = w.configure({"state": state})
-proc `width=`*(w: TtkWidget, width: string or float or int) = w.configure({"width": $width})
+proc `padding=`*(w: TtkWidget, padding: openArray[int]) = w.configure({"padding": padding.toTclList()})
+proc `padding=`*(w: TtkWidget, padding: int) = w.configure({"padding": padding.toTclList()})
+proc `state=`*(w: TtkWidget, state: string) = w.configure({"state": tclEscape state})
+proc `width=`*(w: TtkWidget, width: string or float or int) = w.configure({"width": tclEscape width})
 
+proc padding*(w: TtkWidget): seq[int] = w.cget("padding").split().map(parseInt)
 proc class*(w: TtkWidget): string = w.cget("class")
 proc width*(w: TtkWidget): string = w.cget("width")
 
