@@ -2,6 +2,7 @@ import std/strutils
 
 import ../utils/escaping
 import ../utils/genname
+import ../utils/toargs
 import ../../nimtk
 import ./widget
 
@@ -16,7 +17,7 @@ proc newMessage*(parent: Widget, text: string = "", configuration: openArray[(st
   result.pathname = pathname(parent.pathname, genName("message_"))
   result.tk = parent.tk
 
-  discard result.tk.call("message", result.pathname)
+  result.tk.call("message", result.pathname, {"text": tclEscape text}.toArgs)
 
   if configuration.len > 0:
     result.configure(configuration)

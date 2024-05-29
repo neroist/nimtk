@@ -30,10 +30,7 @@ proc newMenu*(parent: Widget, title: string = "", configuration: openArray[(stri
   result.pathname = pathname(parent.pathname, genName("menu_"))
   result.tk = parent.tk
 
-  result.tk.call("menu", result.pathname)
-  
-  if title.len > 0:
-    result.configure({"title": tclEscape title})
+  result.tk.call("menu", result.pathname, {"title": tclEscape title}.toArgs)
 
   if configuration.len > 0:
     result.configure(configuration)

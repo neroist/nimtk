@@ -4,6 +4,7 @@ import std/colors
 import ../utils/tclcolor
 import ../utils/escaping
 import ../utils/genname
+import ../utils/toargs
 import ../variables
 import ../../nimtk
 import ../images
@@ -20,9 +21,7 @@ proc newRadioButton*(parent: Widget, text: string = "", configuration: openArray
   result.pathname = pathname(parent.pathname, genName("radiobutton_"))
   result.tk = parent.tk
 
-  result.tk.call("radiobutton", result.pathname)
-
-  result.configure({"text": tclEscape text})
+  result.tk.call("radiobutton", result.pathname, {"text": tclEscape text}.toArgs)
 
   if configuration.len > 0:
     result.configure(configuration)

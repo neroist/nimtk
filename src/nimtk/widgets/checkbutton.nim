@@ -5,6 +5,7 @@ import std/macros
 import ../utils/escaping
 import ../utils/tclcolor
 import ../utils/genname
+import ../utils/toargs
 import ../variables
 import ../../nimtk
 import ../images
@@ -21,10 +22,7 @@ proc newCheckButton*(parent: Widget, text: string = "", configuration: openArray
   result.pathname = pathname(parent.pathname, genName("checkbutton_"))
   result.tk = parent.tk
 
-  result.tk.call("checkbutton", result.pathname)
-    
-  if text.len > 0:
-    result.configure({"text": tclEscape text})
+  result.tk.call("checkbutton", result.pathname, {"text": tclEscape text}.toArgs)
 
   if configuration.len > 0:
     result.configure(configuration)

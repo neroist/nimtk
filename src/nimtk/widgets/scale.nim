@@ -2,6 +2,7 @@ import std/strutils
 
 import ../utils/escaping
 import ../utils/genname
+import ../utils/toargs
 import ../utils/alias
 import ../variables
 import ../../nimtk
@@ -18,9 +19,7 @@ proc newScale*(parent: Widget, fromto: Slice[int or float], configuration: openA
   result.pathname = pathname(parent.pathname, genName("scale_"))
   result.tk = parent.tk
 
-  result.tk.call("scale", result.pathname)
-
-  result.configure({"from": $fromto.a, "to": $fromto.b})
+  result.tk.call("scale", result.pathname, {"from": $fromto.a, "to": $fromto.b}.toArgs)
 
   if configuration.len > 0:
     result.configure(configuration)

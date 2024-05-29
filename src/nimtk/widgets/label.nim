@@ -2,6 +2,7 @@ import std/strutils
 
 import ../utils/escaping
 import ../utils/genname
+import ../utils/toargs
 import ../../nimtk
 import ./widget
 
@@ -16,7 +17,7 @@ proc newLabel*(parent: Widget, text: string = "", configuration: openArray[(stri
   result.pathname = pathname(parent.pathname, genName("label_"))
   result.tk = parent.tk
 
-  result.tk.call("label", result.pathname)
+  result.tk.call("label", result.pathname, {"text": tclEscape text}.toArgs)
 
   if configuration.len > 0:
     result.configure(configuration)
