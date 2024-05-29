@@ -1,4 +1,5 @@
 import
+  ./widgets/ttk/panedwindow,
   ./widgets/ttk/checkbutton,
   ./widgets/ttk/progressbar,
   ./widgets/ttk/radiobutton,
@@ -6,12 +7,15 @@ import
   ./widgets/ttk/menubutton,
   ./widgets/ttk/separator,
   ./widgets/ttk/sizegrip,
+  ./widgets/ttk/spinbox,
   ./widgets/ttk/button,
   ./widgets/ttk/widget,
+  ./widgets/ttk/entry,
   ./widgets/ttk/frame,
   ./widgets/ttk/label
 
 export
+  panedwindow,
   checkbutton,
   progressbar,
   radiobutton,
@@ -19,7 +23,9 @@ export
   menubutton,
   separator,
   sizegrip,
+  spinbox,
   button,
   widget,
+  entry,
   frame,
   label
