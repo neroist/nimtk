@@ -52,10 +52,10 @@ filterPrefixLabel.grid(0, 0, pady=15)
 filterPrefixEntry.grid(1, 0)
 
 # -- namesframe
-namesFrame.grid(0, 1, columnspan=2, rowspan=2, sticky=AnchorPosition.West, padx=(15, 0))
+namesFrame.grid(0, 1, columnspan=2, rowspan=2, sticky="w", padx=(15, 0))
 
-namesListbox.pack(side=Side.Left)
-namesScrollbar.pack(side=Side.Right, fill=FillStyle.Y)
+namesListbox.pack(side="left")
+namesScrollbar.pack(side="right", fill="y")
 # !--
 
 nameLabel.grid(2, 1, padx=0)
@@ -69,13 +69,13 @@ updateButton.grid(1, 3)
 deleteButton.grid(2, 3)
 
 # widget configuration
-namesListbox.relief = WidgetRelief.Flat
+namesListbox.relief = wrFlat
 namesListbox.yscrollbar = namesScrollbar
-namesListbox.selectMode = SelectMode.Single
+namesListbox.selectMode = smSingle
 
 for child in mainframe.children:
   if (not child.isLabel):
-    child.relief = WidgetRelief.Solid
+    child.relief = wrSolid
     child.borderwidth = 1
 
 # functionality
