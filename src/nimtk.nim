@@ -153,7 +153,10 @@ macro config*(arg: typed; calls: varargs[untyped]) =
   ## Same as the `with` macro from `std/with` but with no re-evaluation.
 
   quote do:
-    var argvar = `arg`
+    let argvar = `arg`
 
     with.with(argvar, `calls`)
-  
+
+    # needed to avoid segmentation faults on *arc and orc, see #3
+    GC_ref `arg`
+    GC_unref `arg`
