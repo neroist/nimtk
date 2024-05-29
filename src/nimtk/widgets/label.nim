@@ -10,7 +10,7 @@ type
 
 proc isLabel*(w: Widget): bool = "label" in w.pathname.split('.')[^1]
 
-proc newLabel*(parent: Widget, text: string = ""): Label =
+proc newLabel*(parent: Widget, text: string = "", configuration: openArray[(string, string)] = {:}): Label =
   new result
 
   result.pathname = pathname(parent.pathname, genName("label_"))
@@ -18,8 +18,8 @@ proc newLabel*(parent: Widget, text: string = ""): Label =
 
   result.tk.call("label", result.pathname)
 
-  if text.len > 0:
-    result.configure({"text": tclEscape text})
+  if configuration.len > 0:
+    result.configure(configuration)
 
 proc `height=`*(l: Label, height: string or float or int) = l.configure({"height": $height})
 proc `state=`*(l: Label, state: LabelState) = l.configure({"state": $state})

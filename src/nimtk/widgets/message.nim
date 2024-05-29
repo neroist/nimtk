@@ -10,7 +10,7 @@ type
 
 proc isMessage*(w: Widget): bool = "message" in w.pathname.split('.')[^1]
 
-proc newMessage*(parent: Widget, text: string = ""): Message =
+proc newMessage*(parent: Widget, text: string = "", configuration: openArray[(string, string)] = {:}): Message =
   new result
 
   result.pathname = pathname(parent.pathname, genName("message_"))
@@ -18,8 +18,8 @@ proc newMessage*(parent: Widget, text: string = ""): Message =
 
   discard result.tk.call("message", result.pathname)
 
-  if text.len > 0:
-    result.configure({"text": tclEscape text})
+  if configuration.len > 0:
+    result.configure(configuration)
 
 proc `aspect=`*(m: Message, aspect: int) = m.configure({"aspect": $aspect})
 
