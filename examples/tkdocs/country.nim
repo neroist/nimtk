@@ -99,7 +99,7 @@ proc showPopulation(_: Event = Event()) =
   populationLabel.text = "The population of $1 ($2) is $3" % [countryName, countryCode, $population]
   
   # clear the message about the gift being sent, so it doesn't stick around after we
-  # start doing ther things.
+  # start doing other things.
   sentLabel.text = ""
 
 proc sendGift(_: Event = Event()) =
@@ -156,7 +156,7 @@ for itemIndex in countup(0, countryNames.len, 2):
 countriesListbox.selection = 0
 
 # because the <<ListboxSelect>> event is only
-# fired when users makes a change, we explicitly call showPopulation
+# fired when the user makes a change, we explicitly call showPopulation
 showPopulation()
 
 # bind procs
