@@ -17,6 +17,11 @@ colorButton.pack(expand=true)
 colorButton.setCommand() do (_: Widget):
   let color = root.chooseColor()
 
-  tk.setPalette(color)
+  # not the best but an empty string may be returned here by tk
+  # as such we need to handle it
+  if color.len == 0:
+    return
+
+  tk.setPalette(parseColor color)
 
 tk.mainloop()

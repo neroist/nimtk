@@ -835,13 +835,11 @@ proc chooseDirectory*(
 
 # --- tk_chooseColor
 
-# TODO when tk returns an empty string?
-
 proc chooseColor*(
   w: Widget = nil,
   title: string = "",
   initialColor: Color or BlankOption = blankOption,
-): Color {.raises: [ValueError, TkError].} =
+): string =
   w.tk.call(
     "tk_chooseColor",
     {
@@ -849,7 +847,7 @@ proc chooseColor*(
       "initialcolor": $initialColor,
       "title": tclEscape title,
     }.toArgs()
-  ).parseColor()
+  )
 
 # --- tk_focus*
 
