@@ -6,6 +6,7 @@ import ../utils/tclcolor
 import ../utils/escaping
 import ../utils/genname
 import ../utils/tcllist
+import ../utils/toargs
 import ../utils/alias
 import ../../nimtk
 import ./widget
@@ -23,12 +24,13 @@ proc newSpinbox*(parent: Widget, values: openArray[string] = [], configuration: 
   result.pathname = pathname(parent.pathname, genName("spinbox_"))
   result.tk = parent.tk
 
-  result.tk.call("spinbox", result.pathname)
-
-  result.configure({"textvariable": genName("DEFAULTVAR_string_")})
-
-  if values.len > 0:
-    result.configure({"values": values.map(tclEscape).toTclList()})
+  result.tk.call(
+    "spinbox", result.pathname, 
+    {
+      "values": values.map(tclEscape).toTclList(),
+      "textvariable": genName("DEFAULTVAR_string_")
+    }.toArgs
+  )
   
   if configuration.len > 0:
     result.configure(configuration)
@@ -39,12 +41,12 @@ proc bbox*(s: Spinbox, index: Index): tuple[offsetX, offsetY, width, height: int
   if s.tk.result.len == 0:
     return
   
-  let nums = s.tk.result.split()
+  let nums = s.tk.result.split().map(parseInt)
 
-  result.offsetX = nums[0].parseInt()
-  result.offsetY = nums[1].parseInt()
-  result.width = nums[2].parseInt()
-  result.height = nums[3].parseInt()
+  result.offsetX = nums[0]
+  result.offsetY = nums[1]
+  result.width = nums[2]
+  result.height = nums[3]
 proc delete*[I1, I2: Index](s: Spinbox, first: I1; last: I2 = "") = s.call("delete", first, last)
 proc get*(s: Spinbox): string {.alias: "text".} = s.call("get")
 proc icursor*(s: Spinbox, index: Index) = s.call("icursor", index)
