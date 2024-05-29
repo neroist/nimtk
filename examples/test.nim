@@ -39,16 +39,16 @@ let checkvar = tk.newTkBool()
 let bitmap = tk.newBitmap(file="./meow.bitmap")
 
 frame.pack(padx = 25, pady = 25)
-frame.relief = Solid
+frame.relief = wrSolid
 frame.borderwidth = 2
 
 button.grid(padx = 25, pady = 25) # add button to grid
 
 config button:
   image = bitmap # add image to button
-  compound = WidgetCompound.Left # set image to show left of text
+  compound = wcLeft # set image to show left of text
   background = colSpringGreen # set background color
-  cursor = Heart # set cursor
+  cursor = curHeart # set cursor
   
   setCommand() do (w: Widget):
     let btn = cast[Button](w)
@@ -62,9 +62,9 @@ config checkbutton:
   variable = checkvar
   background = colSkyBlue # set button2 color
   foreground = colRebeccaPurple
-  overrelief = WidgetRelief.Raised
-  relief = WidgetRelief.Sunken
-  cursor = Gobbler # set button2 cursor
+  overrelief = wrRaised
+  relief = wrSunken
+  cursor = curGobbler # set button2 cursor
   padx = "3c" # set button2 horizontal padding
   
   setCommand() do (w: Widget):
@@ -72,15 +72,15 @@ config checkbutton:
 
 msg.grid(padx = 25, pady = 25)
 msg.text = "This is a message! o sitelen a!"
-msg.cursor = Gumby
+msg.cursor = curGumby
 
 scale.grid(padx = 25, pady = 25)
 
 config scale:
   label = "nanpa!"
   resolution = 0.01
-  orient = Horizontal
-  cursor = Exchange
+  orient = woHorizontal
+  cursor = curExchange
 
 root.selectionHandle("SECONDARY", command=handle)
 root.selectionOwn("SECONDARY") do (): echo "lost!"

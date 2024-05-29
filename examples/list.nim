@@ -8,7 +8,7 @@ let
   root = tk.getRoot()
 
 root.title = "Listbox Example"
-root.geometry(width=800, 600)
+root.geometry(width=800, 300)
 
 let
   mainframe = root.newFrame()

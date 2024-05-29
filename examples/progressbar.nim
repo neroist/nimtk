@@ -20,7 +20,7 @@ let
   resetButton = mainframe.newTtkButton("Reset")
 
 config progressbar:
-  orient = WidgetOrientation.Horizontal
+  orient = woHorizontal
   length = 300
   variable = val
 
@@ -39,8 +39,8 @@ mainframe.gridRowConfigure(0..2, weight=1)
 mainframe.gridColumnConfigure(0..1, weight=1)
 
 # trace var to update label
-val.trace([toWrite, toRead]) do:
-  # val.get doesnt work..,, idk why
+val.trace([toWrite, toRead]) do ():
+  # val.get doesnt work... idk why
   valueLabel.text = "The progress bar's current value is $1/$2" % [$ int progressbar.value, $ int progressbar.maximum]
 
 # button callbacks

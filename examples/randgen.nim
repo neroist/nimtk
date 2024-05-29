@@ -28,7 +28,7 @@ let
   
   genButton = frame.newButton("Generate!")
 
-frame.pack(fill=FillStyle.Both, expand=true, padx=20, pady=20)
+frame.pack(fill="both", expand=true, padx=20, pady=20)
 
 # intended ui:
 # 

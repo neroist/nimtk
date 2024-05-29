@@ -175,7 +175,7 @@ generateButton.setCommand() do (_: Widget):
     )
 
   except ValueError as err:
-    discard root.messageBox(title="Error", message=err.msg, icon=IconImage.Error)
+    discard root.messageBox(title="Error", message=err.msg, icon=iiError)
 
   finally:
     if len >= 5000:
