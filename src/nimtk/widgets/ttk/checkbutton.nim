@@ -36,10 +36,10 @@ proc setCommand*(c: TtkCheckButton, command: TkWidgetCommand) =
 
   c.configure({"command": name})
 proc `command=`*(c: TtkCheckButton, command: TkWidgetCommand) = c.setCommand(command)
-proc `variable=`*(c: TtkCheckButton, variable: TkBool) = c.configure({"variable": variable.varname})
-proc `offvalue=`*(c: TtkCheckButton, offvalue: string) = c.configure({"offvalue": tclEscape offvalue})
-proc `onvalue=`*(c: TtkCheckButton, onvalue: string) = c.configure({"onvalue": tclEscape onvalue})
+proc `variable=`*(c: TtkCheckButton, variable: TkVar) = c.configure({"variable": variable.varname})
+proc `offvalue=`*[T](c: TtkCheckButton, offvalue: T) = c.configure({"offvalue": tclEscape offvalue})
+proc `onvalue=`*[T](c: TtkCheckButton, onvalue: T) = c.configure({"onvalue": tclEscape onvalue})
 
-proc variable*(c: TtkCheckButton): TkBool = createTkVar c.tk, c.cget("variable")
+proc variable*(c: TtkCheckButton): TkVar = createTkVar c.tk, c.cget("variable")
 proc offvalue*(c: TtkCheckButton): string = c.cget("offvalue")
 proc onvalue*(c: TtkCheckButton): string = c.cget("onvalue")
