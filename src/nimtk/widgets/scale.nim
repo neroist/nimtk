@@ -49,7 +49,7 @@ proc get*(s: Scale): float =
 proc identify*(s: Scale, x, y: int): string =
   s.call("idenify", x, y)
 
-proc set*(s: Scale, value: int or float) {.alias: "value=".} =
+proc set*(s: Scale, value: int or float) =
   s.call("set", value)
 
 proc setCommand*(s: Scale, command: TkScaleCommand) =
