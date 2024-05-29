@@ -3,13 +3,16 @@
 Tkinter examples translated to nimtk from [TkDocs](https://tkdocs.com/).
 
 ### `feettometers.nim`
-
 From <https://tkdocs.com/tutorial/firstexample.html>
 
-### `country.nim`
+### `grid.nim`
+From <https://tkdocs.com/tutorial/grid.html#padding>
 
-From <https://tkdocs.com/tutorial/morewidgets.html>
+### `country.nim`
+From <https://tkdocs.com/tutorial/morewidgets.html#listbox>
+
+### `scrollbar.nim`
+From <https://tkdocs.com/tutorial/morewidgets.html#scrollbar>
 
 ### `ctxmenu.nim`
-
-From <https://tkdocs.com/tutorial/menus.html>
+From <https://tkdocs.com/tutorial/menus.html#popupmenus>
