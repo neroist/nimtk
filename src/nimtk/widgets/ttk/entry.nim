@@ -5,9 +5,9 @@ import ../../utils/escaping
 import ../../utils/tclcolor
 import ../../utils/genname
 import ../../utils/alias
-import ../../variables
 import ../../../nimtk
 import ../widget
+import ./widget
 
 type
   TtkEntry* = ref object of TtkWidget
