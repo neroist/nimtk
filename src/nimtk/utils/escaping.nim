@@ -1,4 +1,4 @@
-from std/strutils import replace
+from std/strutils import replace, escape
 
 type
   BlankOption* = distinct string
@@ -25,15 +25,15 @@ proc tclEscape*(str: string): string =
   ##
   ## :str: The string to escape
 
-  # lets have repr do some of the work for us
-  result = repr str
+  # lets have `escape` do some of the work for us
+  result = str.escape()
 
-  # escape the characters in `escChars` ("[" -> "\[")
+  # escape the characters in `escChars` (e.g. "[" -> "\[")
   for escChar in escChars:
     result = result.replace($escChar, '\\' & escChar)
 
 proc tclEscape*(_: BlankOption): string = ""
-  ## "Escape" a `BlankOption`. Always returns an empty string.
+  ## Escape a `BlankOption`. Always returns an empty string.
 
 proc tclEscape*[T](val: T and not BlankOption and not string): string = tclEscape $val
   ## Escape values without needing to stringify them beforehand
