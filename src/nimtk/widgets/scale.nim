@@ -3,7 +3,6 @@ import std/strutils
 import ../utils/escaping
 import ../utils/genname
 import ../utils/toargs
-import ../utils/alias
 import ../variables
 import ../../nimtk
 import ./widget
