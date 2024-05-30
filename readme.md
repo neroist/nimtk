@@ -25,7 +25,7 @@ interpreter, and `Root` is the root window. Below is common code in all of the
 examples:
 
 ```nim
-import ../src/nimtk/all
+import nimtk/all
 
 let
   tk = newTk()
