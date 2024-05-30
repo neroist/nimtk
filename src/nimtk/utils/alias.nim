@@ -30,16 +30,8 @@ proc addAliasComment(fun: NimNode, originalProc: NimNode): NimNode =
   result.add newCommentStmtNode("This is an alias of `$1`_." % procName)
   result.add fun
 
-macro alias*(name: string, fun: untyped) =
-  ## macro to create aliases for routines, so we can do fun stuff!
-  ## 
-  ## currently just makes an exact copy of the routine but with the aliased name
-  
-  result = newStmtList()
-
-  result.add fun
-
-  result.add newTree(
+proc aliasImpl(name: NimNode, fun: NimNode): NimNode =
+  result = newTree(
     fun.kind,      # we are defining a proc
 
     nnkPostfix.newTree(ident"*", ident(name.strVal)),  # proc name
@@ -51,23 +43,28 @@ macro alias*(name: string, fun: untyped) =
     fun[^1].stripComments().addAliasComment(fun)       # MEAT
   )
 
+macro alias*(name: string, fun: untyped) =
+  ## macro to create aliases for routines, so we can do fun stuff!
+  ## 
+  ## currently just makes an exact copy of the routine but with the aliased name
+
+  result = newStmtList()
+
+  let fun =
+    if fun.kind == nnkStmtList:
+      fun[0]
+    else:
+      fun
+
+  result.add fun
+  result.add aliasImpl(name, fun)
+
 #! syntax highlighting messes up when i use this dsnjfk ughh
 macro alias*[LEN](names: array[LEN, string], fun: untyped) =
   ## Same as above but with multiple aliases
 
   result = newStmtList()
-
   result.add fun
 
   for name in names:
-    result.add newTree(
-      fun.kind,
-
-      nnkPostfix.newTree(ident"*", ident(name.strVal)),
-      newEmptyNode(),
-      fun[2],
-      fun[3],
-      fun[4],
-      newEmptyNode(),
-      fun[^1].stripComments().addAliasComment(fun) 
-    )
+    result.add aliasImpl(name, fun)
