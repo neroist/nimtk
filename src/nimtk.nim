@@ -46,6 +46,7 @@ proc eval*(tk: Tk, cmd: string): int {.discardable.} =
   ## `nimtk.ignoreTclErrors` holds higher presedence than the aforementioned flag,
   ## and will result in all Tcl errors being ignored. No exceptions will be raised.
   ##
+  ## :tk: The Tk instance to use to evaluate the command
   ## :cmd: Command to be evaluated
 
   result = tk.interp.eval(cstring cmd)
@@ -87,6 +88,10 @@ proc mainloop*(tk: Tk) =
   tkMainloop()
 
 proc createCommand*(tk: Tk, name: string, clientData: pointer, fun: CmdProc) =
+  ## Creates a command in the Tcl interpreter
+  ##
+  ## Shortcut for `discard tk.interp.createCommand(...)`
+  
   discard tk.interp.createCommand(
     name,
     fun,
