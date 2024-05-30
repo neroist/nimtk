@@ -49,7 +49,7 @@ proc add*(n: Notebook, window: Widget, options: openArray[(string, string)] = {:
 proc forget*(n: Notebook, tabid: TabId) = n.call("forget", tclEscape tabid)
 proc hide*(n: Notebook, tabid: TabId) = n.call("hide", tclEscape tabid)
 proc index*(n: Notebook, tabid: TabId): int = parseInt n.call("index", tclEscape tabid)
-proc len*(n: Notebook): int = parseInt n.call("index", "emd")
+proc len*(n: Notebook): int = parseInt n.call("index", "end")
 proc insert*(n: Notebook, pos: string or int or Widget, subwindow: Widget, options: openArray[(string, string)] = {:}): Tab =
   n.call("insert", pos, subwindow, toArgs options)
 
