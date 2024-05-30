@@ -3,14 +3,13 @@ import std/strutils
 import ../../utils/escaping
 import ../../utils/genname
 import ../../utils/toargs
-import ../../utils/alias
 import ../../variables
 import ../../../nimtk
 import ../widget
 import ./widget
 
 type
-  TtkScale* = ref object of Widget
+  TtkScale* = ref object of TtkWidget
 
 proc isTtkScale*(w: Widget): bool = "ttkscale" in w.pathname.split('.')[^1]
 

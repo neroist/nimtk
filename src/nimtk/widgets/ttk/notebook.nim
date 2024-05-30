@@ -1,20 +1,17 @@
 import std/sequtils
 import std/strutils
-import std/colors
 
 import ../../utils/escaping
-import ../../utils/tclcolor
 import ../../utils/genname
 import ../../utils/tcllist
 import ../../utils/toargs
-import ../../variables
 import ../../../nimtk
 import ../../images
 import ../widget
 import ./widget
 
 type
-  Notebook* = ref object of Widget
+  Notebook* = ref object of TtkWidget
   Tab* = object
     notebook: Notebook
     index: int
@@ -41,8 +38,13 @@ proc `[]`*(n: Notebook, tabid: int): Tab =
 proc `[]`*(n: Notebook, tabid: string or Widget): Tab =
   Tab(notebook: n, index: n.index(tabid))
 
-proc add*(n: Notebook, window: Widget, options: openArray[(string, string)] = {:}): Tab =
+proc add*(n: Notebook, window: Widget, options: openArray[(string, string)] = {:}): Tab {.discardable.} =
   n.call("add", window, toArgs options)
+
+  result.notebook = n
+  result.index = n.index("end") - 1
+proc add*(n: Notebook, window: Widget, text: string, options: openArray[(string, string)] = {:}): Tab {.discardable.} =
+  n.call("add", window, {"text": tclEscape text}.toArgs, toArgs options)
 
   result.notebook = n
   result.index = n.index("end") - 1
@@ -50,8 +52,13 @@ proc forget*(n: Notebook, tabid: TabId) = n.call("forget", tclEscape tabid)
 proc hide*(n: Notebook, tabid: TabId) = n.call("hide", tclEscape tabid)
 proc index*(n: Notebook, tabid: TabId): int = parseInt n.call("index", tclEscape tabid)
 proc len*(n: Notebook): int = parseInt n.call("index", "end")
-proc insert*(n: Notebook, pos: string or int or Widget, subwindow: Widget, options: openArray[(string, string)] = {:}): Tab =
+proc insert*(n: Notebook, pos: string or int or Widget, subwindow: Widget, options: openArray[(string, string)] = {:}): Tab {.discardable.} =
   n.call("insert", pos, subwindow, toArgs options)
+
+  result.notebook = n
+  result.index = n.index(subwindow)
+proc insert*(n: Notebook, pos: string or int or Widget, subwindow: Widget, text: string, options: openArray[(string, string)] = {:}): Tab {.discardable.} =
+  n.call("insert", pos, subwindow, {"text": tclEscape text}.toArgs, toArgs options)
 
   result.notebook = n
   result.index = n.index(subwindow)
@@ -75,9 +82,8 @@ proc `underline=`*(t: Tab, underline: int) = t.notebook.tab(t.index, {"underline
 proc state*(t: Tab): TabState = parseEnum[TabState] t.notebook.tab(t.index, "state")
 proc sticky*(t: Tab): AnchorPosition = parseEnum[AnchorPosition] t.notebook.tab(t.index, "sticky")
 proc padding*(t: Tab): seq[int] = t.notebook.tab(t.index, "padding").split().map(parseInt)
-proc padding*(t: Tab): int = parseInt t.notebook.tab(t.index, "padding")
 proc text*(t: Tab): string = t.notebook.tab(t.index, "text")
-proc image*(t: Tab): Image = createImage t.notebook.tk t.notebook.tab(t.index, "image")
+proc image*(t: Tab): Image = createImage t.notebook.tk, t.notebook.tab(t.index, "image")
 proc compound*(t: Tab): WidgetCompound = parseEnum[WidgetCompound] t.notebook.tab(t.index, "compound")
 proc underline*(t: Tab): int = parseInt t.notebook.tab(t.index, "underline")
 
