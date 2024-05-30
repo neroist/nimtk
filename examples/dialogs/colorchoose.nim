@@ -6,7 +6,7 @@ let
   tk = newTk()
   root = tk.getRoot()
 
-root.title = "Color Dialogs"
+root.title = "Color Dialog"
 root.geometry("300x200")
 
 let
