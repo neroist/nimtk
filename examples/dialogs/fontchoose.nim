@@ -15,13 +15,13 @@ proc applyFont(root: Root, font: Font) =
     childWidget.font = font
 
 let
-  button = root.newButton("Choose")
-  button2 = root.newButton("Randomize")
+  choosebutton = root.newButton("Choose")
+  randomizebutton = root.newButton("Randomize")
 
-button.pack(padx=50, pady=50)
-button2.pack(padx=50, pady=50)
+choosebutton.pack(padx=50, pady=50)
+randomizebutton.pack(padx=50, pady=50)
 
-button.setCommand() do (_: Widget):
+choosebutton.setCommand() do (_: Widget):
   tk.fontchooser(
     command = (
       proc (font: Font) = root.applyFont(font)    
@@ -30,7 +30,7 @@ button.setCommand() do (_: Widget):
 
   tk.fontchooserShow()
 
-button2.setCommand() do (_: Widget):
+randomizebutton.setCommand() do (_: Widget):
   let font = tk.newFont(family = root.families.sample(), 12)
 
   root.applyFont(font)
