@@ -14,10 +14,6 @@ let
 root.title = "NimTk Dialogs"
 root.geometry("300x200")
 
-proc applyFont(root: Root, font: Font) =
-  for childWidget in root.children:
-    childWidget.font = font
-
 let
   notebook = root.newNotebook()
 
@@ -126,9 +122,12 @@ dirButton.setCommand() do (_: Widget):
     message = "Directory: " & dir.parentDir().splitPath().tail
   )
 
-
 # --- add fontFrame
 notebook.add fontFrame, "Choose-a-font"
+
+proc applyFont(root: Root, font: Font) =
+  for childWidget in root.children:
+    childWidget.font = font
 
 choosebutton.pack(expand=true)
 randomizebutton.pack(expand=true)
