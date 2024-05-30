@@ -17,7 +17,7 @@ proc fromTclColor*[W](w: W, tclColor: string): Color =
 
   # if the color is already a normal HTML code color...
   if tclColor[0] == '#' and tclColor.len == 7:
-    return parseColor tclColor
+    return parseColor(tclColor)
 
   # else, use winfo to get the exact 16-bit rgb values
   let rgb = w.tk.call("winfo rgb", w, tclEscape tclColor)
