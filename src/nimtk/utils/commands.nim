@@ -1,11 +1,17 @@
+import std/strutils
 import std/macros
 
 import ./toargs
 
 template configure*(w: typed, args: openArray[(string, string)]) =
-  ## Query or modify the configuration options of the widget `w`. 
+  ## Modify the configuration options of the widget `w`. 
 
   w.tk.call($w, "configure", args.toArgs())
+
+template configure*(w: typed): seq[string] =
+  ## Query the configuration options of the widget `w`. 
+
+  w.tk.call($w, "configure").split()
 
 template cget*(w: typed, option: string): string =
   ## Returns the current value of the configuration option given by `option`
