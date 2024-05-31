@@ -929,7 +929,7 @@ template getFileImpl[T](cmd: string): T =
     cmd,
     {
       "confirmoverwrite": $confirmoverwrite,
-      "defaultextension": $defaultextension,
+      "defaultextension": tclEscape defaultextension,
       "filetypes": filetypesList.toTclList(),
       "initialdir": tclEscape initialdir,
       "initialfile": tclEscape initialfile,
