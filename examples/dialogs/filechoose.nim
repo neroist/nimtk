@@ -31,22 +31,18 @@ openButton.setCommand() do (_: Widget):
     multiple = true
   )
 
-  # when using `initialfile` the initial file will
-  # always be the first element (unless the dialog
-  # was closed)
-  if files.len < 2:
+  if files.len < 1:
     return
 
   discard root.messageBox(
     title = "You opened a file!",
-    message = "You opened " & files[1].splitPath().tail,
-    detail = "Directory: " & files[1].parentDir().splitPath().tail
+    message = "You opened " & files[0].splitPath().tail,
+    detail = "Directory: " & files[0].parentDir().splitPath().tail
   )
 
 saveButton.setCommand() do (_: Widget):
   let file = root.getSaveFile(
     title = "Open a file",
-    defaultextension = "1",
     filetypes = @[
       ("C/C++ Source Files", @[".c", ".cc", ".h", ".hh", ".cpp", ".hpp"]),
       ("Any File", @["*"])

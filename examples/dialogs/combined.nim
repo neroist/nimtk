@@ -1,3 +1,4 @@
+import std/strformat
 import std/random
 import std/colors
 import std/os
@@ -12,7 +13,7 @@ let
   root = tk.getRoot()
 
 root.title = "NimTk Dialogs"
-root.geometry("300x200")
+root.geometry("450x300")
 
 let
   notebook = root.newNotebook()
@@ -73,22 +74,18 @@ openButton.setCommand() do (_: Widget):
     multiple = true
   )
 
-  # when using `initialfile` the initial file will
-  # always be the first element (unless the dialog
-  # was closed)
-  if files.len < 2:
+  if files.len < 1:
     return
 
   discard root.messageBox(
     title = "You opened a file!",
-    message = "You opened " & files[1].splitPath().tail,
-    detail = "Directory: " & files[1].parentDir().splitPath().tail
+    message = "You opened " & files[0].splitPath().tail,
+    detail = "Directory: " & files[0].parentDir().splitPath().tail
   )
 
 saveButton.setCommand() do (_: Widget):
   let file = root.getSaveFile(
     title = "Open a file",
-    defaultextension = "1",
     filetypes = @[
       ("C/C++ Source Files", @[".c", ".cc", ".h", ".hh", ".cpp", ".hpp"]),
       ("Any File", @["*"])
@@ -125,9 +122,13 @@ dirButton.setCommand() do (_: Widget):
 # --- add fontFrame
 notebook.add fontFrame, "Choose-a-font"
 
+# since ttk widgets dont support the `font` option,
+# we need to do something different
 proc applyFont(root: Root, font: Font) =
-  for childWidget in root.children:
-    childWidget.font = font
+  discard root.messageBox(
+    title = "You chose a font!",
+    message = &"You chose the font \"{font.family}\"!"
+  )
 
 choosebutton.pack(expand=true)
 randomizebutton.pack(expand=true)
