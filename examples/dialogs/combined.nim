@@ -135,9 +135,7 @@ randomizebutton.pack(expand=true)
 
 choosebutton.setCommand() do (_: Widget):
   tk.fontchooser(
-    command = (
-      proc (font: Font) = root.applyFont(font)    
-    )
+    command = (proc (font: Font) = root.applyFont(font))
   )
 
   tk.fontchooserShow()

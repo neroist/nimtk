@@ -17,14 +17,14 @@ let
   scrollbar = mainframe.newScrollbar()
 
 mainframe.grid(0, 0)
-root.gridColumnconfigure(0, weight=1)
-root.gridRowconfigure(0, weight=1)
+root.columnconfigure(0, weight=1)
+root.rowconfigure(0, weight=1)
 
 listbox.grid(0, 0, sticky = "nesw")
 scrollbar.grid(1, 0, sticky = "ns")
-mainframe.gridColumnconfigure(0, weight=1)
-mainframe.gridRowconfigure(0, weight=1)
-mainframe.gridRowconfigure(1, weight=1)
+mainframe.columnconfigure(0, weight=1)
+mainframe.rowconfigure(0, weight=1)
+mainframe.rowconfigure(1, weight=1)
 
 # listbox.selectionSet(0..2)
 listbox.selection = 0..2
