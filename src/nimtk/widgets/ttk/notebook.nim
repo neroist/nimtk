@@ -33,10 +33,15 @@ proc newNotebook*(parent: Widget, configuration: openArray[(string, string)] = {
   if configuration.len > 0:
     result.configure(configuration)
 
-proc `[]`*(n: Notebook, tabid: int): Tab =
-  Tab(notebook: n, index: tabid)
-proc `[]`*(n: Notebook, tabid: string or Widget): Tab =
-  Tab(notebook: n, index: n.index(tabid))
+proc `[]`*(n: Notebook, tabid: TabId): Tab =
+  Tab(
+    notebook: n,
+    index:
+      when tabid is int:
+        tabid
+      else:
+        n.index(tabid)
+  )
 
 proc add*(n: Notebook, window: Widget, options: openArray[(string, string)] = {:}): Tab {.discardable.} =
   n.call("add", window, toArgs options)
