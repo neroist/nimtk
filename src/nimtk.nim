@@ -157,10 +157,17 @@ macro config*(arg: typed; calls: varargs[untyped]) =
   ##
   ## Same as the `with` macro from `std/with` but with no re-evaluation.
 
-  quote do:
-    let argvar = `arg`
+  result = newStmtList()
 
-    with.with(argvar, `calls`)
+  result.add:
+    if arg.kind != nnkIdent:
+      quote do:
+        # let argvar = `arg`
+        with.with(`arg`, `calls`)
+    else:
+      quote do:
+        let argvar = `arg`
+        with.with(argvar, `calls`)
 
-    # needed to avoid segmentation faults on *arc and orc, see #3
-    discard `arg`
+        # needed to avoid segmentation faults on *arc and orc, see #3
+        discard argvar
