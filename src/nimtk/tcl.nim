@@ -22,24 +22,20 @@ type
 
 # --- after
 
-# procs will return an int
-
 proc after*(tk: Tk, ms: int) {.alias: "sleep".} =
   tk.call("after", ms)
 
-proc after*(tk: Tk, ms: int, fn: TkGenericCommand): int {.discardable.} =
+proc after*(tk: Tk, ms: int, fn: TkGenericCommand) =
   let name = genName("after_command_")
   
   tk.registerCmd(name, fn)
+  tk.call("after", ms, name)
 
-  parseInt tk.call("after", ms, name)
-
-proc afterIdle*(tk: Tk, fn: TkGenericCommand): int {.discardable.} =
+proc afterIdle*(tk: Tk, fn: TkGenericCommand) =
   let name = genName("after_command_")
   
   tk.registerCmd(name, fn)
-
-  parseInt tk.call("after idle", name)
+  tk.call("after idle", name)
 
 proc afterCancel*(tk: Tk, id: int) =
   tk.call("after cancel", id)

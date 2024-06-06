@@ -25,7 +25,7 @@ proc newMenuButton*(parent: Widget, text: string = "", configuration: openArray[
   if configuration.len > 0:
     result.configure(configuration)
 
-proc newOptionMenu*(parent: Widget, variable: TkVar, values: varargs[string, `$`], configuration: openArray[(string, string)] = {:}): MenuButton =
+proc newOptionMenu*(parent: Widget, variable: TkVar, values: varargs[string], configuration: openArray[(string, string)] = {:}): MenuButton =
   new result
 
   result.pathname = pathname(parent.pathname, genName("menubutton_"))
