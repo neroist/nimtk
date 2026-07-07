@@ -28,4 +28,4 @@ proc `width=`*(f: TtkFrame, width: int) = f.configure({"width": $width})
 proc `height=`*(f: TtkFrame, height: int) = f.configure({"height": $height})
 
 proc width*(f: TtkFrame): int = parseInt f.cget("width")
-proc height*(f: TtkFrame): int = parseInt f.cget("width")
+proc height*(f: TtkFrame): int = parseInt f.cget("height")
