@@ -41,3 +41,21 @@ though!**
 ## Wrapped functionality from Tk
 
 See https://github.com/neroist/nimtk/issues/1
+
+## Identifying Tk errors
+
+Compile Nim with the `-d:nimtk.exitOnError:false` argument, which enables the display Tcl/Tk errors.
+
+For example, configuring a Frame with an undefined option of `ipadx` and value of `123` will display a `[TkError]` about the unknown `-ipadx` option, like the following:
+
+```
+nim c -r -d:release -d:nimtk.exitOnError:false mycode.nim
+
+...
+
+Error: unhandled exception: Error when evaluating Tcl!
+
+Command: .frame_6a50171ac3851be45cbfd0a2 configure -ipadx 123
+Result: unknown option "-ipadx" [TkError]
+Error: execution of an external program failed: 'mycode'
+```
